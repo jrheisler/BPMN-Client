@@ -672,7 +672,13 @@ function rebuildMenu() {
         const simulation = modeler
           .get('injector')
           .get('tokenSimulation', false);
-        if (simulation) simulation.toggle();
+        if (simulation) {
+          if (typeof simulation.toggleMode === 'function') {
+            simulation.toggleMode();
+          } else {
+            simulation.toggle();
+          }
+        }
       },
       { outline: true, title: "Toggle Token Simulation" }
     )
