@@ -66,8 +66,15 @@ Object.assign(document.body.style, {
   const { BpmnJS }       = window;
   const layoutProcess    = window.bpmnAutoLayout?.layoutProcess;
   const NavigatorModule  = window.NavigatorModule;
-  // try both possible globals exposed by the UMD bundle
-  const tokenSimulationModule = window.BpmnJSTokenSimulation || window['bpmn-js-token-simulation'];
+
+  // try the known globals exposed by the UMD bundle
+  const tokenSimulationModule =
+    window.BpmnJSTokenSimulation ||
+    window.BpmnJsTokenSimulation ||
+    window.TokenSimulationModule ||
+    window.TokenSimulation ||
+    window['bpmn-js-token-simulation'] ||
+    window.tokenSimulationModule;
 
   // ─── build canvas + xml-editor elements ────────────────────────────────────
   // REPLACE with this:
@@ -658,20 +665,18 @@ function rebuildMenu() {
       }, { outline: true, title: "Download as PNG" })
   ];
 
-  if (tokenSimulationModule) {
-    controls.push(
-      reactiveButton(
-        new Stream("▶"),
-        () => {
-          const simulation = modeler
-            .get('injector')
-            .get('tokenSimulation', false);
-          if (simulation) simulation.toggle();
-        },
-        { outline: true, title: "Toggle Token Simulation" }
-      )
-    );
-  }
+  controls.push(
+    reactiveButton(
+      new Stream("▶"),
+      () => {
+        const simulation = modeler
+          .get('injector')
+          .get('tokenSimulation', false);
+        if (simulation) simulation.toggle();
+      },
+      { outline: true, title: "Toggle Token Simulation" }
+    )
+  );
 
   controls.push(saveBtn);
   controls.push(themedThemeSelector());
