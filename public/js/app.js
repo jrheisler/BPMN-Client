@@ -66,6 +66,7 @@ Object.assign(document.body.style, {
   const { BpmnJS }       = window;
   const layoutProcess    = window.bpmnAutoLayout?.layoutProcess;
   const NavigatorModule  = window.NavigatorModule;
+
   // try the known globals exposed by the UMD bundle
   const tokenSimulationModule =
     window.BpmnJSTokenSimulation ||
