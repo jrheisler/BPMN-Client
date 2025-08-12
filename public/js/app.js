@@ -66,6 +66,7 @@ Object.assign(document.body.style, {
   const { BpmnJS }       = window;
   const layoutProcess    = window.bpmnAutoLayout?.layoutProcess;
   const NavigatorModule  = window.NavigatorModule;
+  const tokenSimulationModule = window['bpmn-js-token-simulation'];
 
   // ─── build canvas + xml-editor elements ────────────────────────────────────
   // REPLACE with this:
@@ -90,10 +91,14 @@ Object.assign(document.body.style, {
   // ─── instantiate modeler with navigator only ───────────────────────────────
   const navModule = window.navigatorModule || window.bpmnNavigator;
 
+  const additionalModules = [];
+  if (navModule) additionalModules.push(navModule);
+  if (tokenSimulationModule) additionalModules.push(tokenSimulationModule);
+
   const modeler = new BpmnJS({
     container:       canvasEl,
     selection:       { mode: 'multiple' },
-    additionalModules: navModule ? [ navModule ] : []
+    additionalModules
     });
   const eventBus     = modeler.get('eventBus');
   const commandStack = modeler.get('commandStack');
@@ -646,10 +651,19 @@ function rebuildMenu() {
           a.click();
         });
       };
-    }, { outline: true, title: "Download as PNG" }),
-    saveBtn,    
-    // ─── Continuous Zoom Outfinally theme selector
-    themedThemeSelector()
+      }, { outline: true, title: "Download as PNG" }),
+      // ─── Token simulation toggle ───────────────────────────────────────────
+      reactiveButton(
+        new Stream("▶"),
+        () => {
+          const simulation = modeler.get('tokenSimulation');
+          if (simulation) simulation.toggle();
+        },
+        { outline: true, title: "Toggle Token Simulation" }
+      ),
+      saveBtn,
+      // ─── Continuous Zoom Outfinally theme selector
+      themedThemeSelector()
 
   ], {
     justify: 'flex-start',
