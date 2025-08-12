@@ -490,7 +490,11 @@ const getAllCategories = () => {
 
 const iconButton = (label, onClick, tooltip) => {
   const btn = document.createElement('button');
-  btn.innerHTML = label; // icon SVG or symbol
+  if (typeof label === 'string' && /[<>]/.test(label)) {
+    btn.innerHTML = DOMPurify.sanitize(label);
+  } else {
+    btn.textContent = label;
+  }
   btn.title = tooltip;
   btn.style.fontSize = '1.1rem';
   btn.style.padding = '0.25rem 0.5rem';
