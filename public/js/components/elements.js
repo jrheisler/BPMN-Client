@@ -20,11 +20,11 @@ function reactiveElement(stream, renderFn = v => v) {
     }
   }
 
-  const unsub1 = update(stream.get());
-  const unsub2 = stream.subscribe(update);
-  
+  update(stream.get());
+  const unsub = stream.subscribe(update);
+
   // Fix: observe removal of the 'placeholder' element
-  observeDOMRemoval(placeholder, unsub1, unsub2); // 🔥 Auto cleanup when node removed
+  observeDOMRemoval(placeholder, unsub); // 🔥 Auto cleanup when node removed
   
   return placeholder;
 }
@@ -370,15 +370,19 @@ function fileInput(stream, options = {}, themeStream = currentTheme) {
     input.style.margin = options.margin || '0.5rem 0';
   }
   
-  let unsub1; 
-  input.addEventListener('change', () => {
-    unsub1 = stream.set(input.files[0] || null);
-  });
+  const onChange = () => {
+    stream.set(input.files[0] || null);
+  };
+  input.addEventListener('change', onChange);
 
-  const unsub2 = themeStream.subscribe(applyStyles);
+  const unsubTheme = themeStream.subscribe(applyStyles);
   applyStyles(themeStream.get());
 
-//  observeDOMRemoval(el, unsub1, unsub2); // 🔥 Auto cleanup when node removed
+  observeDOMRemoval(
+    input,
+    () => input.removeEventListener('change', onChange),
+    unsubTheme
+  ); // 🔥 Auto cleanup when node removed
 
   return input;
 }
