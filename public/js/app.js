@@ -666,25 +666,26 @@ function rebuildMenu() {
       }, { outline: true, title: "Download as PNG" })
   ];
 
-  controls.push(
-    reactiveButton(
-      new Stream("▶"),
-      () => {
-        const simulation = modeler
-          .get('injector')
-          .get('tokenSimulation', false);
-          console.log('676', simulation);
-        if (simulation) {
+  if (tokenSimulationModule) {
+    controls.push(
+      reactiveButton(
+        new Stream("▶"),
+        () => {
+          const simulation = modeler.get('tokenSimulation', false);
+          if (!simulation) {
+            console.warn('Token simulation service not available');
+            return;
+          }
           if (typeof simulation.toggleMode === 'function') {
             simulation.toggleMode();
           } else {
             simulation.toggle();
           }
-        }
-      },
-      { outline: true, title: "Toggle Token Simulation" }
-    )
-  );
+        },
+        { outline: true, title: "Toggle Token Simulation" }
+      )
+    );
+  }
 
   controls.push(saveBtn);
   controls.push(themedThemeSelector());
