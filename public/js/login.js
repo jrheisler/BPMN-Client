@@ -745,7 +745,7 @@ function openAddOnModal(currentUser, mode = 'add', addOnData = null, themeStream
   const subtypeChoicesStream = new Stream([]);
 
   function renderSubtype(choices, preselect) {
-    subtypeContainer.innerHTML = '';
+    subtypeContainer.replaceChildren();
     if (preselect && choices.find(c => c.value === preselect)) {
       subtypeStream.set(preselect);
     } else {
@@ -997,7 +997,7 @@ function openAddOnChooserModal(currentUser, themeStream = currentTheme) {
   };
 
   addOnsStream.subscribe(addOns => {
-    listContainer.innerHTML = '';
+    listContainer.replaceChildren();
 
     if (!addOns.length) {
       const empty = document.createElement('p');
@@ -1198,7 +1198,7 @@ function openAddOnHistoryModal(currentUser, addOnId, themeStream = currentTheme)
       }
 
       // Clear container
-      versionsContainer.innerHTML = '';
+      versionsContainer.replaceChildren();
 
       data.versions.forEach((version, idx) => {
         const versionItem = document.createElement('div');

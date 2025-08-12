@@ -296,7 +296,7 @@ function showProperties(element, modeling, moddle, currentUser) {
 
   const fieldsToShow = FIELD_DEFINITIONS.filter(f => fieldKeys.includes(f.key));
 
-  propsSidebar.innerHTML = '';
+  propsSidebar.replaceChildren();
   if (propsSidebar._unsubTheme) {
     propsSidebar._unsubTheme();
   }
@@ -365,7 +365,7 @@ function showProperties(element, modeling, moddle, currentUser) {
   
   
   function renderAddOnsList() {
-  addOnsListContainer.innerHTML = '';
+    addOnsListContainer.replaceChildren();
 
   if (!currentAddOns.length) {
     const emptyMsg = document.createElement('p');
