@@ -227,6 +227,7 @@ document.body.appendChild(jsonFileInput);
 const saveBtn = reactiveButton(
   new Stream('💾'),
   async () => {
+    console.debug('Save button pressed');
     const { xml } = await modeler.saveXML({ format: true });
 
     // Use fallback/defaults if diagramDataStream is null
