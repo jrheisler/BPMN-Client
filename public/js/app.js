@@ -673,6 +673,7 @@ function rebuildMenu() {
         const simulation = modeler
           .get('injector')
           .get('tokenSimulation', false);
+          console.log('676', simulation);
         if (simulation) {
           if (typeof simulation.toggleMode === 'function') {
             simulation.toggleMode();
