@@ -66,7 +66,14 @@ Object.assign(document.body.style, {
   const { BpmnJS }       = window;
   const layoutProcess    = window.bpmnAutoLayout?.layoutProcess;
   const NavigatorModule  = window.NavigatorModule;
-  const tokenSimulationModule = window['bpmn-js-token-simulation'];
+  // try the known globals exposed by the UMD bundle
+  const tokenSimulationModule =
+    window.BpmnJSTokenSimulation ||
+    window.BpmnJsTokenSimulation ||
+    window.TokenSimulationModule ||
+    window.TokenSimulation ||
+    window['bpmn-js-token-simulation'] ||
+    window.tokenSimulationModule;
 
   // ─── build canvas + xml-editor elements ────────────────────────────────────
   // REPLACE with this:
@@ -93,7 +100,10 @@ Object.assign(document.body.style, {
 
   const additionalModules = [];
   if (navModule) additionalModules.push(navModule);
-  if (tokenSimulationModule) additionalModules.push(tokenSimulationModule);
+  if (tokenSimulationModule) {
+    // UMD build may expose the module on `default`
+    additionalModules.push(tokenSimulationModule.default || tokenSimulationModule);
+  }
 
   const modeler = new BpmnJS({
     container:       canvasEl,
@@ -602,9 +612,9 @@ function rebuildMenu() {
   
   avatarMenu = avatarDropdown(avatarStream, avatarOptions, currentTheme, buildDropdownOptions());
 
-  const controlsBar = row([
+  const controls = [
   // 1) avatar menu
-  avatarMenu,  
+  avatarMenu,
    
     
   // ─── Continuous Zoom In ────────────────────────────────────────────────────
@@ -651,26 +661,31 @@ function rebuildMenu() {
           a.click();
         });
       };
-      }, { outline: true, title: "Download as PNG" }),
-      // ─── Token simulation toggle ───────────────────────────────────────────
-      reactiveButton(
-        new Stream("▶"),
-        () => {
-          const simulation = modeler.get('tokenSimulation');
-          if (simulation) simulation.toggle();
-        },
-        { outline: true, title: "Toggle Token Simulation" }
-      ),
-      saveBtn,
-      // ─── Continuous Zoom Outfinally theme selector
-      themedThemeSelector()
+      }, { outline: true, title: "Download as PNG" })
+  ];
 
-  ], {
+  controls.push(
+    reactiveButton(
+      new Stream("▶"),
+      () => {
+        const simulation = modeler
+          .get('injector')
+          .get('tokenSimulation', false);
+        if (simulation) simulation.toggle();
+      },
+      { outline: true, title: "Toggle Token Simulation" }
+    )
+  );
+
+  controls.push(saveBtn);
+  controls.push(themedThemeSelector());
+
+  const controlsBar = row(controls, {
     justify: 'flex-start',
     align:   'center',
     padding: '1rem',
     bg:      currentTheme.get().colors.surface,
-    wrap:    true, 
+    wrap:    true,
   });
 
   // keep background / border in sync
