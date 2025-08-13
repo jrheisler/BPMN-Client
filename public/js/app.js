@@ -97,17 +97,26 @@ Object.assign(document.body.style, {
     await window.BpmnJSTokenSimulationReady;
   }
 
-  const tokenSimulationModule =
-    window.BpmnJSTokenSimulation ||
-    window.BpmnJsTokenSimulation ||
-    window.TokenSimulationModule ||
-    window.TokenSimulation ||
-    window['bpmn-js-token-simulation'] ||
-    window.tokenSimulationModule;
+  const tokenSimulationGlobals = [
+    'BpmnJSTokenSimulation',
+    'BpmnJsTokenSimulation',
+    'TokenSimulationModule',
+    'TokenSimulation',
+    'bpmn-js-token-simulation',
+    'tokenSimulationModule'
+  ];
+
+  const tokenSimulationGlobal = tokenSimulationGlobals.find(name => window[name]);
+  const tokenSimulationModule = tokenSimulationGlobal && window[tokenSimulationGlobal];
 
   if (tokenSimulationModule) {
     // UMD build may expose the module on `default`
     additionalModules.push(tokenSimulationModule.default || tokenSimulationModule);
+  } else {
+    console.warn(
+      'bpmn-js-token-simulation module not found. Expected one of globals:',
+      tokenSimulationGlobals.join(', ')
+    );
   }
 
   const modeler = new BpmnJS({
