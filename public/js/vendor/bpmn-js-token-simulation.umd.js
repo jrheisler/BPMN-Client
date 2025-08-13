@@ -1,10 +1,16 @@
+/**
+ * Tiny helper that loads the token simulation bundle from a CDN and exposes a
+ * promise that resolves once the script finished loading.  Consumers may await
+ * `window.BpmnJSTokenSimulationReady` to ensure the plugin is available.
+ */
 (function (global) {
-  /**
-   * Load the real bpmn-js-token-simulation UMD bundle from a CDN.
-   * The original repository does not ship a pre-built bundle with the npm
-   * package, therefore we dynamically fetch the official UMD build and expose
-   * its global so that `app.js` can resolve `tokenSimulationModule`.
-   */
+  var resolveReady;
+
+  // Expose a promise for consumers to await
+  global.BpmnJSTokenSimulationReady = new Promise(function (resolve) {
+    resolveReady = resolve;
+  });
+
   var script = document.createElement('script');
   script.src =
     'https://unpkg.com/bpmn-js-token-simulation@0.31.0/dist/bpmn-js-token-simulation.umd.js';
@@ -18,6 +24,14 @@
       global.TokenSimulation ||
       global['bpmn-js-token-simulation'] ||
       global.tokenSimulationModule;
+
+    resolveReady(global.BpmnJSTokenSimulation);
+  };
+
+  // Resolve the promise even if loading fails so callers can continue
+  script.onerror = function (err) {
+    console.error('Failed to load bpmn-js-token-simulation bundle', err);
+    resolveReady();
   };
 
   document.head.appendChild(script);
