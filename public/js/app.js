@@ -38,7 +38,7 @@ const defaultXml = `<?xml version="1.0" encoding="UTF-8"?>
 // === Initial BPMN XML template ===
 const diagramXMLStream = new Stream(defaultXml);
 
-document.addEventListener('DOMContentLoaded', () => {  
+document.addEventListener('DOMContentLoaded', async () => {
 
 const avatarStream = new Stream('flow.png');
 let currentDiagramId = null;
@@ -67,15 +67,6 @@ Object.assign(document.body.style, {
   const layoutProcess    = window.bpmnAutoLayout?.layoutProcess;
   const NavigatorModule  = window.NavigatorModule;
 
-  // try the known globals exposed by the UMD bundle
-  const tokenSimulationModule =
-    window.BpmnJSTokenSimulation ||
-    window.BpmnJsTokenSimulation ||
-    window.TokenSimulationModule ||
-    window.TokenSimulation ||
-    window['bpmn-js-token-simulation'] ||
-    window.tokenSimulationModule;
-
   // ─── build canvas + xml-editor elements ────────────────────────────────────
   // REPLACE with this:
   const canvasEl = document.getElementById('canvas');
@@ -101,6 +92,19 @@ Object.assign(document.body.style, {
 
   const additionalModules = [];
   if (navModule) additionalModules.push(navModule);
+
+  if (window.BpmnJSTokenSimulationReady) {
+    await window.BpmnJSTokenSimulationReady;
+  }
+
+  const tokenSimulationModule =
+    window.BpmnJSTokenSimulation ||
+    window.BpmnJsTokenSimulation ||
+    window.TokenSimulationModule ||
+    window.TokenSimulation ||
+    window['bpmn-js-token-simulation'] ||
+    window.tokenSimulationModule;
+
   if (tokenSimulationModule) {
     // UMD build may expose the module on `default`
     additionalModules.push(tokenSimulationModule.default || tokenSimulationModule);
