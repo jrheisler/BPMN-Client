@@ -13,7 +13,7 @@
 
   var script = document.createElement('script');
   script.src =
-    'https://unpkg.com/bpmn-js-token-simulation@0.31.0/dist/bpmn-js-token-simulation.umd.js';
+    'https://unpkg.com/@bpmn-io/token-simulation@0.24.0/dist/index.umd.js';
 
   script.onload = function () {
     // Align with the various globals that may be exposed by the UMD bundle
