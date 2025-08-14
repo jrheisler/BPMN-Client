@@ -93,31 +93,6 @@ Object.assign(document.body.style, {
   const additionalModules = [];
   if (navModule) additionalModules.push(navModule);
 
-  if (window.BpmnJSTokenSimulationReady) {
-    await window.BpmnJSTokenSimulationReady;
-  }
-
-  const tokenSimulationGlobals = [
-    'BpmnJSTokenSimulation',
-    'BpmnJsTokenSimulation',
-    'TokenSimulationModule',
-    'TokenSimulation',
-    'bpmn-js-token-simulation',
-    'tokenSimulationModule'
-  ];
-
-  const tokenSimulationGlobal = tokenSimulationGlobals.find(name => window[name]);
-  const tokenSimulationModule = tokenSimulationGlobal && window[tokenSimulationGlobal];
-
-  if (tokenSimulationModule) {
-    // UMD build may expose the module on `default`
-    additionalModules.push(tokenSimulationModule.default || tokenSimulationModule);
-  } else {
-    console.warn(
-      'bpmn-js-token-simulation module not found. Expected one of globals:',
-      tokenSimulationGlobals.join(', ')
-    );
-  }
 
   const modeler = new BpmnJS({
     container:       canvasEl,
@@ -148,6 +123,8 @@ Object.assign(document.body.style, {
   const modeling        = modeler.get('modeling');
   const elementRegistry = modeler.get('elementRegistry');
   const selectionService= modeler.get('selection');
+  const canvas          = modeler.get('canvas');
+  const simulation      = createSimulation({ elementRegistry, canvas });
 
   // ─── theme (page background) ────────────────────────────────────────────────
   currentTheme.subscribe(applyThemeToPage);
@@ -209,6 +186,7 @@ async function appendXml(xml) {
       await modeler.importXML(xml);
       const svg = canvasEl.querySelector('svg');
       if (svg) svg.style.height = '100%';
+      simulation.reset();
     } catch (err) {
       console.error("Import error:", err);
     }
@@ -630,8 +608,12 @@ function rebuildMenu() {
   const controls = [
   // 1) avatar menu
   avatarMenu,
-   
-    
+
+  // Simulation controls
+  reactiveButton(new Stream("▶"), () => simulation.start(), { outline: true, title: "Play" }),
+  reactiveButton(new Stream("⏸"), () => simulation.pause(), { outline: true, title: "Pause" }),
+  reactiveButton(new Stream("⏭"), () => simulation.step(), { outline: true, title: "Step" }),
+
   // ─── Continuous Zoom In ────────────────────────────────────────────────────
   reactiveButton(
     new Stream("➕"),
@@ -678,27 +660,6 @@ function rebuildMenu() {
       };
       }, { outline: true, title: "Download as PNG" })
   ];
-
-  if (tokenSimulationModule) {
-    controls.push(
-      reactiveButton(
-        new Stream("▶"),
-        () => {
-          const simulation = modeler.get('tokenSimulation', false);
-          if (!simulation) {
-            console.warn('Token simulation service not available');
-            return;
-          }
-          if (typeof simulation.toggleMode === 'function') {
-            simulation.toggleMode();
-          } else {
-            simulation.toggle();
-          }
-        },
-        { outline: true, title: "Toggle Token Simulation" }
-      )
-    );
-  }
 
   controls.push(saveBtn);
   controls.push(themedThemeSelector());
