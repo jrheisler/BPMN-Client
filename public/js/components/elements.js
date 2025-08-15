@@ -707,7 +707,8 @@ function gridView(dataStream, options = {}, themeStream = currentTheme) {
   function renderGrid(data = [], theme = {}) {
     const colors = theme.colors || {};
     const fonts = theme.fonts || {};
-    const keys = data.length > 0 ? Object.keys(data[0]) : [];
+    const firstRow = Array.isArray(data) && data.length > 0 ? data[0] : {};
+    const keys = Object.keys(firstRow);
 
     table.innerHTML = '';
 
