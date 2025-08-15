@@ -747,6 +747,13 @@ currentTheme.subscribe(theme => {
       stroke: ${bpmn.selected.stroke} !important;
       stroke-width: ${bpmn.selected.strokeWidth}px !important;
     }
+
+    /* ── simulation active token highlight ─────────────────────────────── */
+    .djs-element.active .djs-visual > :nth-child(1),
+    .djs-connection.active .djs-visual > path {
+      stroke: orange !important;
+      stroke-width: 4px !important;
+    }
   `;
 });
 
