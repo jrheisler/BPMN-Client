@@ -33,7 +33,14 @@ function createSimulation(services, opts = {}) {
   });
 
   function getStart() {
-    return elementRegistry.filter(e => e.type === 'bpmn:StartEvent')[0] || null;
+    const all = elementRegistry.filter
+      ? elementRegistry.filter(e => e.type === 'bpmn:StartEvent' || e.businessObject?.$type === 'bpmn:StartEvent')
+      : [];
+    const start = all[0] || null;
+    if (!start) {
+      console.warn('No StartEvent found in diagram');
+    }
+    return start;
   }
 
   function schedule() {
