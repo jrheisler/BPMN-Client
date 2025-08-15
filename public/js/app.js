@@ -128,15 +128,11 @@ Object.assign(document.body.style, {
   // Prompt user to choose path at gateways
   simulation.pathsStream.subscribe(flows => {
     if (!flows || !flows.length) return;
-    const message = 'Select next element:\n' + flows
-      .map((f, i) => `${i + 1}. ${f.target?.businessObject?.name || f.target?.id}`)
-      .join('\n');
-    const input = window.prompt(message);
-    const index = parseInt(input, 10) - 1;
-    const chosen = flows[index];
-    if (chosen) {
-      simulation.step(chosen.id);
-    }
+    openFlowSelectionModal(flows, currentTheme).subscribe(chosen => {
+      if (chosen) {
+        simulation.step(chosen.id);
+      }
+    });
   });
 
   // ─── theme (page background) ────────────────────────────────────────────────
