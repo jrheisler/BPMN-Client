@@ -350,11 +350,10 @@ isDirty.subscribe(d => {
 
 // when showSaveButton changes, enable/disable the button automatically:
 showSaveButton.subscribe(d => {
-  console.log("195", d);
   if (d) {
-    saveBtn.visible = true;  
+    saveBtn.visible = true;
   } else {
-    saveBtn.visible = false;  
+    saveBtn.visible = false;
   }
 });
 
