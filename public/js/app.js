@@ -109,7 +109,6 @@ Object.assign(document.body.style, {
         const { xml } = await modeler.saveXML({ format: true });
         diagramXMLStream.set(xml);
         isDirty.set(true);
-        console.log("72");
       } catch (err) {
         console.error('failed to save current XML:', err);
       }
@@ -128,15 +127,12 @@ Object.assign(document.body.style, {
   // Prompt user to choose path at gateways
   simulation.pathsStream.subscribe(flows => {
     if (!flows || !flows.length) return;
-    const message = 'Select next element:\n' + flows
-      .map((f, i) => `${i + 1}. ${f.target?.businessObject?.name || f.target?.id}`)
-      .join('\n');
-    const input = window.prompt(message);
-    const index = parseInt(input, 10) - 1;
-    const chosen = flows[index];
-    if (chosen) {
-      simulation.step(chosen.id);
-    }
+    // Use the flow selection modal to pick a path
+    window.openFlowSelectionModal(flows, currentTheme).subscribe(chosen => {
+      if (chosen) {
+        simulation.step(chosen.id);
+      }
+    });
   });
 
   // ─── theme (page background) ────────────────────────────────────────────────
