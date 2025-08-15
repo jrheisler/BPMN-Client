@@ -514,6 +514,8 @@ function openFlowSelectionModal(flows, themeStream = currentTheme) {
 
   return pickStream;
 }
+// Expose helper globally for external usage
+window.openFlowSelectionModal = openFlowSelectionModal;
 
 
 
