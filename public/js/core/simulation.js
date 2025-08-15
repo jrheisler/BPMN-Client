@@ -45,10 +45,13 @@ function createSimulation(services, opts = {}) {
   function step(flowId) {
     if (!current) return;
 
+    console.log('Stepping from', current.id);
+
     const outgoing = current.outgoing || [];
 
     // Handle exclusive gateway by exposing available paths
     if (current.type === 'bpmn:ExclusiveGateway' && !flowId) {
+      console.log('Awaiting decision at gateway', current.id);
       pathsStream.set(outgoing);
       resumeAfterChoice = running;
       pause();
@@ -57,6 +60,7 @@ function createSimulation(services, opts = {}) {
 
     const flow = flowId ? elementRegistry.get(flowId) : outgoing[0];
     if (!flow) {
+      console.log('No outgoing flow, simulation paused at', current.id);
       pause();
       return;
     }
@@ -64,6 +68,7 @@ function createSimulation(services, opts = {}) {
     current = flow.target;
     tokenStream.set(current);
     pathsStream.set(null);
+    console.log('Token moved to element', current.id);
 
     if (resumeAfterChoice) {
       resumeAfterChoice = false;
@@ -78,6 +83,7 @@ function createSimulation(services, opts = {}) {
       current = getStart();
       tokenStream.set(current);
     }
+    console.log('Simulation started at element', current && current.id);
     running = true;
     schedule();
   }
@@ -85,6 +91,7 @@ function createSimulation(services, opts = {}) {
   function pause() {
     running = false;
     clearTimeout(timer);
+    console.log('Simulation paused at element', current && current.id);
   }
 
   function reset() {
@@ -92,6 +99,7 @@ function createSimulation(services, opts = {}) {
     current = getStart();
     tokenStream.set(current);
     pathsStream.set(null);
+    console.log('Simulation reset to start element', current && current.id);
   }
 
   return {
