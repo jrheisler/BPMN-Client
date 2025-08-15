@@ -127,8 +127,9 @@ Object.assign(document.body.style, {
   // Prompt user to choose path at gateways
   simulation.pathsStream.subscribe(flows => {
     if (!flows || !flows.length) return;
-
-    openFlowSelectionModal(flows, currentTheme).subscribe(chosen => {
+    // Access modal helper via `window` to avoid ReferenceError when used
+    // within modules or strict scopes
+    window.openFlowSelectionModal(flows, currentTheme).subscribe(chosen => {
       if (chosen) {
         simulation.step(chosen.id);
       }
