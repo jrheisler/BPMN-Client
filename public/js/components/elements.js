@@ -328,14 +328,14 @@ function reactiveButton(labelStream, onClick, options = {}, themeStream = curren
   }
 
   button.addEventListener('click', () => {
-    console.debug('Button clicked', {
+    console.log('Button clicked', {
       text: button.textContent,
       disabled: button.disabled
     });
     if (!button.disabled) {
       onClick();
     } else {
-      console.debug('Click ignored: button disabled');
+      console.log('Click ignored: button disabled');
     }
   });
 
