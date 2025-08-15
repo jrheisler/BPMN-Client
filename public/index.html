@@ -40,6 +40,18 @@
     max-width: 100vw;
     box-sizing: border-box;
   }
+
+  /* highlight currently active BPMN element during simulation */
+  .djs-element.active .djs-visual > :nth-child(1) {
+    stroke: #ff5722;
+    stroke-width: 4px;
+  }
+
+  /* highlight active sequence flows */
+  .djs-connection.active .djs-visual > :nth-child(1) {
+    stroke: #ff5722;
+    stroke-width: 4px;
+  }
   </style>
 
 </head>
