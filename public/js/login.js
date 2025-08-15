@@ -549,8 +549,9 @@ function handleAttachmentSelection(attachmentId, versionIndex) {
         return;
       }
 
-      // Example: Add attachment to a specific diagram element (replace `elementId` with actual id)
-      const elementId = 'StartEvent_1'; // Replace with actual element ID
+      // Example: Add attachment to a specific diagram element
+      // Replace `elementId` with the ID of the element you want to target
+      const elementId = 'YOUR_ELEMENT_ID';
       const updatedElementMetadata = {
         ...currentDiagramData[elementId],
         attachments: [
