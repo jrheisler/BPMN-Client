@@ -516,6 +516,7 @@ function openFlowSelectionModal(flows, themeStream = currentTheme) {
 }
 
 
+
 function groupedDocumentGrid(documentsStream, expandedStream, themeStream = currentTheme, keys = ['title', 'status', 'meta', 'filename']) {
   const wrapper = document.createElement('div');
   wrapper.style.overflowX = 'auto';

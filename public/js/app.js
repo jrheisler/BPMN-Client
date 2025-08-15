@@ -109,7 +109,6 @@ Object.assign(document.body.style, {
         const { xml } = await modeler.saveXML({ format: true });
         diagramXMLStream.set(xml);
         isDirty.set(true);
-        console.log("72");
       } catch (err) {
         console.error('failed to save current XML:', err);
       }
@@ -128,6 +127,7 @@ Object.assign(document.body.style, {
   // Prompt user to choose path at gateways
   simulation.pathsStream.subscribe(flows => {
     if (!flows || !flows.length) return;
+
     openFlowSelectionModal(flows, currentTheme).subscribe(chosen => {
       if (chosen) {
         simulation.step(chosen.id);
