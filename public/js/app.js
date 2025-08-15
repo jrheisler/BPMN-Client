@@ -127,8 +127,8 @@ Object.assign(document.body.style, {
   // Prompt user to choose path at gateways
   simulation.pathsStream.subscribe(flows => {
     if (!flows || !flows.length) return;
-    // Use the flow selection modal to pick a path
-    window.openFlowSelectionModal(flows, currentTheme).subscribe(chosen => {
+
+    openFlowSelectionModal(flows, currentTheme).subscribe(chosen => {
       if (chosen) {
         simulation.step(chosen.id);
       }

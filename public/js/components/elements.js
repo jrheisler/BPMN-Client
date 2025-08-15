@@ -515,8 +515,6 @@ function openFlowSelectionModal(flows, themeStream = currentTheme) {
   return pickStream;
 }
 
-// Expose modal helper globally so other scripts can invoke it
-window.openFlowSelectionModal = openFlowSelectionModal;
 
 
 function groupedDocumentGrid(documentsStream, expandedStream, themeStream = currentTheme, keys = ['title', 'status', 'meta', 'filename']) {
