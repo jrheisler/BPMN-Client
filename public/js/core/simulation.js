@@ -67,7 +67,11 @@ function createSimulation(services, opts = {}) {
 
     const flow = flowId ? elementRegistry.get(flowId) : outgoing[0];
     if (!flow) {
-      console.log('No outgoing flow, simulation paused at', current.id);
+      console.log('No outgoing flow, simulation finished at', current.id);
+      // clear token and reset state so simulation can start over cleanly
+      tokenStream.set(null);
+      pathsStream.set(null);
+      current = null;
       pause();
       return;
     }
