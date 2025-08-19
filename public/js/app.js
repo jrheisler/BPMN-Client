@@ -117,6 +117,7 @@ Object.assign(document.body.style, {
         const { xml } = await modeler.saveXML({ format: true });
         diagramXMLStream.set(xml);
         isDirty.set(true);
+        syncAddOnStoreFromElements();
       } catch (err) {
         console.error('failed to save current XML:', err);
       }
@@ -131,6 +132,41 @@ Object.assign(document.body.style, {
   const selectionService= modeler.get('selection');
   const canvas          = modeler.get('canvas');
   const simulation      = createSimulation({ elementRegistry, canvas });
+
+  // --- Add-on store helpers -------------------------------------------------
+  function syncAddOnStoreFromElements() {
+    if (!window.addOnStore) return;
+    addOnStore.clear();
+    elementRegistry.getAll().forEach(el => {
+      const bo = el.businessObject;
+      if (bo && bo.addOns) {
+        try {
+          const data = typeof bo.addOns === 'string' ? JSON.parse(bo.addOns) : bo.addOns;
+          addOnStore.setAddOns(bo.id, data);
+        } catch (err) {
+          console.warn('Failed to parse addOns for', bo.id, err);
+        }
+      }
+    });
+  }
+
+  function applyAddOnsToElements(data) {
+    Object.entries(data || {}).forEach(([id, addOns]) => {
+      const el = elementRegistry.get(id);
+      if (el && el.businessObject) {
+        el.businessObject.addOns = JSON.stringify(addOns);
+      }
+    });
+  }
+
+  function loadAddOnData(data = {}) {
+    if (!window.addOnStore) return;
+    addOnStore.clear();
+    Object.entries(data || {}).forEach(([id, addOns]) => {
+      addOnStore.setAddOns(id, addOns);
+    });
+    applyAddOnsToElements(data);
+  }
 
   // Prompt user to choose path at gateways
   simulation.pathsStream.subscribe(flows => {
@@ -169,6 +205,7 @@ async function appendXml(xml) {
   try {
     // Import the new XML into the current diagram
     await modeler.importXML(xml);
+    syncAddOnStoreFromElements();
     
 
     // Get the current diagram's canvas
@@ -202,6 +239,7 @@ async function appendXml(xml) {
   async function importXml(xml) {
     try {
       await modeler.importXML(xml);
+      syncAddOnStoreFromElements();
       const svg = canvasEl.querySelector('svg');
       if (svg) svg.style.height = '100%';
       simulation.reset();
@@ -237,6 +275,9 @@ const saveBtn = reactiveButton(
   new Stream('💾'),
   async () => {
     console.debug('Save button pressed');
+    syncAddOnStoreFromElements();
+    const allAddOns = addOnStore.getAllAddOns();
+    applyAddOnsToElements(allAddOns);
     const { xml } = await modeler.saveXML({ format: true });
 
     // Use fallback/defaults if diagramDataStream is null
@@ -279,7 +320,8 @@ const saveBtn = reactiveButton(
           versions: firebase.firestore.FieldValue.arrayUnion({
             xml, // Save XML data
             timestamp: localTimestamp, // Timestamp of this version
-            notes: metadata.notes // Save the updated notes
+            notes: metadata.notes, // Save the updated notes
+            addOns: allAddOns
           })
         });
 
@@ -303,7 +345,8 @@ const saveBtn = reactiveButton(
           ...currentDiagramData,
           name: metadata.name, // Update name locally
           notes: metadata.notes, // Update notes locally
-          lastUpdated: localTimestamp // Update lastUpdated locally
+          lastUpdated: localTimestamp, // Update lastUpdated locally
+          versions: [...versions, { xml, timestamp: localTimestamp, notes: metadata.notes, addOns: allAddOns }]
         });
 
       } else {
@@ -313,7 +356,7 @@ const saveBtn = reactiveButton(
           .collection('diagrams')
           .add({
             name: metadata.name || 'Untitled Diagram',
-            versions: [{ xml, timestamp: localTimestamp, notes: metadata.notes }],
+            versions: [{ xml, timestamp: localTimestamp, notes: metadata.notes, addOns: allAddOns }],
             lastUpdated: firebase.firestore.Timestamp.fromMillis(localTimestamp)
           });
 
@@ -338,7 +381,8 @@ const saveBtn = reactiveButton(
           id: currentDiagramId,
           name: metadata.name || 'Untitled Diagram',
           notes: metadata.notes, // Update notes here as well
-          lastUpdated: localTimestamp
+          lastUpdated: localTimestamp,
+          versions: [{ xml, timestamp: localTimestamp, notes: metadata.notes, addOns: allAddOns }]
         });
       }
 
@@ -460,7 +504,12 @@ function buildDropdownOptions() {
                   diagramVersion = selectedIndex + 1;
                   versionStream.set(diagramVersion); // wherever version is selected
 
-                  modeler.importXML(selectedVersion.xml);
+                  await modeler.importXML(selectedVersion.xml);
+                  if (selectedVersion.addOns) {
+                    loadAddOnData(selectedVersion.addOns);
+                  } else {
+                    syncAddOnStoreFromElements();
+                  }
                 } else {
                   showToast("Selected version has no XML", { type: 'warning' });
                 }
@@ -518,7 +567,7 @@ function buildDropdownOptions() {
         onClick: () => {           
           const versions = diagramDataStream.get().versions;
 
-          selectVersionModal(diagramName, versions).subscribe(index => {
+          selectVersionModal(diagramName, versions).subscribe(async index => {
             if (index == null) return;
 
             const selected = versions[index]; // No reversing, index is direct
@@ -526,15 +575,20 @@ function buildDropdownOptions() {
             versionStream.set(diagramVersion);
 
             if (selected?.xml) {
-              modeler.importXML(selected.xml);
-              showToast("Loaded version " + diagramVersion, { type: 'success' });                  
+              await modeler.importXML(selected.xml);
+              if (selected.addOns) {
+                loadAddOnData(selected.addOns);
+              } else {
+                syncAddOnStoreFromElements();
+              }
+              showToast("Loaded version " + diagramVersion, { type: 'success' });
             } else {
               showToast("Selected version has no XML", { type: 'warning' });
             }
           });
         }
       },
-      { 
+      {
         label: "🧩 Add AddOns", 
         onClick: () => {          
           openAddOnChooserModal(currentUser).subscribe(selectedAddOn => {
@@ -778,6 +832,7 @@ currentTheme.subscribe(theme => {
 function clearModeler() {
   
   modeler.importXML(defaultXml).then(() => {
+    addOnStore.clear();
     const canvas = modeler.get('canvas');
     canvas.zoom('fit-viewport');
     diagramXMLStream.set(defaultXml);
