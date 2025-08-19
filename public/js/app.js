@@ -132,6 +132,69 @@ Object.assign(document.body.style, {
   const selectionService= modeler.get('selection');
   const canvas          = modeler.get('canvas');
   const simulation      = createSimulation({ elementRegistry, canvas });
+  const overlays        = modeler.get('overlays');
+
+  // Store IDs of overlays we add so they can be cleaned up on update
+  let addOnOverlayIds = [];
+
+  function updateAddOnOverlays() {
+    // remove previous overlays
+    addOnOverlayIds.forEach(id => overlays.remove(id));
+    addOnOverlayIds = [];
+
+    elementRegistry.getAll().forEach(el => {
+      const bo = el.businessObject;
+      if (!bo || !bo.addOns) return;
+
+      let addOns;
+      try {
+        addOns = typeof bo.addOns === 'string' ? JSON.parse(bo.addOns) : bo.addOns;
+      } catch (err) {
+        return;
+      }
+
+      if (!Array.isArray(addOns) || !addOns.length) return;
+
+      const icons = addOns
+        .map(a => typeIcons[a.type] || '')
+        .filter(Boolean)
+        .join('');
+
+      if (!icons) return;
+
+      const badge = document.createElement('div');
+      badge.className = 'addon-overlay';
+      badge.style.background = 'rgba(255, 255, 255, 0.8)';
+      badge.style.borderRadius = '4px';
+      badge.style.padding = '2px';
+      badge.style.fontSize = '14px';
+      badge.innerText = icons;
+
+      const id = overlays.add(el, {
+        position: { top: -10, left: -10 },
+        html: badge
+      });
+      addOnOverlayIds.push(id);
+    });
+  }
+
+  let overlayUpdateScheduled = false;
+  function scheduleOverlayUpdate() {
+    if (overlayUpdateScheduled) return;
+    overlayUpdateScheduled = true;
+    setTimeout(() => {
+      overlayUpdateScheduled = false;
+      updateAddOnOverlays();
+    }, 0);
+  }
+
+  if (window.addOnStore) {
+    const originalSetAddOns = addOnStore.setAddOns;
+    addOnStore.setAddOns = function(nodeId, addOns) {
+      originalSetAddOns(nodeId, addOns);
+      scheduleOverlayUpdate();
+    };
+  }
 
   // --- Add-on store helpers -------------------------------------------------
   function syncAddOnStoreFromElements() {
@@ -206,6 +269,7 @@ async function appendXml(xml) {
     // Import the new XML into the current diagram
     await modeler.importXML(xml);
     syncAddOnStoreFromElements();
+    scheduleOverlayUpdate();
     
 
     // Get the current diagram's canvas
@@ -240,6 +304,7 @@ async function appendXml(xml) {
     try {
       await modeler.importXML(xml);
       syncAddOnStoreFromElements();
+      scheduleOverlayUpdate();
       const svg = canvasEl.querySelector('svg');
       if (svg) svg.style.height = '100%';
       simulation.reset();
@@ -830,9 +895,10 @@ currentTheme.subscribe(theme => {
 });
 
 function clearModeler() {
-  
+
   modeler.importXML(defaultXml).then(() => {
     addOnStore.clear();
+    scheduleOverlayUpdate();
     const canvas = modeler.get('canvas');
     canvas.zoom('fit-viewport');
     diagramXMLStream.set(defaultXml);
