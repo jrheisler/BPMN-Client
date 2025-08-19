@@ -106,18 +106,18 @@
   function createAddOnFilterPanel(themeStream = currentTheme){
     const panel = document.createElement('div');
     Object.assign(panel.style, {
-      position: 'absolute',
-      left: '0',
-      top: '0',
-      bottom: '0',
+      position: 'fixed',
+      top: '3rem',
+      right: '1rem',
       width: '250px',
+      maxHeight: '80vh',
       overflowY: 'auto',
       padding: '1rem',
-      boxShadow: '2px 0 6px rgba(0,0,0,0.2)',
-      display: 'flex',
+      boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
       flexDirection: 'column',
       gap: '0.5rem',
-      zIndex: '1000'
+      zIndex: '1000',
+      display: 'none'
     });
 
     Object.entries(addOnTypes).forEach(([type, subtypes]) => {

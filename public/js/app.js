@@ -52,12 +52,27 @@ const overlay = createDiagramOverlay(
   versionStream,
   currentTheme
 );
-
-
   const { createAddOnFilterPanel, selectedType, selectedSubtype } = window.addOnFilter;
-  const addOnFilterPanelEl = createAddOnFilterPanel(currentTheme);
-  document.body.appendChild(addOnFilterPanelEl);
+  let addOnFilterPanelEl = null;
 
+  const filterToggleBtn = document.createElement('button');
+  filterToggleBtn.textContent = 'Filters';
+  Object.assign(filterToggleBtn.style, {
+    position: 'fixed',
+    top: '10px',
+    right: '10px',
+    zIndex: '1001'
+  });
+  document.body.appendChild(filterToggleBtn);
+
+  filterToggleBtn.addEventListener('click', () => {
+    if (!addOnFilterPanelEl) {
+      addOnFilterPanelEl = createAddOnFilterPanel(currentTheme);
+      document.body.appendChild(addOnFilterPanelEl);
+    }
+    const isVisible = addOnFilterPanelEl.style.display === 'flex';
+    addOnFilterPanelEl.style.display = isVisible ? 'none' : 'flex';
+  });
 
 Object.assign(document.body.style, {
     display:      'flex',
