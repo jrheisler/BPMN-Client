@@ -1,5 +1,21 @@
 const db = firebase.firestore();
 
+// Inject responsive modal styles
+(function ensureModalStyles() {
+  if (document.getElementById('modal-responsive-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'modal-responsive-styles';
+  style.textContent = `
+    @media (max-width: 768px) {
+      .responsive-modal { max-width: 95% !important; }
+    }
+    @media (max-width: 480px) {
+      .responsive-modal { max-width: 100% !important; }
+    }
+  `;
+  document.head.appendChild(style);
+})();
+
 function reactiveLoginModal(themeStream = currentTheme) {
   const loginStream = new Stream(null); // emits user or error or null (cancel)
   const emailStream = new Stream('');
@@ -20,10 +36,11 @@ function reactiveLoginModal(themeStream = currentTheme) {
 
   // Modal content box
   const content = document.createElement('div');
+  content.classList.add('responsive-modal');
   content.style.padding = '2rem';
   content.style.borderRadius = '8px';
   content.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-  content.style.minWidth = '300px';
+  content.style.maxWidth = '90%';
   content.style.backgroundColor = themeStream.get().colors.surface || '#fff';
   content.style.color = themeStream.get().colors.foreground || '#000';
   content.style.display = 'flex';
@@ -145,10 +162,11 @@ function openDiagramPickerModal(currentUser, themeStream = currentTheme) {
 
   // Content box
   const content = document.createElement('div');
+  content.classList.add('responsive-modal');
   content.style.padding = '2rem';
   content.style.borderRadius = '8px';
   content.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-  content.style.minWidth = '400px';
+  content.style.maxWidth = '90%';
   content.style.maxHeight = '80vh';
   content.style.overflowY = 'auto';
   content.style.backgroundColor = themeStream.get().colors.surface || '#fff';
@@ -335,6 +353,7 @@ function promptDiagramMetadata(initialName = '', initialNotes = '', themeStream 
   });
 
   const box = document.createElement('div');
+  box.classList.add('responsive-modal');
   Object.assign(box.style, {
     backgroundColor: colors.surface,
     color: colors.foreground,
@@ -343,9 +362,9 @@ function promptDiagramMetadata(initialName = '', initialNotes = '', themeStream 
     display: 'flex',
     flexDirection: 'column',
     gap: '1rem',
-    minWidth: '360px',
     boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
-    fontFamily: theme.fonts?.base || 'system-ui, sans-serif'
+    fontFamily: theme.fonts?.base || 'system-ui, sans-serif',
+    maxWidth: '90%'
   });
 
   const title = document.createElement('h2');
@@ -478,6 +497,7 @@ function selectVersionModal(diagramName, versions, themeStream = currentTheme) {
   });
 
   const box = document.createElement('div');
+  box.classList.add('responsive-modal');
   Object.assign(box.style, {
     backgroundColor: themeStream.get().colors.surface,
     color: themeStream.get().colors.foreground,
@@ -486,9 +506,9 @@ function selectVersionModal(diagramName, versions, themeStream = currentTheme) {
     display: 'flex',
     flexDirection: 'column',
     gap: '1rem',
-    minWidth: '360px',
     fontFamily: themeStream.get().fonts?.base || 'system-ui, sans-serif',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+    boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+    maxWidth: '90%'
   });
 
   const label = document.createElement('label');
@@ -705,9 +725,10 @@ function openAddOnModal(currentUser, mode = 'add', addOnData = null, themeStream
 
   // ——— Content Box ———
   const content = document.createElement('div');
+  content.classList.add('responsive-modal');
   Object.assign(content.style, {
     padding: '2rem', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-    minWidth: '320px', maxHeight: '90vh', overflowY: 'auto',
+    maxWidth: '90%', maxHeight: '90vh', overflowY: 'auto',
     backgroundColor: themeStream.get().colors.surface || '#fff',
     color: themeStream.get().colors.foreground || '#000',
     display: 'flex', flexDirection: 'column', gap: '1rem'
@@ -954,9 +975,10 @@ function openAddOnChooserModal(currentUser, themeStream = currentTheme) {
   });
 
   const content = document.createElement('div');
+  content.classList.add('responsive-modal');
   Object.assign(content.style, {
     width: '80%',
-    maxWidth: '800px',
+    maxWidth: '90%',
     padding: '2rem',
     borderRadius: '8px',
     boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
@@ -1155,11 +1177,12 @@ function openAddOnHistoryModal(currentUser, addOnId, themeStream = currentTheme)
   });
 
   const content = document.createElement('div');
+  content.classList.add('responsive-modal');
   Object.assign(content.style, {
     padding: '2rem',
     borderRadius: '8px',
     boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-    minWidth: '400px',
+    maxWidth: '90%',
     maxHeight: '80vh',
     overflowY: 'auto',
     backgroundColor: themeStream.get().colors.surface || '#fff',
