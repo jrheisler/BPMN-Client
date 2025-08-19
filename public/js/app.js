@@ -71,7 +71,9 @@ Object.assign(document.body.style, {
   const canvasEl = document.getElementById('canvas');
   Object.assign(canvasEl.style, {
     flex:      '1 1 auto',
-    minHeight: '600px',
+    // Use a viewport based minimum height so the canvas scales with screen size
+    // rather than being locked to a fixed pixel value.
+    minHeight: '60vh',
     width:     '100%',
     border:    `1px solid ${currentTheme.get().colors.border}`
   });
