@@ -200,6 +200,11 @@ Object.assign(document.body.style, {
     };
   }
 
+  if (window.addOnLegend) {
+    const legendEl = addOnLegend.createAddOnLegend(typeIcons, currentTheme);
+    document.body.appendChild(legendEl);
+  }
+
   // Highlight nodes matching selected type/subtype
   const highlightedNodes = new Set();
 
