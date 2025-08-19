@@ -59,8 +59,8 @@ const overlay = createDiagramOverlay(
   filterToggleBtn.textContent = 'Filters';
   Object.assign(filterToggleBtn.style, {
     position: 'fixed',
-    top: '10px',
-    right: '10px',
+    top: '0.5rem',
+    right: '1rem',
     zIndex: '1001'
   });
   document.body.appendChild(filterToggleBtn);
