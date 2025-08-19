@@ -42,6 +42,41 @@
     box-sizing: border-box;
   }
 
+  /* properties sidebar */
+  .props-sidebar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    background: #fff;
+    box-shadow: -2px 0 6px rgba(0,0,0,0.2);
+    padding: 1rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s;
+    z-index: 1000;
+    width: 300px;
+    transform: translateX(100%);
+  }
+
+  .props-sidebar.open {
+    transform: translateX(0);
+  }
+
+  @media (max-width: 768px) {
+    .props-sidebar {
+      width: 80vw;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .props-sidebar {
+      width: 100vw;
+    }
+  }
+
   /* highlight currently active BPMN element during simulation */
   .djs-element.active .djs-visual > :nth-child(1) {
     stroke: #ff5722;
