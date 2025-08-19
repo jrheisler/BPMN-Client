@@ -200,6 +200,31 @@ Object.assign(document.body.style, {
     };
   }
 
+  // Highlight nodes matching selected type/subtype
+  const highlightedNodes = new Set();
+
+  function updateHighlightedNodes() {
+    // remove previous markers
+    highlightedNodes.forEach(id => canvas.removeMarker(id, 'bpmn-addOn-highlight'));
+    highlightedNodes.clear();
+
+    const type = selectedType.get();
+    if (!type || !window.addOnStore) return;
+
+    const subtype = selectedSubtype.get();
+    const nodeIds = subtype
+      ? addOnStore.findNodesBySubtype(type, subtype)
+      : addOnStore.findNodesByType(type);
+
+    nodeIds.forEach(id => {
+      canvas.addMarker(id, 'bpmn-addOn-highlight');
+      highlightedNodes.add(id);
+    });
+  }
+
+  selectedType.subscribe(updateHighlightedNodes);
+  selectedSubtype.subscribe(updateHighlightedNodes);
+
   // --- Add-on store helpers -------------------------------------------------
   function syncAddOnStoreFromElements() {
     if (!window.addOnStore) return;
