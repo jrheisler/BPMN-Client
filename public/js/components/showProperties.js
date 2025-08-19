@@ -1,22 +1,7 @@
 // 1) Create the sidebar container (hidden by default)
-  const propsSidebar = document.createElement('div');
-Object.assign(propsSidebar.style, {
-  position:    'absolute',
-  top:         '0',
-  right:       '-400px',       // slide it offscreen initially
-  width:       '300px',
-  height:      '100%',
-  background:  '#fff',
-  boxShadow:   '-2px 0 6px rgba(0,0,0,0.2)',
-  padding:     '1rem',
-  overflowY:   'auto',
-  overflowX:   'hidden',       // prevent horizontal scroll if not needed
-  display:     'flex',
-  flexDirection: 'column',
-  transition:  'right 0.3s',
-  zIndex: '1000',
-});
-  document.body.appendChild(propsSidebar);
+const propsSidebar = document.createElement('div');
+propsSidebar.classList.add('props-sidebar');
+document.body.appendChild(propsSidebar);
 
 
 const BPMN_PROPERTY_MAP = {
@@ -618,7 +603,7 @@ function showProperties(element, modeling, moddle, currentUser) {
 
 
   propsSidebar.append(form);
-  propsSidebar.style.right = '0';
+  propsSidebar.classList.add('open');
 
   const unsub = currentTheme.subscribe(theme => {
     propsSidebar.style.backgroundColor = theme.colors.surface;
@@ -664,7 +649,7 @@ function getOrCreateExtEl(bo, moddle) {
       
   // hide helper cleans up subscription
   function hideSidebar() {
-    propsSidebar.style.right = '-400px';
+    propsSidebar.classList.remove('open');
     if (propsSidebar._unsubTheme) {
       propsSidebar._unsubTheme();
       delete propsSidebar._unsubTheme;      
