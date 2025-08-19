@@ -3,7 +3,7 @@
     const container = document.createElement('div');
     Object.assign(container.style, {
       position: 'absolute',
-      top: '1rem',
+      top: 'calc(1rem + 4px)',
       right: '1rem',
       padding: '0.5rem 0.75rem',
       borderRadius: '4px',
