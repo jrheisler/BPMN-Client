@@ -54,6 +54,10 @@ const overlay = createDiagramOverlay(
 );
 
 
+  const { createAddOnFilterPanel, selectedType, selectedSubtype } = window.addOnFilter;
+  const addOnFilterPanelEl = createAddOnFilterPanel(currentTheme);
+  document.body.appendChild(addOnFilterPanelEl);
+
 
 Object.assign(document.body.style, {
     display:      'flex',
