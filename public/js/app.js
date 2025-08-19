@@ -67,16 +67,22 @@ Object.assign(document.body.style, {
   const NavigatorModule  = window.NavigatorModule;
 
   // ─── build canvas + xml-editor elements ────────────────────────────────────
-  // REPLACE with this:
   const canvasEl = document.getElementById('canvas');
+  const header   = document.querySelector('header');
+
+  const setCanvasHeight = () => {
+    if (!header) return;
+    canvasEl.style.height = `calc(100vh - ${header.offsetHeight}px)`;
+  };
+
   Object.assign(canvasEl.style, {
-    flex:      '1 1 auto',
-    // Use a viewport based minimum height so the canvas scales with screen size
-    // rather than being locked to a fixed pixel value.
-    minHeight: '60vh',
-    width:     '100%',
-    border:    `1px solid ${currentTheme.get().colors.border}`
+    flex:   '1 1 auto',
+    width:  '100%',
+    border: `1px solid ${currentTheme.get().colors.border}`
   });
+
+  setCanvasHeight();
+  window.addEventListener('resize', setCanvasHeight);
 
 
   // ─── mount theme selector, spacer, canvas & xml ────────────────────────────
