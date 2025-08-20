@@ -105,6 +105,7 @@
 
   function createAddOnFilterPanel(themeStream = currentTheme){
     const panel = document.createElement('div');
+    panel.classList.add('addon-filter');
     Object.assign(panel.style, {
       position: 'fixed',
       top: '3rem',
@@ -120,42 +121,50 @@
       display: 'none'
     });
 
+    const list = document.createElement('ul');
+    panel.appendChild(list);
+
     Object.entries(addOnTypes).forEach(([type, subtypes]) => {
-      const section = document.createElement('div');
+      const typeItem = document.createElement('li');
+      typeItem.className = 'addon-type';
 
-      const header = reactiveElement(selectedType, sel => {
-        const div = document.createElement('div');
-        div.textContent = type;
-        div.style.cursor = 'pointer';
-        div.style.fontWeight = sel === type ? 'bold' : 'normal';
-        div.addEventListener('click', () => {
-          expandedType.set(expandedType.get() === type ? null : type);
-          selectedType.set(type);
-          selectedSubtype.set(null);
+      const header = document.createElement('div');
+      header.className = 'addon-type-header';
+      header.textContent = type;
+      header.addEventListener('click', () => {
+        expandedType.set(expandedType.get() === type ? null : type);
+        selectedType.set(type);
+        selectedSubtype.set(null);
+      });
+      typeItem.appendChild(header);
+
+      const subList = document.createElement('ul');
+      subList.className = 'subtype-list';
+
+      subtypes.forEach(sub => {
+        const subItem = document.createElement('li');
+        subItem.className = 'subtype-item';
+        subItem.textContent = sub;
+        subItem.addEventListener('click', e => {
+          e.stopPropagation();
+          selectedSubtype.set(sub);
         });
-        return div;
+        selectedSubtype.subscribe(sel => {
+          subItem.classList.toggle('selected', sel === sub);
+        });
+        subList.appendChild(subItem);
       });
 
-      section.appendChild(header);
+      typeItem.appendChild(subList);
+      list.appendChild(typeItem);
 
-      const subList = reactiveElement(expandedType, exp => {
-        if (exp !== type) return null;
-        return subtypes.map(sub => reactiveElement(selectedSubtype, sel => {
-          const item = document.createElement('div');
-          item.textContent = sub;
-          item.style.cursor = 'pointer';
-          item.style.marginLeft = '1rem';
-          item.style.fontWeight = sel === sub ? 'bold' : 'normal';
-          item.addEventListener('click', e => {
-            e.stopPropagation();
-            selectedSubtype.set(sub);
-          });
-          return item;
-        }));
+      selectedType.subscribe(sel => {
+        header.classList.toggle('selected', sel === type);
       });
 
-      section.appendChild(subList);
-      panel.appendChild(section);
+      expandedType.subscribe(exp => {
+        typeItem.classList.toggle('expanded', exp === type);
+      });
     });
 
     themeStream.subscribe(theme => {
@@ -163,6 +172,8 @@
       panel.style.color = theme.colors.foreground;
       panel.style.borderRight = `1px solid ${theme.colors.border}`;
       panel.style.fontFamily = theme.fonts.base || 'sans-serif';
+      panel.style.setProperty('--addon-hover-bg', theme.colors.primary + '22');
+      panel.style.setProperty('--addon-icon-color', theme.colors.foreground);
     });
 
     return panel;
