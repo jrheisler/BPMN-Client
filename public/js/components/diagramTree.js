@@ -9,7 +9,16 @@
 
   function renderNode(node){
     const li = document.createElement('li');
-    li.textContent = node.name || node.id;
+    const label = node.name || node.id;
+    if (node.owner){
+      li.textContent = label + ' ';
+      const ownerSpan = document.createElement('span');
+      ownerSpan.className = 'diagram-tree-owner';
+      ownerSpan.textContent = `(${node.owner})`;
+      li.appendChild(ownerSpan);
+    } else {
+      li.textContent = label;
+    }
     li.dataset.elementId = node.id;
     li.addEventListener('click', e => {
       e.stopPropagation();
