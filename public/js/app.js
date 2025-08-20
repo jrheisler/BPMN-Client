@@ -85,6 +85,12 @@ Object.assign(document.body.style, {
 
   // ─── build canvas + xml-editor elements ────────────────────────────────────
   const canvasEl = document.getElementById('canvas');
+
+  canvasEl.addEventListener(
+    'touchmove',
+    e => e.preventDefault(),
+    { passive: false }
+  );
   const header   = document.querySelector('header');
 
   const setCanvasHeight = () => {
