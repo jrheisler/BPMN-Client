@@ -68,3 +68,16 @@
   border-radius: 4px;
   cursor: pointer;
 }
+
+/* Close button inside add-on filter panel */
+.addon-filter-close {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
