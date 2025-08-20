@@ -27,13 +27,18 @@
   }
 
   html, body {
-    overflow-x: hidden;
+    overflow: hidden;
     width: 100%;
   }
 
   body {
     display: flex;
     flex-direction: column;
+  }
+
+  #canvas {
+    touch-action: none;
+    overflow: hidden;
   }
 
   #diagram-wrapper {
