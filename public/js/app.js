@@ -287,6 +287,8 @@ Object.assign(document.body.style, {
       addOnStore.setAddOns(id, addOns);
     });
     applyAddOnsToElements(data);
+    scheduleOverlayUpdate();
+    updateHighlightedNodes();
   }
 
   // Prompt user to choose path at gateways
