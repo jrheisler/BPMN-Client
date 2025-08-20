@@ -3,13 +3,13 @@
     const container = document.createElement('div');
     Object.assign(container.style, {
       position: 'absolute',
-      top: 'calc(1rem + 4px)',
+      top: '0.5rem',
       right: '1rem',
       padding: '0.5rem 0.75rem',
       borderRadius: '4px',
       display: 'flex',
       flexDirection: 'column',
-      gap: '0.25rem',
+      gap: '0.5rem',
       zIndex: '1000',
       fontSize: '14px'
     });

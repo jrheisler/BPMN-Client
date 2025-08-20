@@ -56,3 +56,15 @@
 .addon-filter .selected {
   font-weight: bold;
 }
+
+/* Filter toggle button within add-on legend */
+.addon-filter-toggle {
+  padding: 0.25rem 0.5rem;
+  font-size: 14px;
+  font-family: inherit;
+  background: transparent;
+  color: inherit;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  cursor: pointer;
+}
