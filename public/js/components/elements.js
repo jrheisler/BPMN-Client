@@ -8,7 +8,11 @@ function reactiveElement(stream, renderFn = v => v) {
   function update(value) {
     placeholder.innerHTML = ''; // Clear existing content
     const rendered = renderFn(value);
-    
+    // Guard against null, undefined, or false to avoid appending text nodes
+    if (rendered == null || rendered === false) {
+      return;
+    }
+
     if (rendered instanceof Node) {
       placeholder.appendChild(rendered);
     } else if (Array.isArray(rendered)) {
