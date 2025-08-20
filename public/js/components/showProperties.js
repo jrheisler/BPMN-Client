@@ -298,7 +298,7 @@ function showProperties(element, modeling, moddle, currentUser) {
   addOnsField.value = '';
 
   // Load existing addOns value from element
-  let existingVal = bo.addOns;
+  let existingVal = bo?.$attrs?.addOns || bo.addOns;
   if (Array.isArray(existingVal)) {
     currentAddOns = existingVal;
     addOnsField.value = JSON.stringify(currentAddOns, null, 2);
@@ -499,9 +499,17 @@ function showProperties(element, modeling, moddle, currentUser) {
         }
       });
 
-      props['addOns'] = addOnsField.value;
-
       modeling.updateProperties(element, props);
+
+      // Store addOns under $attrs for custom serialization
+      bo.$attrs = bo.$attrs || {};
+      if (addOnsField.value) {
+        bo.$attrs.addOns = addOnsField.value;
+      } else {
+        delete bo.$attrs.addOns;
+      }
+      delete bo.addOns;
+
       hideSidebar();
     },
     {

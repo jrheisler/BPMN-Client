@@ -157,11 +157,12 @@ Object.assign(document.body.style, {
 
     elementRegistry.getAll().forEach(el => {
       const bo = el.businessObject;
-      if (!bo || !bo.addOns) return;
+      const raw = bo?.$attrs?.addOns || bo?.addOns;
+      if (!raw) return;
 
       let addOns;
       try {
-        addOns = typeof bo.addOns === 'string' ? JSON.parse(bo.addOns) : bo.addOns;
+        addOns = typeof raw === 'string' ? JSON.parse(raw) : raw;
       } catch (err) {
         return;
       }
@@ -255,9 +256,10 @@ Object.assign(document.body.style, {
     addOnStore.clear();
     elementRegistry.getAll().forEach(el => {
       const bo = el.businessObject;
-      if (bo && bo.addOns) {
+      const raw = bo?.$attrs?.addOns || bo?.addOns;
+      if (raw) {
         try {
-          const data = typeof bo.addOns === 'string' ? JSON.parse(bo.addOns) : bo.addOns;
+          const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
           addOnStore.setAddOns(bo.id, data);
         } catch (err) {
           console.warn('Failed to parse addOns for', bo.id, err);
@@ -270,7 +272,10 @@ Object.assign(document.body.style, {
     Object.entries(data || {}).forEach(([id, addOns]) => {
       const el = elementRegistry.get(id);
       if (el && el.businessObject) {
-        el.businessObject.addOns = JSON.stringify(addOns);
+        const bo = el.businessObject;
+        bo.$attrs = bo.$attrs || {};
+        bo.$attrs.addOns = JSON.stringify(addOns);
+        delete bo.addOns;
       }
     });
   }
