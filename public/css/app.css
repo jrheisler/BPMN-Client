@@ -9,3 +9,50 @@
   stroke: #ff9800;
   stroke-width: 4px;
 }
+
+/* Add-on filter panel */
+.addon-filter ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.addon-filter li {
+  cursor: pointer;
+}
+
+.addon-filter .addon-type-header {
+  position: relative;
+  padding: 0.25rem 0.5rem 0.25rem 1rem;
+}
+
+.addon-filter .addon-type-header:hover,
+.addon-filter .subtype-item:hover {
+  background-color: var(--addon-hover-bg);
+}
+
+.addon-filter .subtype-list {
+  margin-left: 1rem;
+  display: none;
+}
+
+.addon-filter .expanded > .subtype-list {
+  display: block;
+}
+
+.addon-filter .addon-type-header::before {
+  content: '\25B6';
+  position: absolute;
+  left: 0;
+  top: 0.25rem;
+  color: var(--addon-icon-color);
+  transition: transform 0.2s;
+}
+
+.addon-filter .expanded > .addon-type-header::before {
+  transform: rotate(90deg);
+}
+
+.addon-filter .selected {
+  font-weight: bold;
+}
