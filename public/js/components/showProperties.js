@@ -642,6 +642,7 @@ function showProperties(element, modeling, moddle, currentUser) {
 
 
   propsSidebar.append(form);
+  propsSidebar.style.display = 'flex';
   propsSidebar.classList.add('open');
 
   const unsub = currentTheme.subscribe(theme => {
@@ -689,9 +690,10 @@ function getOrCreateExtEl(bo, moddle) {
   // hide helper cleans up subscription
   function hideSidebar() {
     propsSidebar.classList.remove('open');
+    propsSidebar.style.display = 'none';
     if (propsSidebar._unsubTheme) {
       propsSidebar._unsubTheme();
-      delete propsSidebar._unsubTheme;      
+      delete propsSidebar._unsubTheme;
     }
   }
 
