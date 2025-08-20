@@ -1,9 +1,24 @@
 (function(global){
   const treeStream = new Stream(null);
+  let selectedId = null;
+
+  function setSelectedId(id){
+    selectedId = id;
+    treeStream.set(treeStream.get());
+  }
 
   function renderNode(node){
     const li = document.createElement('li');
     li.textContent = node.name || node.id;
+    li.dataset.elementId = node.id;
+    li.addEventListener('click', e => {
+      e.stopPropagation();
+      global.diagramTree.onSelect?.(node.id);
+    });
+
+    if (node.id === selectedId){
+      li.classList.add('diagram-tree-selected');
+    }
 
     if (node.children && node.children.length){
       const ul = document.createElement('ul');
@@ -31,6 +46,9 @@
 
   global.diagramTree = {
     treeStream,
-    createTreeContainer
+    createTreeContainer,
+    onSelect: () => {},
+    setSelectedId,
+    get selectedId(){ return selectedId; }
   };
 })(window);
