@@ -166,6 +166,35 @@ Object.assign(document.body.style, {
   const simulation      = createSimulation({ elementRegistry, canvas });
   const overlays        = modeler.get('overlays');
 
+  function updateDiagramTree() {
+    const registry = modeler.get('elementRegistry');
+    const root = registry.getAll().find(el => el.type === 'bpmn:Process');
+    if (!root) {
+      window.diagramTree?.treeStream.set(null);
+      return;
+    }
+
+    const visited = new Set();
+
+    function build(node) {
+      if (!node || visited.has(node.id)) return null;
+      visited.add(node.id);
+
+      const children = (node.children || [])
+        .map(build)
+        .filter(Boolean);
+
+      return {
+        id: node.id,
+        name: node.businessObject?.name || '',
+        children
+      };
+    }
+
+    const tree = build(root);
+    window.diagramTree?.treeStream.set(tree);
+  }
+
   // Store IDs of overlays we add so they can be cleaned up on update
   let addOnOverlayIds = [];
 
@@ -355,6 +384,7 @@ async function appendXml(xml) {
   try {
     // Import the new XML into the current diagram
     await modeler.importXML(xml);
+    updateDiagramTree();
     syncAddOnStoreFromElements();
     scheduleOverlayUpdate();
     
@@ -390,6 +420,7 @@ async function appendXml(xml) {
   async function importXml(xml) {
     try {
       await modeler.importXML(xml);
+      updateDiagramTree();
       syncAddOnStoreFromElements();
       scheduleOverlayUpdate();
       const svg = canvasEl.querySelector('svg');
@@ -656,7 +687,7 @@ function buildDropdownOptions() {
                   diagramVersion = selectedIndex + 1;
                   versionStream.set(diagramVersion); // wherever version is selected
 
-                  await modeler.importXML(selectedVersion.xml);
+                  await importXml(selectedVersion.xml);
                   if (selectedVersion.addOns) {
                     loadAddOnData(selectedVersion.addOns);
                   } else {
@@ -727,7 +758,7 @@ function buildDropdownOptions() {
             versionStream.set(diagramVersion);
 
             if (selected?.xml) {
-              await modeler.importXML(selected.xml);
+              await importXml(selected.xml);
               if (selected.addOns) {
                 loadAddOnData(selected.addOns);
               } else {
@@ -983,7 +1014,7 @@ currentTheme.subscribe(theme => {
 
 function clearModeler() {
 
-  modeler.importXML(defaultXml).then(() => {
+  importXml(defaultXml).then(() => {
     addOnStore.clear();
     scheduleOverlayUpdate();
     const canvas = modeler.get('canvas');
