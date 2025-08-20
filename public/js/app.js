@@ -194,6 +194,8 @@ Object.assign(document.body.style, {
       if (!node || visited.has(node.id)) return null;
       visited.add(node.id);
 
+      const owner = node.businessObject?.get('ownerRole') || '';
+
       const children = (node.children || [])
         .map(build)
         .filter(Boolean);
@@ -201,6 +203,7 @@ Object.assign(document.body.style, {
       return {
         id: node.id,
         name: node.businessObject?.name || '',
+        owner,
         children
       };
     }
