@@ -298,8 +298,11 @@ function showProperties(element, modeling, moddle, currentUser) {
   addOnsField.value = '';
 
   // Load existing addOns value from element
-  let existingVal = bo.get('addOns');
-  if (existingVal != null) {
+  let existingVal = bo.addOns;
+  if (Array.isArray(existingVal)) {
+    currentAddOns = existingVal;
+    addOnsField.value = JSON.stringify(currentAddOns, null, 2);
+  } else if (existingVal != null) {
     addOnsField.value = existingVal;
     try {
       currentAddOns = JSON.parse(existingVal);
@@ -307,6 +310,11 @@ function showProperties(element, modeling, moddle, currentUser) {
       console.warn("Invalid existing AddOns JSON; starting fresh");
       currentAddOns = [];
     }
+  }
+
+  // Sync store on open
+  if (window.addOnStore) {
+    addOnStore.setAddOns(bo.id, currentAddOns);
   }
 
   // Attach button
@@ -332,6 +340,11 @@ function showProperties(element, modeling, moddle, currentUser) {
 
         // Update visual list
         renderAddOnsList();
+
+        // Sync store after add
+        if (window.addOnStore) {
+          addOnStore.setAddOns(bo.id, currentAddOns);
+        }
 
         console.log("Updated AddOns array:", currentAddOns);
       });
@@ -442,6 +455,11 @@ function showProperties(element, modeling, moddle, currentUser) {
           currentAddOns.splice(index, 1);
           addOnsField.value = JSON.stringify(currentAddOns, null, 2);
           renderAddOnsList();
+
+          // Sync store after remove
+          if (window.addOnStore) {
+            addOnStore.setAddOns(bo.id, currentAddOns);
+          }
         }
       },
       // ✅ Use a fresh options object literal inside each call
