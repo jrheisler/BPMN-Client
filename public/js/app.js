@@ -201,14 +201,6 @@ Object.assign(document.body.style, {
     }, 0);
   }
 
-  if (window.addOnStore) {
-    const originalSetAddOns = addOnStore.setAddOns;
-    addOnStore.setAddOns = function(nodeId, addOns) {
-      originalSetAddOns(nodeId, addOns);
-      scheduleOverlayUpdate();
-    };
-  }
-
   if (window.addOnLegend) {
     const legendEl = addOnLegend.createAddOnLegend(typeIcons, currentTheme);
     legendEl.prepend(filterToggleBtn);
@@ -239,6 +231,23 @@ Object.assign(document.body.style, {
 
   selectedType.subscribe(updateHighlightedNodes);
   selectedSubtype.subscribe(updateHighlightedNodes);
+
+  if (window.addOnStore) {
+    const originalSetAddOns = addOnStore.setAddOns;
+    const originalClear = addOnStore.clear;
+
+    addOnStore.setAddOns = function(nodeId, addOns) {
+      originalSetAddOns(nodeId, addOns);
+      scheduleOverlayUpdate();
+      updateHighlightedNodes();
+    };
+
+    addOnStore.clear = function() {
+      originalClear();
+      scheduleOverlayUpdate();
+      updateHighlightedNodes();
+    };
+  }
 
   // --- Add-on store helpers -------------------------------------------------
   function syncAddOnStoreFromElements() {
