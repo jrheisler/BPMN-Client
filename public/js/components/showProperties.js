@@ -488,6 +488,19 @@ function showProperties(element, modeling, moddle, currentUser) {
   const saveBtn = reactiveButton(
     new Stream('Save'),
     () => {
+      let parsedAddOns = [];
+      try {
+        parsedAddOns = addOnsField.value ? JSON.parse(addOnsField.value) : [];
+        currentAddOns = parsedAddOns;
+        addOnsField.value = JSON.stringify(currentAddOns, null, 2);
+        if (window.addOnStore) {
+          addOnStore.setAddOns(bo.id, currentAddOns);
+        }
+      } catch (e) {
+        alert('AddOns must be valid JSON');
+        return;
+      }
+
       const data = new FormData(form);
       const props = {};
       const standardKeys = BPMN_PROPERTY_MAP[bo.$type] || [];
