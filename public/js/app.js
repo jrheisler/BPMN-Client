@@ -57,13 +57,7 @@ const overlay = createDiagramOverlay(
 
   const filterToggleBtn = document.createElement('button');
   filterToggleBtn.textContent = 'Filters';
-  Object.assign(filterToggleBtn.style, {
-    position: 'fixed',
-    top: '0.5rem',
-    right: '1rem',
-    zIndex: '1001'
-  });
-  document.body.appendChild(filterToggleBtn);
+  filterToggleBtn.classList.add('addon-filter-toggle');
 
   filterToggleBtn.addEventListener('click', () => {
     if (!addOnFilterPanelEl) {
@@ -217,6 +211,7 @@ Object.assign(document.body.style, {
 
   if (window.addOnLegend) {
     const legendEl = addOnLegend.createAddOnLegend(typeIcons, currentTheme);
+    legendEl.prepend(filterToggleBtn);
     document.body.appendChild(legendEl);
   }
 
