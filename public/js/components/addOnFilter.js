@@ -121,8 +121,19 @@
       display: 'none'
     });
 
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '\u00d7';
+    closeBtn.className = 'addon-filter-close';
+    closeBtn.addEventListener('click', () => {
+      panel.style.display = 'none';
+      selectedType.set(null);
+      selectedSubtype.set(null);
+      expandedType.set(null);
+    });
+
     const list = document.createElement('ul');
     panel.appendChild(list);
+    panel.prepend(closeBtn);
 
     Object.entries(addOnTypes).forEach(([type, subtypes]) => {
       const typeItem = document.createElement('li');

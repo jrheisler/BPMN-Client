@@ -65,6 +65,10 @@ const overlay = createDiagramOverlay(
       document.body.appendChild(addOnFilterPanelEl);
     }
     const isVisible = addOnFilterPanelEl.style.display === 'flex';
+    if (isVisible) {
+      selectedType.set(null);
+      selectedSubtype.set(null);
+    }
     addOnFilterPanelEl.style.display = isVisible ? 'none' : 'flex';
   });
 
