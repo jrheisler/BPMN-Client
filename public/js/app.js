@@ -86,9 +86,18 @@ Object.assign(document.body.style, {
   // ─── build canvas + xml-editor elements ────────────────────────────────────
   const canvasEl = document.getElementById('canvas');
 
-  canvasEl.addEventListener(
+  // Touch interactions are handled via CSS (see `touch-action: none`).
+  // Previously, we suppressed page scrolling by preventing the default
+  // `touchmove` behavior on the canvas element which also blocked BPMN's
+  // internal handlers. Rely on CSS instead and only prevent scrolling when
+  // touches originate outside the BPMN diagram container.
+  document.addEventListener(
     'touchmove',
-    e => e.preventDefault(),
+    e => {
+      if (!e.target.closest('.djs-container')) {
+        e.preventDefault();
+      }
+    },
     { passive: false }
   );
   const header   = document.querySelector('header');
