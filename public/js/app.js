@@ -165,9 +165,9 @@ Object.assign(document.body.style, {
       if (el.type === 'label' || el.labelTarget) return;
 
       const bo = el.businessObject;
-      const id = bo?.id;
-      if (!id || processed.has(id)) return;
-      processed.add(id);
+      const elementId = bo?.id;
+      if (!elementId || processed.has(elementId)) return;
+      processed.add(elementId);
 
       const raw = bo?.$attrs?.addOns || bo?.addOns;
       if (!raw) return;
@@ -196,11 +196,11 @@ Object.assign(document.body.style, {
       badge.style.fontSize = '14px';
       badge.innerText = icons;
 
-      const id = overlays.add(el, {
+      const overlayId = overlays.add(el, {
         position: { top: -10, left: -10 },
         html: badge
       });
-      addOnOverlayIds.push(id);
+      addOnOverlayIds.push(overlayId);
     });
   }
 
