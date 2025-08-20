@@ -159,8 +159,16 @@ Object.assign(document.body.style, {
     addOnOverlayIds.forEach(id => overlays.remove(id));
     addOnOverlayIds = [];
 
+    const processed = new Set();
+
     elementRegistry.getAll().forEach(el => {
+      if (el.type === 'label' || el.labelTarget) return;
+
       const bo = el.businessObject;
+      const id = bo?.id;
+      if (!id || processed.has(id)) return;
+      processed.add(id);
+
       const raw = bo?.$attrs?.addOns || bo?.addOns;
       if (!raw) return;
 
