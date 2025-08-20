@@ -461,14 +461,14 @@ function promptDiagramMetadata(initialName = '', initialNotes = '', themeStream 
 
 
 function selectVersionModal(diagramName, versions, themeStream = currentTheme) {
-  const versionStream = new Stream("0"); // Default to latest
+  const versionStream = new Stream((versions.length - 1).toString()); // Default to latest
   const pickStream = new Stream(null);   // Emits selected version index
 
   // Choices for dropdown
   const versionChoices = versions.map((ver, index) => ({
     value: index.toString(),
     label: `Version ${index + 1} — ${new Date(ver.timestamp).toLocaleString()}`
-  }));
+  })).reverse();
 
   const dropdown = dropdownStream(versionStream, {
     choices: versionChoices,

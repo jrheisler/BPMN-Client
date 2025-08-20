@@ -623,9 +623,9 @@ function buildDropdownOptions() {
               const versionChoices = versions.map((ver, index) => ({
                 value: index.toString(),
                 label: `Version ${index + 1} — ${new Date(ver.timestamp).toLocaleString()}`
-              }));
+              })).reverse();
 
-              versionStream.set("0"); // Default to latest version
+              versionStream.set((versions.length - 1).toString()); // Default to latest version
               const dropdown = dropdownStream(versionStream, {
                 choices: versionChoices,
                 width: '100%',
