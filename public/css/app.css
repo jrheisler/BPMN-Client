@@ -57,6 +57,10 @@
   font-weight: bold;
 }
 
+.diagram-tree-selected {
+  background: #ffd54f;
+}
+
 /* Filter toggle button within add-on legend */
 .addon-filter-toggle {
   padding: 0.25rem 0.5rem;

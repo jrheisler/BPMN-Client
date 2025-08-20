@@ -166,6 +166,20 @@ Object.assign(document.body.style, {
   const simulation      = createSimulation({ elementRegistry, canvas });
   const overlays        = modeler.get('overlays');
 
+  window.diagramTree.onSelect = id => {
+    const element = elementRegistry.get(id);
+    if (element) {
+      selectionService.select(element);
+      showProperties(element, modeling, moddle, currentUser);
+    }
+    window.diagramTree.setSelectedId(id);
+  };
+
+  eventBus.on('selection.changed', ({ newSelection }) => {
+    const element = newSelection[0];
+    window.diagramTree.setSelectedId(element?.id || null);
+  });
+
   function updateDiagramTree() {
     const registry = modeler.get('elementRegistry');
     const root = registry.getAll().find(el => el.type === 'bpmn:Process');
