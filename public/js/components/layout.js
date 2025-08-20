@@ -123,6 +123,7 @@ window.addEventListener('DOMContentLoaded', () => {
   panel.style.top = '0';
   panel.style.left = '-300px';
   panel.style.width = '300px';
+  panel.style.boxSizing = 'border-box';
   panel.style.height = '100%';
   panel.style.background = '#fff';
   panel.style.boxShadow = '2px 0 6px rgba(0,0,0,0.2)';
