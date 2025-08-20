@@ -113,3 +113,36 @@ function divider(options = {}, themeStream = currentTheme) {
   el.style.margin = options.margin || '1rem 0';
   return el;
 }
+
+// Diagram tree side panel toggle
+window.addEventListener('DOMContentLoaded', () => {
+  if (!window.diagramTree) return;
+
+  const panel = document.createElement('div');
+  panel.style.position = 'fixed';
+  panel.style.top = '0';
+  panel.style.left = '-300px';
+  panel.style.width = '300px';
+  panel.style.height = '100%';
+  panel.style.background = '#fff';
+  panel.style.boxShadow = '2px 0 6px rgba(0,0,0,0.2)';
+  panel.style.overflowY = 'auto';
+  panel.style.transition = 'left 0.3s';
+  panel.style.zIndex = '1000';
+  panel.style.padding = '1rem';
+
+  const content = window.diagramTree.createTreeContainer();
+  panel.appendChild(content);
+  document.body.appendChild(panel);
+
+  const btn = document.createElement('button');
+  btn.textContent = 'Tree';
+  btn.classList.add('diagram-tree-toggle');
+  btn.addEventListener('click', () => {
+    const open = panel.style.left === '0px';
+    panel.style.left = open ? '-300px' : '0px';
+  });
+
+  const header = document.querySelector('header') || document.body;
+  header.appendChild(btn);
+});
