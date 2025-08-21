@@ -11,6 +11,7 @@ function createSimulation(services, opts = {}) {
 
   // Stream of the current BPMN element holding the token
   const tokenStream = new Stream(null);
+  const tokenLogStream = new Stream([]);
   // Stream of available sequence flows when waiting on a gateway decision
   const pathsStream = new Stream(null);
 
@@ -31,6 +32,15 @@ function createSimulation(services, opts = {}) {
     }
     previousId = id;
   });
+
+  function logToken(element) {
+    const entry = {
+      elementId: element ? element.id : null,
+      elementName: element ? element.businessObject?.name || element.name || null : null,
+      timestamp: Date.now()
+    };
+    tokenLogStream.set([...tokenLogStream.get(), entry]);
+  }
 
   function getStart() {
     const all = elementRegistry.filter
@@ -70,6 +80,7 @@ function createSimulation(services, opts = {}) {
       console.log('No outgoing flow, simulation finished at', current.id);
       // clear token and reset state so simulation can start over cleanly
       tokenStream.set(null);
+      logToken(null);
       pathsStream.set(null);
       current = null;
       pause();
@@ -78,6 +89,7 @@ function createSimulation(services, opts = {}) {
 
     current = flow.target;
     tokenStream.set(current);
+    logToken(current);
     pathsStream.set(null);
     console.log('Token moved to element', current.id);
 
@@ -93,6 +105,7 @@ function createSimulation(services, opts = {}) {
     if (!current) {
       current = getStart();
       tokenStream.set(current);
+      logToken(current);
     }
     console.log('Simulation started at element', current && current.id);
     running = true;
@@ -112,7 +125,9 @@ function createSimulation(services, opts = {}) {
     }
     previousId = null;
     current = getStart();
+    tokenLogStream.set([]);
     tokenStream.set(current);
+    logToken(current);
     pathsStream.set(null);
     console.log('Simulation reset to start element', current && current.id);
   }
@@ -123,6 +138,7 @@ function createSimulation(services, opts = {}) {
     reset,
     step,
     tokenStream,
+    tokenLogStream,
     pathsStream
   };
 }
