@@ -185,6 +185,28 @@ Object.assign(document.body.style, {
   const simulation      = createSimulation({ elementRegistry, canvas });
   const overlays        = modeler.get('overlays');
 
+  // Token list panel for simulation log
+  const tokenPanel = window.tokenListPanel
+    .createTokenListPanel(simulation.tokenLogStream, currentTheme);
+  document.body.appendChild(tokenPanel.el);
+
+  const origStart = simulation.start;
+  simulation.start = (...args) => {
+    tokenPanel.show();
+    return origStart.apply(simulation, args);
+  };
+
+  const origReset = simulation.reset;
+  simulation.reset = (...args) => {
+    const res = origReset.apply(simulation, args);
+    tokenPanel.hide();
+    return res;
+  };
+
+  simulation.tokenLogStream.subscribe(entries => {
+    if (!entries.length) tokenPanel.hide();
+  });
+
   window.diagramTree.onSelect = id => {
     const element = elementRegistry.get(id);
     if (element) {
