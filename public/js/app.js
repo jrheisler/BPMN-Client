@@ -196,6 +196,14 @@ Object.assign(document.body.style, {
 
       const owner = node.businessObject?.get('ownerRole') || '';
 
+      // Classify element type for tree rendering
+      let kind = 'node';
+      if (node.type === 'label' || node.businessObject?.$type === 'bpmn:TextAnnotation') {
+        kind = 'text';
+      } else if (node.waypoints) {
+        kind = 'line';
+      }
+
       const children = (node.children || [])
         .map(build)
         .filter(Boolean);
@@ -204,6 +212,7 @@ Object.assign(document.body.style, {
         id: node.id,
         name: node.businessObject?.name || '',
         owner,
+        kind,
         children
       };
     }

@@ -119,18 +119,15 @@ window.addEventListener('DOMContentLoaded', () => {
   if (!window.diagramTree) return;
 
   const panel = document.createElement('div');
-  panel.style.position = 'fixed';
-  panel.style.top = '0';
-  panel.style.left = '-300px';
-  panel.style.width = '300px';
-  panel.style.boxSizing = 'border-box';
-  panel.style.height = '100%';
-  panel.style.background = '#fff';
-  panel.style.boxShadow = '2px 0 6px rgba(0,0,0,0.2)';
-  panel.style.overflowY = 'auto';
-  panel.style.transition = 'left 0.3s';
-  panel.style.zIndex = '1000';
-  panel.style.padding = '1rem';
+  panel.classList.add('diagram-tree-panel');
+
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '\u00D7';
+  closeBtn.classList.add('diagram-tree-close');
+  closeBtn.addEventListener('click', () => {
+    panel.style.left = '-300px';
+  });
+  panel.appendChild(closeBtn);
 
   const content = window.diagramTree.createTreeContainer();
   panel.appendChild(content);
@@ -144,6 +141,21 @@ window.addEventListener('DOMContentLoaded', () => {
     panel.style.left = open ? '-300px' : '0px';
   });
 
-  const header = document.querySelector('header') || document.body;
-  header.appendChild(btn);
+  document.body.appendChild(btn);
+
+  // Apply theme styling
+  currentTheme.subscribe(theme => {
+    const colors = theme.colors;
+    panel.style.background = colors.surface;
+    panel.style.color = colors.foreground;
+    panel.style.boxShadow = `2px 0 6px ${colors.border}`;
+
+    btn.style.backgroundColor = colors.primary;
+    btn.style.color = colors.foreground;
+    btn.style.border = `1px solid ${colors.border}`;
+
+    closeBtn.style.background = 'transparent';
+    closeBtn.style.color = colors.foreground;
+    closeBtn.style.border = 'none';
+  });
 });
