@@ -213,7 +213,7 @@ const themes = {
     colors: {
       background: '#000000',
       foreground: '#00ff00',
-      primary:    '#001100',
+      primary:    '#004400',
       accent:     '#00ff00',
       surface:    '#002200',
       border:     '#00aa00'
