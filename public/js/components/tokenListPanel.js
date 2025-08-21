@@ -8,7 +8,7 @@
       width: '250px',
       maxHeight: '200px',
       overflowY: 'auto',
-      padding: '0.5rem',
+      padding: '1.5rem 0.5rem 0.5rem 0.5rem',
       borderRadius: '4px',
       boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
       display: 'none',
@@ -27,6 +27,21 @@
     });
     panel.appendChild(list);
 
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '\u00D7';
+    Object.assign(closeBtn.style, {
+      position: 'absolute',
+      top: '0.25rem',
+      right: '0.25rem',
+      background: 'transparent',
+      border: 'none',
+      color: 'inherit',
+      cursor: 'pointer',
+      fontSize: '1rem',
+      lineHeight: '1'
+    });
+    panel.appendChild(closeBtn);
+
     function render(entries){
       list.innerHTML = '';
       entries.forEach(entry => {
@@ -44,6 +59,16 @@
 
     const unsubscribe = logStream.subscribe(render);
 
+    const treeBtn = document.querySelector('.diagram-tree-toggle');
+    if(treeBtn){
+      const styles = window.getComputedStyle(treeBtn);
+      const btnBottom = parseFloat(styles.bottom) || 0;
+      const btnHeight = treeBtn.offsetHeight || 0;
+      const gap = 8; // px
+      panel.style.bottom = `${btnBottom + btnHeight + gap}px`;
+      panel.style.right = styles.right;
+    }
+
     themeStream.subscribe(theme => {
       panel.style.background = theme.colors.surface;
       panel.style.color = theme.colors.foreground;
@@ -60,6 +85,8 @@
     function hide(){
       panel.style.display = 'none';
     }
+
+    closeBtn.addEventListener('click', hide);
 
     observeDOMRemoval(panel, unsubscribe);
 
