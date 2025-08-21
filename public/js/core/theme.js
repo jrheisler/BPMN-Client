@@ -5,14 +5,14 @@ const themes = {
     name: 'Dark',
     colors: {
       background: '#121212',
-      foreground: '#333',
+      foreground: '#f0f0f0',
       primary:    '#1e1e1e',
       accent:     '#bb86fc',
       surface:    '#1e1e1e',
-      border:     '#333'
+      border:     '#666'
     },
     bpmn: {
-      shape:      { fill: '#1e1e1e', stroke: '#333', strokeWidth: 2 },
+      shape:      { fill: '#1e1e1e', stroke: '#666', strokeWidth: 2 },
       connection: { stroke: '#f0f0f0', strokeWidth: 2 },
       marker:     { fill: '#f0f0f0', stroke: '#f0f0f0' },
       label:      { fontFamily: 'system-ui, sans-serif', fill: '#f0f0f0' },
