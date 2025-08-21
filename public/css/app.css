@@ -66,6 +66,59 @@
   opacity: 0.7;
 }
 
+/* Diagram tree type indicators */
+.diagram-tree-item::before {
+  display: inline-block;
+  width: 1rem;
+  margin-right: 0.25rem;
+  text-align: center;
+}
+
+.diagram-tree-kind-node::before {
+  content: '\25A0'; /* black square */
+}
+
+.diagram-tree-kind-line::before {
+  content: '\27A4'; /* arrow */
+}
+
+.diagram-tree-kind-text::before {
+  content: '\270E'; /* pencil */
+}
+
+/* Diagram tree panel and controls */
+.diagram-tree-panel {
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 300px;
+  box-sizing: border-box;
+  height: 100%;
+  overflow-y: auto;
+  transition: left 0.3s;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.diagram-tree-toggle {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.diagram-tree-close {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
 /* Filter toggle button within add-on legend */
 .addon-filter-toggle {
   padding: 0.25rem 0.5rem;

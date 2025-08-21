@@ -9,6 +9,7 @@
 
   function renderNode(node){
     const li = document.createElement('li');
+    li.classList.add('diagram-tree-item', `diagram-tree-kind-${node.kind || 'node'}`);
     const label = node.name || node.id;
     if (node.owner){
       li.textContent = label + ' ';
