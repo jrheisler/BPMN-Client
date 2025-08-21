@@ -62,11 +62,17 @@
     const treeBtn = document.querySelector('.diagram-tree-toggle');
     if(treeBtn){
       const styles = window.getComputedStyle(treeBtn);
-      const btnBottom = parseFloat(styles.bottom) || 0;
-      const btnHeight = treeBtn.offsetHeight || 0;
+      const rect = treeBtn.getBoundingClientRect();
       const gap = 8; // px
-      panel.style.bottom = `${btnBottom + btnHeight + gap}px`;
+
+      // place the panel above the tree button using pixel values
+      const bottomOffset = (window.innerHeight - rect.bottom) + rect.height + gap;
+      panel.style.bottom = `${bottomOffset}px`;
       panel.style.right = styles.right;
+
+      // ensure the panel appears above the tree button
+      const zIndex = parseInt(styles.zIndex || '0', 10);
+      panel.style.zIndex = String(zIndex + 1);
     }
 
     themeStream.subscribe(theme => {
