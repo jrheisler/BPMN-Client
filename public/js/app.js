@@ -182,7 +182,11 @@ Object.assign(document.body.style, {
 
   function updateDiagramTree() {
     const registry = modeler.get('elementRegistry');
-    const root = registry.getAll().find(el => el.type === 'bpmn:Process');
+    const canvas = modeler.get('canvas');
+    let root = canvas.getRootElement();
+    if (root.type === 'bpmn:Collaboration' && root.children?.length) {
+      root = root.children[0]; // pick first participant/process
+    }
     if (!root) {
       window.diagramTree?.treeStream.set(null);
       return;
