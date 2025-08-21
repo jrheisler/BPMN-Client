@@ -209,7 +209,9 @@ function toggleSwitch(stream, options = {}, themeStream = currentTheme) {
 
     applyTheme(wrapper, options);
 
-    const onColor = options.onColor || colors.primary || '#4CAF50';
+    // Prefer a bright accent color for the "on" state to ensure contrast,
+    // falling back to the theme's primary or a default green.
+    const onColor = options.onColor || colors.accent || colors.primary || '#4CAF50';
     const offColor = options.offColor || colors.background || '#888';
     const knobColor = options.knobColor || '#fff';
 
