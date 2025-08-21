@@ -1,3 +1,11 @@
+.djs-direct-editing-parent,
+.djs-direct-editing-content {
+  background: #1e1e1e;
+  color: #f0f0f0;
+  border: 1px solid #666;
+  outline: 1px solid #666;
+}
+
 .djs-element.bpmn-addOn-highlight .djs-visual > :nth-child(1) {
   stroke: #ff9800;
   stroke-width: 4px;
