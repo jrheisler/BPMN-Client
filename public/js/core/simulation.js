@@ -23,7 +23,7 @@ function createSimulation(services, opts = {}) {
   let previousId = null;
   tokenStream.subscribe(el => {
     const id = el && el.id;
-    if (previousId) {
+    if (previousId && elementRegistry.get(previousId)) {
       canvas.removeMarker(previousId, 'active');
     }
     if (id) {
@@ -107,6 +107,10 @@ function createSimulation(services, opts = {}) {
 
   function reset() {
     pause();
+    if (previousId && elementRegistry.get(previousId)) {
+      canvas.removeMarker(previousId, 'active');
+    }
+    previousId = null;
     current = getStart();
     tokenStream.set(current);
     pathsStream.set(null);
