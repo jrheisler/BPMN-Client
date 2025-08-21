@@ -103,6 +103,29 @@
   const selectedSubtype = new Stream(null);
   const expandedType = new Stream(null);
 
+  function adjustColor(hex, amount) {
+    const col = hex.startsWith('#') ? hex.slice(1) : hex;
+    const num = parseInt(col, 16);
+    let r = (num >> 16) + amount;
+    let g = ((num >> 8) & 0xFF) + amount;
+    let b = (num & 0xFF) + amount;
+    r = Math.min(255, Math.max(0, r));
+    g = Math.min(255, Math.max(0, g));
+    b = Math.min(255, Math.max(0, b));
+    return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+  }
+
+  function getContrastingHoverBg(primary) {
+    const col = primary.startsWith('#') ? primary : `#${primary}`;
+    const num = parseInt(col.slice(1), 16);
+    const r = num >> 16;
+    const g = (num >> 8) & 0xFF;
+    const b = num & 0xFF;
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    const amount = 40;
+    return adjustColor(col, brightness < 128 ? amount : -amount);
+  }
+
   function createAddOnFilterPanel(themeStream = currentTheme){
     const panel = document.createElement('div');
     panel.classList.add('addon-filter');
@@ -183,7 +206,7 @@
       panel.style.color = theme.colors.foreground;
       panel.style.borderRight = `1px solid ${theme.colors.border}`;
       panel.style.fontFamily = theme.fonts.base || 'sans-serif';
-      panel.style.setProperty('--addon-hover-bg', theme.colors.primary + '22');
+      panel.style.setProperty('--addon-hover-bg', getContrastingHoverBg(theme.colors.primary));
       panel.style.setProperty('--addon-icon-color', theme.colors.foreground);
     });
 
