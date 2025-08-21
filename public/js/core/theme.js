@@ -5,18 +5,18 @@ const themes = {
     name: 'Dark',
     colors: {
       background: '#121212',
-      foreground: '#f0f0f0',
+      foreground: '#00ffcc',
       primary:    '#1e1e1e',
-      accent:     '#bb86fc',
+      accent:     '#ff00ff',
       surface:    '#1e1e1e',
       border:     '#666'
     },
     bpmn: {
       shape:      { fill: '#1e1e1e', stroke: '#666', strokeWidth: 2 },
-      connection: { stroke: '#f0f0f0', strokeWidth: 2 },
-      marker:     { fill: '#f0f0f0', stroke: '#f0f0f0' },
-      label:      { fontFamily: 'system-ui, sans-serif', fill: '#f0f0f0' },
-      selected:   { stroke: '#bb86fc', strokeWidth: 3 }
+      connection: { stroke: '#00ffcc', strokeWidth: 2 },
+      marker:     { fill: '#00ffcc', stroke: '#00ffcc' },
+      label:      { fontFamily: 'system-ui, sans-serif', fill: '#00ffcc' },
+      selected:   { stroke: '#ff00ff', strokeWidth: 3 }
     },
     fonts: {
       base:      'system-ui, sans-serif',
@@ -51,18 +51,18 @@ const themes = {
     name: 'Ocean',
     colors: {
       background: '#0a192f',
-      foreground: '#ccd6f6',
+      foreground: '#00ffcc',
       primary:    '#112240',
-      accent:     '#64ffda',
+      accent:     '#ff00ff',
       surface:    '#0e2438',
       border:     '#1c3a5f'
     },
     bpmn: {
       shape:      { fill: '#0e2438', stroke: '#1c3a5f', strokeWidth: 2 },
-      connection: { stroke: '#ccd6f6', strokeWidth: 2 },
-      marker:     { fill: '#ccd6f6', stroke: '#ccd6f6' },
-      label:      { fontFamily: 'Roboto, sans-serif', fill: '#ccd6f6' },
-      selected:   { stroke: '#64ffda', strokeWidth: 3 }
+      connection: { stroke: '#00ffcc', strokeWidth: 2 },
+      marker:     { fill: '#00ffcc', stroke: '#00ffcc' },
+      label:      { fontFamily: 'Roboto, sans-serif', fill: '#00ffcc' },
+      selected:   { stroke: '#ff00ff', strokeWidth: 3 }
     },
     fonts: {
       base:      'Roboto, sans-serif',
@@ -74,18 +74,18 @@ const themes = {
     name: 'Solarized Dark',
     colors: {
       background: '#002b36',
-      foreground: '#93a1a1',
+      foreground: '#00ffcc',
       primary:    '#073642',
-      accent:     '#b58900',
+      accent:     '#ff00ff',
       surface:    '#003847',
       border:     '#586e75'
     },
     bpmn: {
       shape:      { fill: '#003847', stroke: '#586e75', strokeWidth: 2 },
-      connection: { stroke: '#93a1a1', strokeWidth: 2 },
-      marker:     { fill: '#93a1a1', stroke: '#93a1a1' },
-      label:      { fontFamily: 'Arial, sans-serif', fill: '#93a1a1' },
-      selected:   { stroke: '#b58900', strokeWidth: 3 }
+      connection: { stroke: '#00ffcc', strokeWidth: 2 },
+      marker:     { fill: '#00ffcc', stroke: '#00ffcc' },
+      label:      { fontFamily: 'Arial, sans-serif', fill: '#00ffcc' },
+      selected:   { stroke: '#ff00ff', strokeWidth: 3 }
     },
     fonts: {
       base:      'Arial, sans-serif',
@@ -120,18 +120,18 @@ const themes = {
     name: 'Forest',
     colors: {
       background: '#2e3d29',
-      foreground: '#e1f4e5',
+      foreground: '#00ffcc',
       primary:    '#3a4d37',
-      accent:     '#a8e6cf',
+      accent:     '#ff00ff',
       surface:    '#2d4f3a',
       border:     '#4caf50'
     },
     bpmn: {
       shape:      { fill: '#2d4f3a', stroke: '#4caf50', strokeWidth: 2 },
-      connection: { stroke: '#e1f4e5', strokeWidth: 2 },
-      marker:     { fill: '#e1f4e5', stroke: '#e1f4e5' },
-      label:      { fontFamily: 'Verdana, sans-serif', fill: '#e1f4e5' },
-      selected:   { stroke: '#a8e6cf', strokeWidth: 3 }
+      connection: { stroke: '#00ffcc', strokeWidth: 2 },
+      marker:     { fill: '#00ffcc', stroke: '#00ffcc' },
+      label:      { fontFamily: 'Verdana, sans-serif', fill: '#00ffcc' },
+      selected:   { stroke: '#ff00ff', strokeWidth: 3 }
     },
     fonts: {
       base:      'Verdana, sans-serif',
@@ -166,18 +166,18 @@ const themes = {
     name: 'Midnight',
     colors: {
       background: '#1a1a2e',
-      foreground: '#eaeaea',
+      foreground: '#00ffcc',
       primary:    '#16213e',
-      accent:     '#0f3460',
+      accent:     '#ff00ff',
       surface:    '#202040',
       border:     '#2a2a5c'
     },
     bpmn: {
       shape:      { fill: '#202040', stroke: '#2a2a5c', strokeWidth: 2 },
-      connection: { stroke: '#eaeaea', strokeWidth: 2 },
-      marker:     { fill: '#eaeaea', stroke: '#eaeaea' },
-      label:      { fontFamily: 'Helvetica Neue, sans-serif', fill: '#eaeaea' },
-      selected:   { stroke: '#0f3460', strokeWidth: 3 }
+      connection: { stroke: '#00ffcc', strokeWidth: 2 },
+      marker:     { fill: '#00ffcc', stroke: '#00ffcc' },
+      label:      { fontFamily: 'Helvetica Neue, sans-serif', fill: '#00ffcc' },
+      selected:   { stroke: '#ff00ff', strokeWidth: 3 }
     },
     fonts: {
       base:      'Helvetica Neue, sans-serif',
