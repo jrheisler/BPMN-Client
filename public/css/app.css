@@ -102,8 +102,8 @@
 
 .diagram-tree-toggle {
   position: fixed;
-  bottom: 1rem;
-  left: 1rem;
+  bottom: 3rem;
+  right: 1rem;
   padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
