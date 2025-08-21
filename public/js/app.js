@@ -1035,6 +1035,15 @@ currentTheme.subscribe(theme => {
       stroke: orange !important;
       stroke-width: 4px !important;
     }
+
+    /* ── direct editing overlay ───────────────────────────────────────── */
+    .djs-direct-editing-parent,
+    .djs-direct-editing-content {
+      background: ${colors.surface} !important;
+      color: ${colors.foreground} !important;
+      border: 1px solid ${colors.border} !important;
+      outline: 1px solid ${colors.border} !important;
+    }
   `;
 });
 
