@@ -218,9 +218,13 @@ Object.assign(document.body.style, {
     return res;
   };
 
-  simulation.tokenLogStream.subscribe(entries => {
-    if (!entries.length) tokenPanel.hide();
-  });
+    simulation.tokenLogStream.subscribe(entries => {
+      if (entries.length) {
+        tokenPanel.show();
+      } else {
+        tokenPanel.hide();
+      }
+    });
 
   window.diagramTree.onSelect = id => {
     const element = elementRegistry.get(id);
