@@ -19,6 +19,7 @@ function createSimulation(services, opts = {}) {
   let running = false;
   let current = null;
   let resumeAfterChoice = false;
+  let tokenQueue = [];
 
   // Visual highlighting of the active element
   let previousId = null;
@@ -59,26 +60,36 @@ function createSimulation(services, opts = {}) {
     timer = setTimeout(() => step(), delay);
   }
 
-  function step(flowId) {
+  function step(flowIds) {
     if (!current) return;
 
     console.log('Stepping from', current.id);
 
     const outgoing = current.outgoing || [];
 
-    // Handle exclusive gateway by exposing available paths
-    if (current.type === 'bpmn:ExclusiveGateway' && !flowId) {
-      console.log('Awaiting decision at gateway', current.id);
-      pathsStream.set(outgoing);
-      resumeAfterChoice = running;
-      pause();
-      return;
+    const handlers = {
+      'bpmn:ExclusiveGateway': handleExclusiveGateway,
+      'bpmn:ParallelGateway': handleParallelGateway,
+      'bpmn:InclusiveGateway': handleInclusiveGateway,
+      'bpmn:EventBasedGateway': handleEventBasedGateway
+    };
+
+    const handler = handlers[current.type];
+
+    if (handler) {
+      const paused = handler(outgoing, flowIds);
+      if (paused) return;
+    } else {
+      if (/Gateway/.test(current.type)) {
+        console.warn('Unknown gateway type', current.type);
+      }
+      handleDefault(outgoing);
     }
 
-    const flow = flowId ? elementRegistry.get(flowId) : outgoing[0];
-    if (!flow) {
-      console.log('No outgoing flow, simulation finished at', current.id);
-      // clear token and reset state so simulation can start over cleanly
+    current = tokenQueue.shift();
+
+    if (!current) {
+      console.log('No outgoing flow, simulation finished');
       tokenStream.set(null);
       logToken(null);
       pathsStream.set(null);
@@ -87,7 +98,6 @@ function createSimulation(services, opts = {}) {
       return;
     }
 
-    current = flow.target;
     tokenStream.set(current);
     logToken(current);
     pathsStream.set(null);
@@ -98,6 +108,64 @@ function createSimulation(services, opts = {}) {
       start();
     } else {
       schedule();
+    }
+  }
+
+  function handleDefault(outgoing) {
+    const flow = outgoing[0];
+    if (flow) {
+      tokenQueue.push(flow.target);
+    }
+  }
+
+  function handleExclusiveGateway(outgoing, flowId) {
+    if (!flowId) {
+      console.log('Awaiting decision at gateway', current.id);
+      pathsStream.set(outgoing);
+      resumeAfterChoice = running;
+      pause();
+      return true;
+    }
+    const flow = elementRegistry.get(flowId);
+    if (flow) {
+      tokenQueue.push(flow.target);
+    }
+  }
+
+  function handleParallelGateway(outgoing) {
+    outgoing.forEach(flow => {
+      tokenQueue.push(flow.target);
+    });
+  }
+
+  function handleInclusiveGateway(outgoing, flowIds) {
+    const ids = Array.isArray(flowIds) ? flowIds : flowIds ? [flowIds] : null;
+    if (!ids || ids.length === 0) {
+      console.log('Awaiting inclusive decision at gateway', current.id);
+      pathsStream.set(outgoing);
+      resumeAfterChoice = running;
+      pause();
+      return true;
+    }
+    ids.forEach(id => {
+      const flow = elementRegistry.get(id);
+      if (flow) {
+        tokenQueue.push(flow.target);
+      }
+    });
+  }
+
+  function handleEventBasedGateway(outgoing, flowId) {
+    if (!flowId) {
+      console.log('Awaiting event at gateway', current.id);
+      pathsStream.set(outgoing);
+      resumeAfterChoice = running;
+      pause();
+      return true;
+    }
+    const flow = elementRegistry.get(flowId);
+    if (flow) {
+      tokenQueue.push(flow.target);
     }
   }
 
@@ -124,6 +192,7 @@ function createSimulation(services, opts = {}) {
       canvas.removeMarker(previousId, 'active');
     }
     previousId = null;
+    tokenQueue = [];
     current = getStart();
     tokenLogStream.set([]);
     tokenStream.set(current);
