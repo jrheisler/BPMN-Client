@@ -115,6 +115,20 @@ function createSimulation(services, opts = {}) {
     if (clearSkip) skipHandlerFor.clear();
   }
 
+  function cleanup() {
+    clearHandlerState(true);
+    awaitingToken = null;
+    resumeAfterChoice = false;
+    pathsStream.set(null);
+    tokens = [];
+    tokenStream.set(tokens);
+    tokenLogStream.set([]);
+    previousIds.forEach(id => {
+      if (elementRegistry.get(id)) canvas.removeMarker(id, 'active');
+    });
+    previousIds = new Set();
+  }
+
   function handleDefault(token, outgoing) {
     const flow = outgoing[0];
     if (flow) {
@@ -240,6 +254,7 @@ function createSimulation(services, opts = {}) {
       if (!tokens.length) {
         console.log('No outgoing flow, simulation finished');
         pause();
+        cleanup();
         return;
       }
       if (resumeAfterChoice) {
@@ -298,6 +313,7 @@ function createSimulation(services, opts = {}) {
     if (!tokens.length) {
       console.log('No outgoing flow, simulation finished');
       pause();
+      cleanup();
       return;
     }
 
@@ -322,18 +338,19 @@ function createSimulation(services, opts = {}) {
     running = false;
     clearTimeout(timer);
     console.log('Simulation paused');
+    if (!tokens.length) {
+      cleanup();
+    }
+  }
+
+  function stop() {
+    pause();
+    cleanup();
   }
 
   function reset() {
     pause();
-    clearHandlerState(true);
-    previousIds.forEach(id => {
-      if (elementRegistry.get(id)) canvas.removeMarker(id, 'active');
-    });
-    previousIds = new Set();
-    tokens = [];
-    awaitingToken = null;
-    tokenLogStream.set([]);
+    cleanup();
     const startEl = getStart();
     const t = { id: nextTokenId++, element: startEl };
     tokens = [t];
@@ -346,6 +363,7 @@ function createSimulation(services, opts = {}) {
   return {
     start,
     pause,
+    stop,
     reset,
     step,
     tokenStream,
