@@ -4,6 +4,14 @@
 // Usage:
 //   const simulation = createSimulation({ elementRegistry, canvas }, { delay: 500 });
 //   simulation.start();
+//
+// Handlers can be registered via `elementHandlers` to intercept elements:
+//   simulation.elementHandlers.set('bpmn:UserTask', (token, api) => {
+//     api.pause();
+//     // async work ... then
+//     api.resume();
+//     return [token];
+//   });
 
 function createSimulation(services, opts = {}) {
   const { elementRegistry, canvas } = services;
@@ -21,6 +29,15 @@ function createSimulation(services, opts = {}) {
   let awaitingToken = null;
   let resumeAfterChoice = false;
   let nextTokenId = 1;
+
+  // Map of BPMN element type -> handler(token, api)
+  const elementHandlers = new Map();
+
+  // Cleanup hooks for element handlers (timeouts, listeners, ...)
+  const handlerCleanups = new Set();
+
+  // Token ids that should skip their element handler on next step
+  const skipHandlerFor = new Set();
 
   // Visual highlighting of the active elements
   let previousIds = new Set();
@@ -67,6 +84,35 @@ function createSimulation(services, opts = {}) {
     clearTimeout(timer);
     if (!running) return;
     timer = setTimeout(() => step(), delay);
+  }
+
+  // --- Default element handlers ---
+  elementHandlers.set('bpmn:UserTask', (token, api) => {
+    console.log('Waiting at user task', token.element.id);
+    api.pause();
+    const to = setTimeout(() => {
+      skipHandlerFor.add(token.id);
+      api.resume();
+    }, delay);
+    api.addCleanup(() => clearTimeout(to));
+    return [token];
+  });
+
+  elementHandlers.set('bpmn:TimerEvent', (token, api) => {
+    console.log('Timer event triggered', token.element.id);
+    api.pause();
+    const to = setTimeout(() => {
+      skipHandlerFor.add(token.id);
+      api.resume();
+    }, delay);
+    api.addCleanup(() => clearTimeout(to));
+    return [token];
+  });
+
+  function clearHandlerState(clearSkip = false) {
+    handlerCleanups.forEach(fn => fn());
+    handlerCleanups.clear();
+    if (clearSkip) skipHandlerFor.clear();
   }
 
   function handleDefault(token, outgoing) {
@@ -151,15 +197,31 @@ function createSimulation(services, opts = {}) {
 
   function processToken(token, flowIds) {
     const outgoing = token.element.outgoing || [];
-    const handlers = {
+
+    if (!skipHandlerFor.has(token.id)) {
+      const elHandler = elementHandlers.get(token.element.type);
+      if (elHandler) {
+        const api = {
+          pause,
+          resume: start,
+          addCleanup: fn => handlerCleanups.add(fn)
+        };
+        const res = elHandler(token, api, flowIds);
+        if (Array.isArray(res)) return res;
+      }
+    } else {
+      skipHandlerFor.delete(token.id);
+    }
+
+    const gatewayHandlers = {
       'bpmn:ExclusiveGateway': handleExclusiveGateway,
       'bpmn:ParallelGateway': handleParallelGateway,
       'bpmn:InclusiveGateway': handleInclusiveGateway,
       'bpmn:EventBasedGateway': handleEventBasedGateway
     };
-    const handler = handlers[token.element.type];
-    if (handler) {
-      return handler(token, outgoing, flowIds);
+    const gatewayHandler = gatewayHandlers[token.element.type];
+    if (gatewayHandler) {
+      return gatewayHandler(token, outgoing, flowIds);
     }
     if (/Gateway/.test(token.element.type)) {
       console.warn('Unknown gateway type', token.element.type);
@@ -243,6 +305,7 @@ function createSimulation(services, opts = {}) {
   }
 
   function start() {
+    clearHandlerState();
     if (!tokens.length) {
       const startEl = getStart();
       const t = { id: nextTokenId++, element: startEl };
@@ -263,6 +326,7 @@ function createSimulation(services, opts = {}) {
 
   function reset() {
     pause();
+    clearHandlerState(true);
     previousIds.forEach(id => {
       if (elementRegistry.get(id)) canvas.removeMarker(id, 'active');
     });
@@ -286,7 +350,8 @@ function createSimulation(services, opts = {}) {
     step,
     tokenStream,
     tokenLogStream,
-    pathsStream
+    pathsStream,
+    elementHandlers
   };
 }
 
