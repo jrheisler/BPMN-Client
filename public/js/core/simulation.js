@@ -321,7 +321,19 @@ function createSimulation(services, opts = {}) {
   }
 
   function start() {
+    if (tokens.length && !running) {
+      stop();
+    }
+
     clearHandlerState();
+    tokenLogStream.set([]);
+    pathsStream.set(null);
+    awaitingToken = null;
+    previousIds.forEach(id => {
+      if (elementRegistry.get(id)) canvas.removeMarker(id, 'active');
+    });
+    previousIds = new Set();
+
     if (!tokens.length) {
       const startEl = getStart();
       const t = { id: nextTokenId++, element: startEl };
