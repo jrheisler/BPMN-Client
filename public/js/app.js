@@ -190,6 +190,21 @@ Object.assign(document.body.style, {
     .createTokenListPanel(simulation.tokenLogStream, currentTheme);
   document.body.appendChild(tokenPanel.el);
 
+  const treeBtn = document.querySelector('.diagram-tree-toggle');
+
+  const origPanelShow = tokenPanel.show;
+  tokenPanel.show = (...args) => {
+    if (treeBtn) treeBtn.style.display = 'none';
+    return origPanelShow.apply(tokenPanel, args);
+  };
+
+  const origPanelHide = tokenPanel.hide;
+  tokenPanel.hide = (...args) => {
+    const res = origPanelHide.apply(tokenPanel, args);
+    if (treeBtn) treeBtn.style.display = '';
+    return res;
+  };
+
   const origStart = simulation.start;
   simulation.start = (...args) => {
     tokenPanel.show();
