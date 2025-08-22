@@ -48,7 +48,8 @@
         const li = document.createElement('li');
         const time = new Date(entry.timestamp).toLocaleTimeString();
         const namePart = entry.elementName ? ` - ${entry.elementName}` : '';
-        li.textContent = `${time}: ${entry.elementId}${namePart}`;
+        const idPart = entry.tokenId != null ? `[${entry.tokenId}] ` : '';
+        li.textContent = `${time} ${idPart}${entry.elementId}${namePart}`;
         list.appendChild(li);
       });
       panel.style.display = entries.length ? 'block' : 'none';
