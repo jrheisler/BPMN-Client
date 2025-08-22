@@ -132,7 +132,7 @@ function createSimulation(services, opts = {}) {
   function handleDefault(token, outgoing) {
     const flow = outgoing[0];
     if (flow) {
-      const next = { id: token.id, element: flow.target };
+      const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins };
       logToken(next);
       return [next];
     }
@@ -151,7 +151,7 @@ function createSimulation(services, opts = {}) {
     }
     const flow = elementRegistry.get(flowId);
     if (flow) {
-      const next = { id: token.id, element: flow.target };
+      const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins };
       logToken(next);
       return [next];
     }
@@ -162,7 +162,8 @@ function createSimulation(services, opts = {}) {
     return outgoing.map((flow, idx) => {
       const next = {
         id: idx === 0 ? token.id : nextTokenId++,
-        element: flow.target
+        element: flow.target,
+        pendingJoins: token.pendingJoins
       };
       logToken(next);
       return next;
@@ -182,9 +183,12 @@ function createSimulation(services, opts = {}) {
     return ids.map((id, idx) => {
       const flow = elementRegistry.get(id);
       if (!flow) return null;
+      const pendingJoins = { ...(token.pendingJoins || {}) };
+      pendingJoins[token.element.id] = ids.length;
       const next = {
         id: idx === 0 ? token.id : nextTokenId++,
-        element: flow.target
+        element: flow.target,
+        pendingJoins
       };
       logToken(next);
       return next;
@@ -202,7 +206,7 @@ function createSimulation(services, opts = {}) {
     }
     const flow = elementRegistry.get(flowId);
     if (flow) {
-      const next = { id: token.id, element: flow.target };
+      const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins };
       logToken(next);
       return [next];
     }
@@ -278,11 +282,20 @@ function createSimulation(services, opts = {}) {
       if (incomingCount > 1) {
         const group = tokens.filter(t => t.element.id === el.id);
         group.forEach(t => processed.add(t.id));
-        if (group.length < incomingCount) {
+        const expected = group[0].pendingJoins?.[el.id] || incomingCount;
+        if (group.length < expected) {
           newTokens.push(...group);
           continue;
         }
         const merged = { id: group[0].id, element: el };
+        const mergedPending = {};
+        group.forEach(t => {
+          if (t.pendingJoins) Object.assign(mergedPending, t.pendingJoins);
+        });
+        if (mergedPending[el.id]) delete mergedPending[el.id];
+        if (Object.keys(mergedPending).length) {
+          merged.pendingJoins = mergedPending;
+        }
         const res = processToken(merged);
         if (res === null) {
           awaitingToken = merged;
