@@ -59,20 +59,26 @@
 
     const unsubscribe = logStream.subscribe(render);
 
+    const cleanupFns = [unsubscribe];
+
     const treeBtn = document.querySelector('.diagram-tree-toggle');
     if(treeBtn){
       const styles = window.getComputedStyle(treeBtn);
       const gap = 8; // px
 
-      // position the panel above the tree button
-      const bottom = parseFloat(styles.bottom) || 0;
-      const bottomOffset = bottom + treeBtn.offsetHeight + gap;
-      panel.style.bottom = `${bottomOffset}px`;
-      panel.style.right = styles.right;
+      function positionPanel(){
+        const rect = treeBtn.getBoundingClientRect();
+        panel.style.bottom = `${window.innerHeight - rect.top + gap}px`;
+        panel.style.right = `${window.innerWidth - rect.right}px`;
+      }
 
-      // ensure the panel appears above the tree button
-      const zIndex = parseInt(styles.zIndex || '0', 10);
-      panel.style.zIndex = String(zIndex + 1);
+      positionPanel();
+
+      const zIndex = parseInt(styles.zIndex, 10);
+      panel.style.zIndex = String((Number.isNaN(zIndex) ? 0 : zIndex) + 1);
+
+      window.addEventListener('resize', positionPanel);
+      cleanupFns.push(() => window.removeEventListener('resize', positionPanel));
     }
 
     themeStream.subscribe(theme => {
@@ -101,7 +107,7 @@
 
     closeBtn.addEventListener('click', hide);
 
-    observeDOMRemoval(panel, unsubscribe);
+    observeDOMRemoval(panel, ...cleanupFns);
 
     return { el: panel, show, hide };
   }
