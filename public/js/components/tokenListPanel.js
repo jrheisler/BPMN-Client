@@ -62,11 +62,11 @@
     const treeBtn = document.querySelector('.diagram-tree-toggle');
     if(treeBtn){
       const styles = window.getComputedStyle(treeBtn);
-      const rect = treeBtn.getBoundingClientRect();
       const gap = 8; // px
 
-      // place the panel above the tree button using pixel values
-      const bottomOffset = (window.innerHeight - rect.bottom) + rect.height + gap;
+      // position the panel above the tree button
+      const bottom = parseFloat(styles.bottom) || 0;
+      const bottomOffset = bottom + treeBtn.offsetHeight + gap;
       panel.style.bottom = `${bottomOffset}px`;
       panel.style.right = styles.right;
 
