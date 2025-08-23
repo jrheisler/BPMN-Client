@@ -95,15 +95,8 @@
       }
     }
 
-    let clearing = false;
-
     function hide(){
       panel.style.display = 'none';
-      if(!clearing && logStream.get().length){
-        clearing = true;
-        logStream.set([]);
-        clearing = false;
-      }
     }
 
     closeBtn.addEventListener('click', hide);
