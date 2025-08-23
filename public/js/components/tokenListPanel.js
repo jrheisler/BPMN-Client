@@ -42,6 +42,22 @@
     });
     panel.appendChild(closeBtn);
 
+    const downloadBtn = document.createElement('button');
+    downloadBtn.textContent = '\u2193';
+    Object.assign(downloadBtn.style, {
+      position: 'absolute',
+      top: '0.25rem',
+      right: '1.75rem',
+      background: 'transparent',
+      border: 'none',
+      color: 'inherit',
+      cursor: 'pointer',
+      fontSize: '1rem',
+      lineHeight: '1',
+      display: 'none'
+    });
+    panel.appendChild(downloadBtn);
+
     function render(entries){
       list.innerHTML = '';
       entries.forEach(entry => {
@@ -97,13 +113,22 @@
 
     function hide(){
       panel.style.display = 'none';
+      downloadBtn.style.display = 'none';
+    }
+
+    function showDownload(){
+      downloadBtn.style.display = 'inline';
+    }
+
+    function setDownloadHandler(handler){
+      downloadBtn.addEventListener('click', handler);
     }
 
     closeBtn.addEventListener('click', hide);
 
     observeDOMRemoval(panel, ...cleanupFns);
 
-    return { el: panel, show, hide };
+    return { el: panel, show, hide, showDownload, setDownloadHandler };
   }
 
   global.tokenListPanel = { createTokenListPanel };

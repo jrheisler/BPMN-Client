@@ -212,18 +212,34 @@ Object.assign(document.body.style, {
 
   const origStart = simulation.start;
   simulation.start = (...args) => {
+    tokenPanel.hide();
     tokenPanel.show();
     return origStart.apply(simulation, args);
   };
 
   const origReset = simulation.reset;
   simulation.reset = (...args) => {
+    tokenPanel.hide();
     const res = origReset.apply(simulation, args);
     return res;
   };
 
   const blockchain = new Blockchain();
   window.blockchain = blockchain;
+
+  tokenPanel.setDownloadHandler(() => {
+    const data = JSON.stringify(blockchain.chain, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'blockchain.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
   let processedTokens = 0;
   simulation.tokenLogStream.subscribe(entries => {
     if (entries.length) {
@@ -238,6 +254,15 @@ Object.assign(document.body.style, {
       }
       processedTokens = entries.length;
     }
+  });
+
+  let prevTokenCount = simulation.tokenStream.get().length;
+  simulation.tokenStream.subscribe(tokens => {
+    if (prevTokenCount > 0 && tokens.length === 0) {
+      tokenPanel.show();
+      tokenPanel.showDownload();
+    }
+    prevTokenCount = tokens.length;
   });
 
   window.diagramTree.onSelect = id => {
