@@ -198,6 +198,48 @@
   gap: 0.25rem;
 }
 
+.token-list-entry li {
+  padding: 0.25rem 0.5rem;
+  border-radius: 2px;
+}
+
+.token-entry-even {
+  background-color: #f9f9f9;
+}
+
+.token-entry-odd {
+  background-color: #e9e9e9;
+}
+
+.token-entry-start::before {
+  content: '🟢';
+  margin-right: 0.25rem;
+}
+
+.token-entry-end::before {
+  content: '🔴';
+  margin-right: 0.25rem;
+}
+
+.token-entry-task::before {
+  content: '🛠️';
+  margin-right: 0.25rem;
+}
+
+.token-entry-gateway::before {
+  content: '◇';
+  margin-right: 0.25rem;
+}
+
+.token-entry-new {
+  animation: token-entry-highlight 1.5s ease-out;
+}
+
+@keyframes token-entry-highlight {
+  from { background-color: #fff3cd; }
+  to { background-color: inherit; }
+}
+
 .token-list-download {
   display: none;
 }

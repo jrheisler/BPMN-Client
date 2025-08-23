@@ -30,16 +30,38 @@
     list.classList.add('token-list-entry');
     panel.appendChild(list);
 
+    let prevLength = 0;
+
+    function getTypeClass(id){
+      if(!id) return null;
+      if(/StartEvent/i.test(id)) return 'token-entry-start';
+      if(/EndEvent/i.test(id)) return 'token-entry-end';
+      if(/Task/i.test(id)) return 'token-entry-task';
+      if(/Gateway/i.test(id)) return 'token-entry-gateway';
+      return null;
+    }
+
     function render(entries){
       list.innerHTML = '';
-      entries.forEach(entry => {
+      entries.forEach((entry, index) => {
         const li = document.createElement('li');
         const time = new Date(entry.timestamp).toLocaleTimeString();
         const namePart = entry.elementName ? ` - ${entry.elementName}` : '';
         const idPart = entry.tokenId != null ? `[${entry.tokenId}] ` : '';
         li.textContent = `${time} ${idPart}${entry.elementId}${namePart}`;
+
+        li.classList.add('token-entry');
+        li.classList.add(index % 2 === 0 ? 'token-entry-even' : 'token-entry-odd');
+        const typeClass = getTypeClass(entry.elementId);
+        if(typeClass) li.classList.add(typeClass);
+        if(index >= prevLength){
+          li.classList.add('token-entry-new');
+          li.addEventListener('animationend', () => li.classList.remove('token-entry-new'), { once: true });
+        }
+
         list.appendChild(li);
       });
+      prevLength = entries.length;
       if(entries.length){
         panel.style.display = 'block';
         panel.scrollTop = panel.scrollHeight;
