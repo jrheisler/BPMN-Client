@@ -1,61 +1,20 @@
 (function(global){
   function createTokenListPanel(logStream, themeStream = currentTheme){
     const panel = document.createElement('div');
-    Object.assign(panel.style, {
-      position: 'fixed',
-      bottom: '1rem',
-      right: '1rem',
-      width: '250px',
-      maxHeight: '200px',
-      overflowY: 'auto',
-      padding: '1.5rem 0.5rem 0.5rem 0.5rem',
-      borderRadius: '4px',
-      boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
-      display: 'none',
-      zIndex: '1000',
-      fontSize: '14px'
-    });
+    panel.classList.add('token-list-panel');
 
     const list = document.createElement('ul');
-    Object.assign(list.style, {
-      listStyle: 'none',
-      margin: 0,
-      padding: 0,
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '0.25rem'
-    });
+    list.classList.add('token-list-entry');
     panel.appendChild(list);
 
     const closeBtn = document.createElement('button');
     closeBtn.textContent = '\u00D7';
-    Object.assign(closeBtn.style, {
-      position: 'absolute',
-      top: '0.25rem',
-      right: '0.25rem',
-      background: 'transparent',
-      border: 'none',
-      color: 'inherit',
-      cursor: 'pointer',
-      fontSize: '1rem',
-      lineHeight: '1'
-    });
+    closeBtn.classList.add('addon-filter-close');
     panel.appendChild(closeBtn);
 
     const downloadBtn = document.createElement('button');
     downloadBtn.textContent = '\u2193';
-    Object.assign(downloadBtn.style, {
-      position: 'absolute',
-      top: '0.25rem',
-      right: '1.75rem',
-      background: 'transparent',
-      border: 'none',
-      color: 'inherit',
-      cursor: 'pointer',
-      fontSize: '1rem',
-      lineHeight: '1',
-      display: 'none'
-    });
+    downloadBtn.classList.add('token-list-download');
     panel.appendChild(downloadBtn);
 
     function render(entries){
