@@ -519,6 +519,7 @@ async function appendXml(xml) {
       scheduleOverlayUpdate();
       const svg = canvasEl.querySelector('svg');
       if (svg) svg.style.height = '100%';
+      simulation.clearTokenLog();
       simulation.reset();
     } catch (err) {
       console.error("Import error:", err);

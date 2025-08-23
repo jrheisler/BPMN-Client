@@ -60,6 +60,11 @@ function createSimulation(services, opts = {}) {
       console.warn('Failed to load token log', err);
     }
   }
+
+  function clearTokenLog() {
+    tokenLogStream.set([]);
+    saveTokenLog();
+  }
 let timer = null;
 let running = false;
 let tokens = [];
@@ -162,9 +167,6 @@ let nextTokenId = 1;
     pathsStream.set(null);
     tokens = [];
     tokenStream.set(tokens);
-    tokenLogStream.set([]);
-    saveTokenLog();
-    localStorage.removeItem(TOKEN_LOG_STORAGE_KEY);
     previousIds.forEach(id => {
       if (elementRegistry.get(id)) canvas.removeMarker(id, 'active');
     });
@@ -382,8 +384,7 @@ let nextTokenId = 1;
     }
 
     clearHandlerState();
-    tokenLogStream.set([]);
-    saveTokenLog();
+    clearTokenLog();
     pathsStream.set(null);
     awaitingToken = null;
     previousIds.forEach(id => {
@@ -426,7 +427,7 @@ let nextTokenId = 1;
   function reset() {
     pause();
     cleanup();
-    localStorage.removeItem(TOKEN_LOG_STORAGE_KEY);
+    clearTokenLog();
     const startEl = getStart();
     const t = { id: nextTokenId++, element: startEl };
     tokens = [t];
@@ -442,6 +443,7 @@ let nextTokenId = 1;
     pause,
     stop,
     reset,
+    clearTokenLog,
     step,
     tokenStream,
     tokenLogStream,
