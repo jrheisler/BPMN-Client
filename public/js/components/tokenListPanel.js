@@ -87,8 +87,8 @@
 
     const cleanupFns = [unsubscribe];
 
-    const treeBtn = document.querySelector('.diagram-tree-toggle');
-    if(treeBtn){
+    function setTreeButton(treeBtn){
+      if(!treeBtn) return;
       const styles = window.getComputedStyle(treeBtn);
       const gap = 8; // px
 
@@ -150,7 +150,7 @@
 
     observeDOMRemoval(panel, ...cleanupFns);
 
-    return { el: panel, show, hide, showDownload, setDownloadHandler };
+    return { el: panel, show, hide, showDownload, setDownloadHandler, setTreeButton };
   }
 
   global.tokenListPanel = { createTokenListPanel };

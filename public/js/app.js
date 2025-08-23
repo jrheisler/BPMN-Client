@@ -191,7 +191,7 @@ Object.assign(document.body.style, {
     .createTokenListPanel(simulation.tokenLogStream, currentTheme);
   document.body.appendChild(tokenPanel.el);
 
-  const treeBtn = document.querySelector('.diagram-tree-toggle');
+  let treeBtn;
 
   const origPanelShow = tokenPanel.show;
   tokenPanel.show = (...args) => {
@@ -1048,6 +1048,8 @@ function rebuildMenu() {
   ];
 
   controls.push(saveBtn);
+  treeBtn = reactiveButton(new Stream("🌳"), () => window.diagramTree.togglePanel(), { outline: true, title: "Toggle diagram tree" });
+  controls.push(treeBtn);
   controls.push(themedThemeSelector());
 
   const controlsBar = row(controls, {
@@ -1066,9 +1068,8 @@ function rebuildMenu() {
 
   // insert the controls bar before the canvas
   document.body.insertBefore(controlsBar, canvasEl);
+  if (tokenPanel.setTreeButton) tokenPanel.setTreeButton(treeBtn);
 
-  
-  
   // 6) Wire up double-click on any BPMN element
   eventBus.on('element.dblclick', ({ element }) => {
     if (element.type && element.type.startsWith('bpmn:')) {
