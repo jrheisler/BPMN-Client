@@ -205,6 +205,11 @@ Object.assign(document.body.style, {
     return res;
   };
 
+  // render persisted log immediately if entries exist
+  if (simulation.tokenLogStream.get().length) {
+    tokenPanel.show();
+  }
+
   const origStart = simulation.start;
   simulation.start = (...args) => {
     tokenPanel.show();
@@ -217,11 +222,13 @@ Object.assign(document.body.style, {
     return res;
   };
 
-    simulation.tokenLogStream.subscribe(entries => {
-      if (entries.length) {
-        tokenPanel.show();
-      }
-    });
+  simulation.tokenLogStream.subscribe(entries => {
+    if (entries.length) {
+      tokenPanel.show();
+    } else {
+      tokenPanel.hide();
+    }
+  });
 
   window.diagramTree.onSelect = id => {
     const element = elementRegistry.get(id);
