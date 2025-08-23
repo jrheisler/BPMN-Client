@@ -121,6 +121,7 @@
     }
 
     function setDownloadHandler(handler){
+      // allow consumers to hook into the download button
       downloadBtn.addEventListener('click', handler);
     }
 
