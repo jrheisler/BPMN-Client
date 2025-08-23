@@ -214,15 +214,12 @@ Object.assign(document.body.style, {
   const origReset = simulation.reset;
   simulation.reset = (...args) => {
     const res = origReset.apply(simulation, args);
-    tokenPanel.hide();
     return res;
   };
 
     simulation.tokenLogStream.subscribe(entries => {
       if (entries.length) {
         tokenPanel.show();
-      } else {
-        tokenPanel.hide();
       }
     });
 

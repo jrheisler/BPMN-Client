@@ -52,8 +52,8 @@
         li.textContent = `${time} ${idPart}${entry.elementId}${namePart}`;
         list.appendChild(li);
       });
-      panel.style.display = entries.length ? 'block' : 'none';
       if(entries.length){
+        panel.style.display = 'block';
         panel.scrollTop = panel.scrollHeight;
       }
     }
