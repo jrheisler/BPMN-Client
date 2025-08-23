@@ -222,11 +222,21 @@ Object.assign(document.body.style, {
     return res;
   };
 
+  const blockchain = new Blockchain();
+  window.blockchain = blockchain;
+  let processedTokens = 0;
   simulation.tokenLogStream.subscribe(entries => {
     if (entries.length) {
       tokenPanel.show();
     } else {
       tokenPanel.hide();
+    }
+
+    if (entries.length > processedTokens) {
+      for (let i = processedTokens; i < entries.length; i++) {
+        blockchain.addBlock(entries[i]);
+      }
+      processedTokens = entries.length;
     }
   });
 
