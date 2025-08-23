@@ -164,9 +164,20 @@
   padding: 0.5rem;
   border-radius: 4px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  display: none;
   z-index: 1000;
   font-size: 14px;
+  opacity: 0;
+  transform: translateY(1rem);
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.token-list-panel.token-list-open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  visibility: visible;
 }
 
 .token-list-header {
