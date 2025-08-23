@@ -1068,7 +1068,6 @@ function rebuildMenu() {
 
   // insert the controls bar before the canvas
   document.body.insertBefore(controlsBar, canvasEl);
-  if (tokenPanel.setTreeButton) tokenPanel.setTreeButton(treeBtn);
 
   // 6) Wire up double-click on any BPMN element
   eventBus.on('element.dblclick', ({ element }) => {
