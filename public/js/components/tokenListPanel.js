@@ -3,19 +3,32 @@
     const panel = document.createElement('div');
     panel.classList.add('token-list-panel');
 
-    const list = document.createElement('ul');
-    list.classList.add('token-list-entry');
-    panel.appendChild(list);
+    const header = document.createElement('div');
+    header.classList.add('token-list-header');
+    panel.appendChild(header);
 
-    const closeBtn = document.createElement('button');
-    closeBtn.textContent = '\u00D7';
-    closeBtn.classList.add('addon-filter-close');
-    panel.appendChild(closeBtn);
+    const title = document.createElement('span');
+    title.textContent = 'Token Log';
+    header.appendChild(title);
 
     const downloadBtn = document.createElement('button');
     downloadBtn.textContent = '\u2193';
     downloadBtn.classList.add('token-list-download');
-    panel.appendChild(downloadBtn);
+    header.appendChild(downloadBtn);
+
+    const clearBtn = document.createElement('button');
+    clearBtn.textContent = 'Clear';
+    clearBtn.classList.add('token-list-clear');
+    header.appendChild(clearBtn);
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '\u00D7';
+    closeBtn.classList.add('token-list-close');
+    header.appendChild(closeBtn);
+
+    const list = document.createElement('ul');
+    list.classList.add('token-list-entry');
+    panel.appendChild(list);
 
     function render(entries){
       list.innerHTML = '';
@@ -83,6 +96,12 @@
       // allow consumers to hook into the download button
       downloadBtn.addEventListener('click', handler);
     }
+
+    clearBtn.addEventListener('click', () => {
+      if (global.simulation && typeof global.simulation.clearTokenLog === 'function') {
+        global.simulation.clearTokenLog();
+      }
+    });
 
     closeBtn.addEventListener('click', hide);
 
