@@ -183,6 +183,7 @@ Object.assign(document.body.style, {
   const selectionService= modeler.get('selection');
   const canvas          = modeler.get('canvas');
   const simulation      = createSimulation({ elementRegistry, canvas });
+  window.simulation = simulation;
   const overlays        = modeler.get('overlays');
 
   // Token list panel for simulation log
