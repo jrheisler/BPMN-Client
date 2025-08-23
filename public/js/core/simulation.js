@@ -221,7 +221,7 @@ function createSimulation(services, opts = {}) {
       if (elHandler) {
         const api = {
           pause,
-          resume: start,
+          resume,
           addCleanup: fn => handlerCleanups.add(fn)
         };
         const res = elHandler(token, api, flowIds);
@@ -263,7 +263,7 @@ function createSimulation(services, opts = {}) {
       }
       if (resumeAfterChoice) {
         resumeAfterChoice = false;
-        start();
+        resume();
       } else {
         schedule();
       }
@@ -335,7 +335,7 @@ function createSimulation(services, opts = {}) {
   }
 
   function start() {
-    if (tokens.length && !running) {
+    if (tokens.length || running) {
       stop();
     }
 
@@ -348,14 +348,20 @@ function createSimulation(services, opts = {}) {
     });
     previousIds = new Set();
 
-    if (!tokens.length) {
-      const startEl = getStart();
-      const t = { id: nextTokenId++, element: startEl };
-      tokens = [t];
-      tokenStream.set(tokens);
-      logToken(t);
-    }
+    const startEl = getStart();
+    const t = { id: nextTokenId++, element: startEl };
+    tokens = [t];
+    tokenStream.set(tokens);
+    logToken(t);
     console.log('Simulation started');
+    running = true;
+    schedule();
+  }
+
+  function resume() {
+    if (running) return;
+    clearHandlerState();
+    console.log('Simulation resumed');
     running = true;
     schedule();
   }
@@ -388,6 +394,7 @@ function createSimulation(services, opts = {}) {
 
   return {
     start,
+    resume,
     pause,
     stop,
     reset,
