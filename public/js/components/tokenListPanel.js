@@ -27,6 +27,12 @@
     closeBtn.classList.add('token-list-close');
     header.appendChild(closeBtn);
 
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.placeholder = 'Search';
+    searchInput.classList.add('token-list-search');
+    panel.appendChild(searchInput);
+
     const list = document.createElement('ul');
     list.classList.add('token-list-entry');
     panel.appendChild(list);
@@ -44,7 +50,12 @@
 
     function render(entries){
       list.innerHTML = '';
+      const query = searchInput.value.trim().toLowerCase();
+      const filtered = [];
       entries.forEach((entry, index) => {
+        const tokenId = entry.tokenId != null ? String(entry.tokenId).toLowerCase() : '';
+        const elementName = entry.elementName ? entry.elementName.toLowerCase() : '';
+        if(query && !(tokenId.includes(query) || elementName.includes(query))) return;
         const li = document.createElement('li');
         const time = new Date(entry.timestamp).toLocaleTimeString();
         const namePart = entry.elementName ? ` - ${entry.elementName}` : '';
@@ -52,7 +63,7 @@
         li.textContent = `${time} ${idPart}${entry.elementId}${namePart}`;
 
         li.classList.add('token-entry');
-        li.classList.add(index % 2 === 0 ? 'token-entry-even' : 'token-entry-odd');
+        li.classList.add(filtered.length % 2 === 0 ? 'token-entry-even' : 'token-entry-odd');
         const typeClass = getTypeClass(entry.elementId);
         if(typeClass) li.classList.add(typeClass);
         if(index >= prevLength){
@@ -61,15 +72,18 @@
         }
 
         list.appendChild(li);
+        filtered.push(entry);
       });
       prevLength = entries.length;
-      if(entries.length){
+      if(filtered.length){
         show();
         panel.scrollTop = panel.scrollHeight;
       }
     }
 
     const unsubscribe = logStream.subscribe(render);
+
+    searchInput.addEventListener('input', () => render(logStream.get()));
 
     const cleanupFns = [unsubscribe];
 
@@ -98,6 +112,10 @@
       panel.style.color = theme.colors.foreground;
       panel.style.border = `1px solid ${theme.colors.border}`;
       panel.style.fontFamily = theme.fonts.base || 'sans-serif';
+      searchInput.style.background = theme.colors.surface;
+      searchInput.style.color = theme.colors.foreground;
+      searchInput.style.border = `1px solid ${theme.colors.border}`;
+      searchInput.style.fontFamily = theme.fonts.base || 'sans-serif';
     });
 
     function show(){
