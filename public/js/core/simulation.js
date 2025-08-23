@@ -279,7 +279,8 @@ function createSimulation(services, opts = {}) {
       if (processed.has(token.id)) continue;
       const el = token.element;
       const incomingCount = (el.incoming || []).length;
-      if (incomingCount > 1) {
+      const type = el.type;
+      if (incomingCount > 1 && (type === 'bpmn:ParallelGateway' || type === 'bpmn:InclusiveGateway')) {
         const group = tokens.filter(t => t.element.id === el.id);
         group.forEach(t => processed.add(t.id));
         const expected = group[0].pendingJoins?.[el.id] || incomingCount;
