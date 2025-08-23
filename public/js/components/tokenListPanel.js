@@ -2,6 +2,7 @@
   function createTokenListPanel(logStream, themeStream = currentTheme){
     const panel = document.createElement('div');
     panel.classList.add('token-list-panel');
+    panel.setAttribute('aria-hidden', 'true');
 
     const header = document.createElement('div');
     header.classList.add('token-list-header');
@@ -63,7 +64,7 @@
       });
       prevLength = entries.length;
       if(entries.length){
-        panel.style.display = 'block';
+        show();
         panel.scrollTop = panel.scrollHeight;
       }
     }
@@ -101,12 +102,14 @@
 
     function show(){
       if(list.children.length){
-        panel.style.display = 'block';
+        panel.classList.add('token-list-open');
+        panel.setAttribute('aria-hidden', 'false');
       }
     }
 
     function hide(){
-      panel.style.display = 'none';
+      panel.classList.remove('token-list-open');
+      panel.setAttribute('aria-hidden', 'true');
       downloadBtn.style.display = 'none';
     }
 
