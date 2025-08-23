@@ -23,14 +23,51 @@ function createSimulation(services, opts = {}) {
   // Stream of available sequence flows when waiting on a gateway decision
   const pathsStream = new Stream(null);
 
-  let timer = null;
-  let running = false;
-  let tokens = [];
-  let awaitingToken = null;
-  let resumeAfterChoice = false;
-  let nextTokenId = 1;
+  const TOKEN_LOG_STORAGE_KEY = 'simulationTokenLog';
 
-  // Map of BPMN element type -> handler(token, api)
+  function saveTokenLog() {
+    try {
+      const data = tokenLogStream.get();
+      if (data && data.length) {
+        localStorage.setItem(TOKEN_LOG_STORAGE_KEY, JSON.stringify(data));
+      } else {
+        localStorage.removeItem(TOKEN_LOG_STORAGE_KEY);
+      }
+    } catch (err) {
+      console.warn('Failed to save token log', err);
+    }
+  }
+
+  function loadTokenLog() {
+    try {
+      const data = localStorage.getItem(TOKEN_LOG_STORAGE_KEY);
+      if (data) {
+        const parsed = JSON.parse(data);
+        tokenLogStream.set(parsed);
+        if (parsed.length) {
+          const last = parsed[parsed.length - 1];
+          if (last.elementId) {
+            const el = elementRegistry.get(last.elementId);
+            if (el) {
+              tokens = [{ id: last.tokenId, element: el }];
+              tokenStream.set(tokens);
+            }
+          }
+        }
+        saveTokenLog();
+      }
+    } catch (err) {
+      console.warn('Failed to load token log', err);
+    }
+  }
+let timer = null;
+let running = false;
+let tokens = [];
+let awaitingToken = null;
+let resumeAfterChoice = false;
+let nextTokenId = 1;
+
+// Map of BPMN element type -> handler(token, api)
   const elementHandlers = new Map();
 
   // Cleanup hooks for element handlers (timeouts, listeners, ...)
@@ -58,6 +95,8 @@ function createSimulation(services, opts = {}) {
     previousIds = currentIds;
   });
 
+  loadTokenLog();
+
   function logToken(token) {
     const el = token.element;
     const entry = {
@@ -67,6 +106,7 @@ function createSimulation(services, opts = {}) {
       timestamp: Date.now()
     };
     tokenLogStream.set([...tokenLogStream.get(), entry]);
+    saveTokenLog();
   }
 
   function getStart() {
@@ -123,6 +163,8 @@ function createSimulation(services, opts = {}) {
     tokens = [];
     tokenStream.set(tokens);
     tokenLogStream.set([]);
+    saveTokenLog();
+    localStorage.removeItem(TOKEN_LOG_STORAGE_KEY);
     previousIds.forEach(id => {
       if (elementRegistry.get(id)) canvas.removeMarker(id, 'active');
     });
@@ -341,6 +383,7 @@ function createSimulation(services, opts = {}) {
 
     clearHandlerState();
     tokenLogStream.set([]);
+    saveTokenLog();
     pathsStream.set(null);
     awaitingToken = null;
     previousIds.forEach(id => {
@@ -383,6 +426,7 @@ function createSimulation(services, opts = {}) {
   function reset() {
     pause();
     cleanup();
+    localStorage.removeItem(TOKEN_LOG_STORAGE_KEY);
     const startEl = getStart();
     const t = { id: nextTokenId++, element: startEl };
     tokens = [t];
