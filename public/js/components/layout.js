@@ -133,15 +133,10 @@ window.addEventListener('DOMContentLoaded', () => {
   panel.appendChild(content);
   document.body.appendChild(panel);
 
-  const btn = document.createElement('button');
-  btn.textContent = 'Tree';
-  btn.classList.add('diagram-tree-toggle');
-  btn.addEventListener('click', () => {
+  window.diagramTree.togglePanel = () => {
     const open = panel.style.left === '0px';
     panel.style.left = open ? '-300px' : '0px';
-  });
-
-  document.body.appendChild(btn);
+  };
 
   // Apply theme styling
   currentTheme.subscribe(theme => {
@@ -149,10 +144,6 @@ window.addEventListener('DOMContentLoaded', () => {
     panel.style.background = colors.surface;
     panel.style.color = colors.foreground;
     panel.style.boxShadow = `2px 0 6px ${colors.border}`;
-
-    btn.style.backgroundColor = colors.primary;
-    btn.style.color = colors.foreground;
-    btn.style.border = `1px solid ${colors.border}`;
 
     closeBtn.style.background = 'transparent';
     closeBtn.style.color = colors.foreground;
