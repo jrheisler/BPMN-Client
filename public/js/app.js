@@ -289,6 +289,11 @@ Object.assign(document.body.style, {
   });
 
   eventBus.on('contextPad.open', ({ element }) => {
+    if (!element) {
+      console.warn('contextPad.open called without element');
+      return;
+    }
+
     const entries = contextPad.getEntries(element);
     const types = Object.values(entries)
       .map(entry => entry.action?.options?.type)
