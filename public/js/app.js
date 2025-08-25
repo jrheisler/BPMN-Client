@@ -187,6 +187,7 @@ Object.assign(document.body.style, {
   const simulation      = createSimulation({ elementRegistry, canvas });
   window.simulation = simulation;
   const overlays        = modeler.get('overlays');
+  const contextPad      = modeler.get('contextPad');
 
   // Token list panel for simulation log
   const tokenPanel = window.tokenListPanel
@@ -284,6 +285,19 @@ Object.assign(document.body.style, {
   eventBus.on('selection.changed', ({ newSelection }) => {
     const element = newSelection[0];
     window.diagramTree.setSelectedId(element?.id || null);
+    helpPanel.update(element);
+  });
+
+  eventBus.on('contextPad.open', ({ element }) => {
+    const entries = contextPad.getEntries(element);
+    const types = Object.values(entries)
+      .map(entry => entry.action?.options?.type)
+      .filter(Boolean);
+    helpPanel.showQuickMenuHelp(types);
+  });
+
+  eventBus.on('contextPad.close', () => {
+    const [element] = selectionService.get();
     helpPanel.update(element);
   });
 
