@@ -1,0 +1,99 @@
+<style>
+:root {
+  color-scheme: light dark;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  margin: 0;
+  font-family: sans-serif;
+}
+#help-container {
+  background: var(--panel);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+#help-search {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  background: var(--panel2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+#help-tags { margin-bottom: 0.5rem; }
+.tag {
+  display: inline-block;
+  margin: 0 0.25rem 0.25rem 0;
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  background: var(--panel2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
+}
+.tag.active {
+  background: var(--accent);
+  color: var(--text);
+}
+section { margin-bottom: 1rem; }
+section h2 {
+  margin: 0 0 0.5rem 0;
+  color: var(--accent);
+}
+</style>
+<div id="help-container">
+  <input id="help-search" type="search" placeholder="Search help..." />
+  <div id="help-tags"></div>
+  <div id="help-sections">
+    <section data-tags="getting started basics">
+      <h2>Getting Started</h2>
+      <p>Use the toolbar buttons to manipulate the diagram. Zoom with the ➕ and ➖ controls and use the tree view to navigate elements.</p>
+    </section>
+    <section data-tags="editing">
+      <h2>Editing</h2>
+      <p>Double‑click an element to edit its properties. Drag elements to reposition them. Use the palette to create new nodes.</p>
+    </section>
+    <section data-tags="simulation run">
+      <h2>Simulation</h2>
+      <p>Start the token simulation with the ▶ control. Pause with ⏸ or step through tokens using ⏭.</p>
+    </section>
+  </div>
+</div>
+<script>
+(function(){
+  const sections = Array.from(document.querySelectorAll('#help-sections section'));
+  const searchInput = document.getElementById('help-search');
+  const tagsContainer = document.getElementById('help-tags');
+  const tags = Array.from(new Set(sections.flatMap(s => (s.dataset.tags || '').split(/\s+/).filter(Boolean)))).sort();
+  let activeTag = '';
+  function filter(){
+    const q = searchInput.value.toLowerCase();
+    sections.forEach(s => {
+      const matchQuery = s.textContent.toLowerCase().includes(q);
+      const matchTag = !activeTag || (s.dataset.tags || '').split(/\s+/).includes(activeTag);
+      s.style.display = matchQuery && matchTag ? '' : 'none';
+    });
+  }
+  tags.forEach(tag => {
+    const btn = document.createElement('button');
+    btn.textContent = tag;
+    btn.className = 'tag';
+    btn.addEventListener('click', () => {
+      activeTag = activeTag === tag ? '' : tag;
+      Array.from(tagsContainer.children).forEach(c => c.classList.toggle('active', c===btn && activeTag));
+      filter();
+    });
+    tagsContainer.appendChild(btn);
+  });
+  searchInput.addEventListener('input', filter);
+  if (location.hash){
+    const tag = location.hash.slice(1);
+    const btn = Array.from(tagsContainer.children).find(b => b.textContent === tag);
+    if (btn) btn.click();
+  }
+})();
+</script>

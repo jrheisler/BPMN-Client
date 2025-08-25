@@ -1,25 +1,4 @@
 (function(global){
-  // Simple help guide data; in practice this could be imported from HTML.
-  const HELP = [
-    {
-      title: 'Getting Started',
-      html: `
-        <p>Use the toolbar buttons to manipulate the diagram. Zoom with the ➕ and ➖ controls and use the tree view to navigate elements.</p>
-      `
-    },
-    {
-      title: 'Editing',
-      html: `
-        <p>Double‑click an element to edit its properties. Drag elements to reposition them. Use the palette to create new nodes.</p>
-      `
-    },
-    {
-      title: 'Simulation',
-      html: `
-        <p>Start the token simulation with the ▶ control. Pause with ⏸ or step through tokens using ⏭.</p>
-      `
-    }
-  ];
 
   function hexToRgb(hex){
     const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex);
@@ -88,18 +67,23 @@
     const content = document.createElement('div');
     panel.appendChild(content);
 
-    HELP.forEach(section => {
-      const h2 = document.createElement('h2');
-      h2.textContent = section.title;
-      h2.style.color = 'var(--accent)';
-      h2.style.marginTop = '1rem';
-      content.appendChild(h2);
-
-      const div = document.createElement('div');
-      div.innerHTML = DOMPurify.sanitize(section.html);
-      div.style.marginBottom = '0.5rem';
-      content.appendChild(div);
-    });
+    fetch('help/quick-help.html')
+      .then(r => r.text())
+      .then(html => {
+        const temp = document.createElement('div');
+        temp.innerHTML = DOMPurify.sanitize(html, { ADD_TAGS: ['style'] });
+        Array.from(temp.children).forEach(child => content.appendChild(child));
+        // execute scripts from fetched HTML
+        content.querySelectorAll('script').forEach(oldScript => {
+          const s = document.createElement('script');
+          Array.from(oldScript.attributes).forEach(a => s.setAttribute(a.name, a.value));
+          s.textContent = oldScript.textContent;
+          oldScript.replaceWith(s);
+        });
+      })
+      .catch(() => {
+        content.textContent = 'Unable to load help content.';
+      });
 
     function applyTheme(theme){
       const colors = theme.colors || {};
