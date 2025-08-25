@@ -1,4 +1,5 @@
 import { createHelpPanel } from './components/helpPanel.js';
+import customReplaceModule from './modules/customReplaceMenuProvider.js';
 
 // js/app.js
   const typeIcons = {
@@ -150,7 +151,7 @@ Object.assign(document.body.style, {
   // ─── instantiate modeler with navigator only ───────────────────────────────
   const navModule = window.navigatorModule || window.bpmnNavigator;
 
-  const additionalModules = [];
+  const additionalModules = [ customReplaceModule ];
   if (navModule) additionalModules.push(navModule);
 
 
