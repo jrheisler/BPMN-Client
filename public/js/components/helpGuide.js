@@ -71,7 +71,11 @@
       .then(r => r.text())
       .then(html => {
         const temp = document.createElement('div');
-        temp.innerHTML = DOMPurify.sanitize(html, {
+        const sanitize = window.DOMPurify ? DOMPurify.sanitize : (h) => {
+          console.warn('DOMPurify is not available; help content is not sanitized.');
+          return h;
+        };
+        temp.innerHTML = sanitize(html, {
           ADD_TAGS: ['style', 'svg', 'path', 'script'],
           ADD_ATTR: [
             'width', 'height', 'viewBox', 'fill', 'aria-hidden',
