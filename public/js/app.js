@@ -290,12 +290,11 @@ Object.assign(document.body.style, {
   });
 
   eventBus.on('contextPad.open', (event) => {
-    const element = event.current?.target;
-    if (!element) {
-      return;
-    }
+    const { current } = event || {};
+    const element = current && current.target;
+    if (!element) return;
 
-    const entries = contextPad.getEntries(element);
+    const entries = current.entries || contextPad.getEntries(element);
     const types = Object.values(entries)
       .map(entry => entry.action?.options?.type)
       .filter(Boolean);
