@@ -1,8 +1,8 @@
-import ReplaceMenuProvider from 'bpmn-js/lib/features/popup-menu/ReplaceMenuProvider';
-import { is } from 'bpmn-js/lib/util/ModelUtil';
-import * as replaceOptions from 'bpmn-js/lib/features/replace/ReplaceOptions';
+import ReplaceMenuProvider from 'bpmn-js/lib/features/popup-menu/ReplaceMenuProvider.js';
+import { is } from 'bpmn-js/lib/util/ModelUtil.js';
+import * as replaceOptions from 'bpmn-js/lib/features/replace/ReplaceOptions.js';
 
-import { START_EVENT as CUSTOM_START_EVENT } from './startEventReplaceOptions';
+import { START_EVENT as CUSTOM_START_EVENT } from './startEventReplaceOptions.js';
 
 export class CustomReplaceMenuProvider extends ReplaceMenuProvider {
   constructor(
