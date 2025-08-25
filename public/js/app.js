@@ -1,3 +1,5 @@
+import { createHelpPanel } from './components/helpPanel.js';
+
 // js/app.js
   const typeIcons = {
     'Knowledge': '📚',
@@ -191,6 +193,9 @@ Object.assign(document.body.style, {
     .createTokenListPanel(simulation.tokenLogStream, currentTheme);
   document.body.appendChild(tokenPanel.el);
 
+  const helpPanel = createHelpPanel();
+  document.body.appendChild(helpPanel.el);
+
   let treeBtn;
 
   const origPanelShow = tokenPanel.show;
@@ -279,6 +284,7 @@ Object.assign(document.body.style, {
   eventBus.on('selection.changed', ({ newSelection }) => {
     const element = newSelection[0];
     window.diagramTree.setSelectedId(element?.id || null);
+    helpPanel.update(element);
   });
 
   function updateDiagramTree() {
