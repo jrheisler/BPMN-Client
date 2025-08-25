@@ -1,4 +1,3 @@
-import { createHelpPanel } from './components/helpPanel.js';
 import customReplaceModule from './modules/customReplaceMenuProvider.js';
 
 // js/app.js
@@ -188,15 +187,12 @@ Object.assign(document.body.style, {
   const simulation      = createSimulation({ elementRegistry, canvas });
   window.simulation = simulation;
   const overlays        = modeler.get('overlays');
-  const contextPad      = modeler.get('contextPad');
 
   // Token list panel for simulation log
   const tokenPanel = window.tokenListPanel
     .createTokenListPanel(simulation.tokenLogStream, currentTheme);
   document.body.appendChild(tokenPanel.el);
 
-  const helpPanel = createHelpPanel();
-  document.body.appendChild(helpPanel.el);
 
   let treeBtn;
 
@@ -286,24 +282,6 @@ Object.assign(document.body.style, {
   eventBus.on('selection.changed', ({ newSelection }) => {
     const element = newSelection[0];
     window.diagramTree.setSelectedId(element?.id || null);
-    helpPanel.update(element);
-  });
-
-  eventBus.on('contextPad.open', (event) => {
-    const { current } = event || {};
-    const element = current && current.target;
-    if (!element) return;
-
-    const entries = current.entries || contextPad.getEntries(element);
-    const types = Object.values(entries)
-      .map(entry => entry.action?.options?.type)
-      .filter(Boolean);
-    helpPanel.showQuickMenuHelp(types);
-  });
-
-  eventBus.on('contextPad.close', () => {
-    const [element] = selectionService.get();
-    helpPanel.update(element);
   });
 
   function updateDiagramTree() {

@@ -253,29 +253,3 @@
   display: none;
 }
 
-/* Help panel */
-.help-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  height: 100%;
-  width: 250px;
-  overflow-y: auto;
-  background: #fff;
-  border-left: 1px solid #ccc;
-  box-shadow: -2px 0 6px rgba(0,0,0,0.1);
-  padding: 1rem;
-  z-index: 3000;
-}
-
-.help-panel h2 {
-  margin-top: 0;
-  font-size: 1.1rem;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.help-panel .help-item {
-  margin-bottom: 0.5rem;
-}
