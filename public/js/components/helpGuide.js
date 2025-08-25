@@ -67,33 +67,8 @@
     const content = document.createElement('div');
     panel.appendChild(content);
 
-    fetch('bpmn_help_guide_embeddable_html.html')
-      .then(r => r.text())
-      .then(html => {
-        const temp = document.createElement('div');
-        const sanitize = window.DOMPurify ? DOMPurify.sanitize : (h) => {
-          console.warn('DOMPurify is not available; help content is not sanitized.');
-          return h;
-        };
-        temp.innerHTML = sanitize(html, {
-          ADD_TAGS: ['style', 'svg', 'path', 'script'],
-          ADD_ATTR: [
-            'width', 'height', 'viewBox', 'fill', 'aria-hidden',
-            'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'd'
-          ]
-        });
-        Array.from(temp.children).forEach(child => content.appendChild(child));
-        // execute scripts from fetched HTML so cards render
-        content.querySelectorAll('script').forEach(oldScript => {
-          const s = document.createElement('script');
-          Array.from(oldScript.attributes).forEach(a => s.setAttribute(a.name, a.value));
-          s.textContent = oldScript.textContent;
-          oldScript.replaceWith(s);
-        });
-      })
-      .catch(() => {
-        content.textContent = 'Unable to load help content.';
-      });
+    const html = window.bpmn_help_guide_embeddable_html;
+    content.innerHTML = DOMPurify.sanitize(html);
 
     function applyTheme(theme){
       const colors = theme.colors || {};
