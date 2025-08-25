@@ -71,7 +71,13 @@
       .then(r => r.text())
       .then(html => {
         const temp = document.createElement('div');
-        temp.innerHTML = DOMPurify.sanitize(html, { ADD_TAGS: ['style'] });
+        temp.innerHTML = DOMPurify.sanitize(html, {
+          ADD_TAGS: ['style', 'svg', 'path'],
+          ADD_ATTR: [
+            'width', 'height', 'viewBox', 'fill', 'aria-hidden',
+            'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'd'
+          ]
+        });
         Array.from(temp.children).forEach(child => content.appendChild(child));
         // execute scripts from fetched HTML
         content.querySelectorAll('script').forEach(oldScript => {
