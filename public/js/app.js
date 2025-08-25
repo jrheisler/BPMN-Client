@@ -1053,6 +1053,13 @@ function rebuildMenu() {
   controls.push(saveBtn);
   treeBtn = reactiveButton(new Stream("🌳"), () => window.diagramTree.togglePanel(), { outline: true, title: "Toggle diagram tree" });
   controls.push(treeBtn);
+  controls.push(
+    reactiveButton(
+      new Stream('❔'),
+      () => window.openHelpGuideModal(currentTheme),
+      { outline: true, title: 'Help guide' }
+    )
+  );
   controls.push(themedThemeSelector());
 
   const controlsBar = row(controls, {
