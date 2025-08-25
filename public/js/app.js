@@ -289,9 +289,9 @@ Object.assign(document.body.style, {
     helpPanel.update(element);
   });
 
-  eventBus.on('contextPad.open', ({ element }) => {
+  eventBus.on('contextPad.open', (event) => {
+    const element = event.current?.target;
     if (!element) {
-      console.warn('contextPad.open called without element');
       return;
     }
 
