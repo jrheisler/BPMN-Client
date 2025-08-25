@@ -3,16 +3,11 @@ import { helpContent } from '../helpContent.js';
 export function createHelpPanel() {
   const panel = document.createElement('aside');
   panel.className = 'help-panel';
-  panel.style.position = 'fixed';
-  panel.style.top = '0';
-  panel.style.right = '0';
-  panel.style.height = '100%';
-  panel.style.width = '250px';
-  panel.style.overflowY = 'auto';
-  panel.style.background = '#fff';
-  panel.style.borderLeft = '1px solid #ccc';
-  panel.style.padding = '1em';
   panel.style.display = 'none';
+
+  const header = document.createElement('h2');
+  header.textContent = 'Help';
+  panel.appendChild(header);
 
   const content = document.createElement('div');
   panel.appendChild(content);
@@ -29,5 +24,18 @@ export function createHelpPanel() {
     }
   }
 
-  return { el: panel, update };
+  function showQuickMenuHelp(types = []) {
+    const items = types
+      .map(t => helpContent[t] && `<div class="help-item"><strong>${t.replace('bpmn:', '')}</strong>: ${helpContent[t]}</div>`)
+      .filter(Boolean);
+    if (items.length) {
+      content.innerHTML = items.join('');
+      panel.style.display = '';
+    } else {
+      panel.style.display = 'none';
+      content.innerHTML = '';
+    }
+  }
+
+  return { el: panel, update, showQuickMenuHelp };
 }
