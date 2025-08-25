@@ -19,7 +19,7 @@
     return `rgb(${Math.round(r + (255 - r) * amount)}, ${Math.round(g + (255 - g) * amount)}, ${Math.round(b + (255 - b) * amount)})`;
   }
 
-  function openHelpGuideModal(themeStream = currentTheme){
+  async function openHelpGuideModal(themeStream = currentTheme){
     const overlay = document.createElement('div');
     overlay.className = 'help-guide-overlay';
     Object.assign(overlay.style, {
@@ -67,7 +67,8 @@
     const content = document.createElement('div');
     panel.appendChild(content);
 
-    const html = window.bpmn_help_guide_embeddable_html;
+    const response = await fetch('bpmn_help_guide_embeddable_html.html');
+    const html = await response.text();
     content.innerHTML = DOMPurify.sanitize(html);
 
     function applyTheme(theme){
