@@ -7,6 +7,7 @@ yarn-error.log*
 firebase-debug.log*
 firebase-debug.*.log*
 public/js/firebase.js
+add ons/Orpheus-bpmn.html
 
 # Firebase cache
 .firebase/
