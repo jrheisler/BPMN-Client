@@ -67,7 +67,7 @@
     const content = document.createElement('div');
     panel.appendChild(content);
 
-    fetch('help/quick-help.html')
+    fetch('bpmn_help_guide_embeddable_html.html')
       .then(r => r.text())
       .then(html => {
         const temp = document.createElement('div');
