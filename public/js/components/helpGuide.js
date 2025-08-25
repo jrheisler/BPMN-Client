@@ -79,7 +79,7 @@
           ]
         });
         Array.from(temp.children).forEach(child => content.appendChild(child));
-        // execute scripts from fetched HTML
+        // execute scripts from fetched HTML so cards render
         content.querySelectorAll('script').forEach(oldScript => {
           const s = document.createElement('script');
           Array.from(oldScript.attributes).forEach(a => s.setAttribute(a.name, a.value));
