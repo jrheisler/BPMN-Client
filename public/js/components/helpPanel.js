@@ -17,7 +17,7 @@ export function createHelpPanel() {
     const help = type && helpContent[type];
     if (help) {
       content.innerHTML = help;
-      panel.style.display = '';
+      panel.style.display = 'block';
     } else {
       panel.style.display = 'none';
       content.innerHTML = '';
@@ -30,7 +30,7 @@ export function createHelpPanel() {
       .filter(Boolean);
     if (items.length) {
       content.innerHTML = items.join('');
-      panel.style.display = '';
+      panel.style.display = 'block';
     } else {
       panel.style.display = 'none';
       content.innerHTML = '';
