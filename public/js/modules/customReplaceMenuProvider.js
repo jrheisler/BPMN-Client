@@ -1,8 +1,5 @@
 import ReplaceMenuProvider from 'bpmn-js/lib/features/popup-menu/ReplaceMenuProvider.js';
 import { is } from 'bpmn-js/lib/util/ModelUtil.js';
-import * as replaceOptions from 'bpmn-js/lib/features/replace/ReplaceOptions.js';
-
-import { START_EVENT as CUSTOM_START_EVENT } from './startEventReplaceOptions.js';
 
 export class CustomReplaceMenuProvider extends ReplaceMenuProvider {
   constructor(
@@ -29,16 +26,14 @@ export class CustomReplaceMenuProvider extends ReplaceMenuProvider {
 
   getPopupMenuEntries(target) {
     const businessObject = target.businessObject;
+    const entries = super.getPopupMenuEntries(target);
 
     if (is(businessObject, 'bpmn:StartEvent') && !is(businessObject.$parent, 'bpmn:SubProcess')) {
-      const originalStart = replaceOptions.START_EVENT;
-      replaceOptions.START_EVENT = CUSTOM_START_EVENT;
-      const entries = super.getPopupMenuEntries(target);
-      replaceOptions.START_EVENT = originalStart;
-      return entries;
+      delete entries['replace-with-none-intermediate-throwing'];
+      delete entries['replace-with-none-end'];
     }
 
-    return super.getPopupMenuEntries(target);
+    return entries;
   }
 }
 
