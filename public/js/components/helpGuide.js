@@ -72,7 +72,7 @@
       .then(html => {
         const temp = document.createElement('div');
         temp.innerHTML = DOMPurify.sanitize(html, {
-          ADD_TAGS: ['style', 'svg', 'path'],
+          ADD_TAGS: ['style', 'svg', 'path', 'script'],
           ADD_ATTR: [
             'width', 'height', 'viewBox', 'fill', 'aria-hidden',
             'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'd'
