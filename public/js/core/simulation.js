@@ -214,6 +214,45 @@ let nextTokenId = 1;
     });
   }
 
+  function findInclusiveJoin(split) {
+    const outgoings = split.outgoing || [];
+    let common = null;
+
+    function collect(el, result, visited) {
+      if (!el || visited.has(el.id)) return;
+      visited.add(el.id);
+      if (
+        el.type === 'bpmn:InclusiveGateway' &&
+        el.businessObject?.gatewayDirection === 'Converging'
+      ) {
+        result.add(el.id);
+        return;
+      }
+      (el.outgoing || []).forEach(flow => {
+        if (flow.target) collect(flow.target, result, visited);
+      });
+    }
+
+    outgoings.forEach(flow => {
+      if (!flow.target) return;
+      const joins = new Set();
+      collect(flow.target, joins, new Set([split.id]));
+      const joinIds = new Set([...joins]);
+      if (common === null) {
+        common = joinIds;
+      } else {
+        common = new Set([...common].filter(id => joinIds.has(id)));
+      }
+    });
+
+    if (common && common.size) {
+      const [id] = [...common];
+      return elementRegistry.get(id);
+    }
+
+    return null;
+  }
+
   function handleInclusiveGateway(token, outgoing, flowIds) {
     const ids = Array.isArray(flowIds) ? flowIds : flowIds ? [flowIds] : null;
     if (!ids || ids.length === 0) {
@@ -224,19 +263,22 @@ let nextTokenId = 1;
       pause();
       return null;
     }
-    return ids.map((id, idx) => {
-      const flow = elementRegistry.get(id);
-      if (!flow) return null;
-      const pendingJoins = { ...(token.pendingJoins || {}) };
-      pendingJoins[token.element.id] = ids.length;
-      const next = {
-        id: idx === 0 ? token.id : nextTokenId++,
-        element: flow.target,
-        pendingJoins
-      };
-      logToken(next);
-      return next;
-    }).filter(Boolean);
+    const join = findInclusiveJoin(token.element);
+    return ids
+      .map((id, idx) => {
+        const flow = elementRegistry.get(id);
+        if (!flow) return null;
+        const pendingJoins = { ...(token.pendingJoins || {}) };
+        if (join) pendingJoins[join.id] = ids.length;
+        const next = {
+          id: idx === 0 ? token.id : nextTokenId++,
+          element: flow.target,
+          pendingJoins
+        };
+        logToken(next);
+        return next;
+      })
+      .filter(Boolean);
   }
 
   function handleEventBasedGateway(token, outgoing, flowId) {
