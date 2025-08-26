@@ -2,7 +2,7 @@
 
 // Simple token simulation service built on Streams
 // Usage:
-//   const simulation = createSimulation({ elementRegistry, canvas }, { delay: 500 });
+//   const simulation = createSimulation({ elementRegistry, canvas, context: { foo: true } }, { delay: 500 });
 //   simulation.start();
 //
 // Handlers can be registered via `elementHandlers` to intercept elements:
@@ -14,8 +14,21 @@
 //   });
 
 function createSimulation(services, opts = {}) {
-  const { elementRegistry, canvas } = services;
+  const { elementRegistry, canvas, context: initialContext = {} } = services;
   const delay = opts.delay || 1000;
+  const conditionFallback = Object.prototype.hasOwnProperty.call(opts, 'conditionFallback')
+    ? opts.conditionFallback
+    : false;
+
+  let simulationContext = { ...initialContext };
+
+  function setContext(obj) {
+    simulationContext = { ...simulationContext, ...obj };
+  }
+
+  function getContext() {
+    return { ...simulationContext };
+  }
 
   // Stream of currently active tokens [{ id, element }]
   const tokenStream = new Stream([]);
@@ -187,20 +200,29 @@ let nextTokenId = 1;
   function handleExclusiveGateway(token, outgoing, flowId) {
     // Determine viable flows based on conditions when no flowId is provided
     if (!flowId) {
-      const evaluate = expr => {
+      const evaluate = (expr, data) => {
         if (!expr) return true;
         const raw = (expr.body || expr.value || '').toString().trim();
         const js = raw.replace(/^\$\{?|\}$/g, '');
         if (!js) return true;
+        const proxy = new Proxy(data || {}, {
+          has: () => true,
+          get(target, prop) {
+            if (prop === Symbol.unscopables) return undefined;
+            return prop in target ? target[prop] : conditionFallback;
+          }
+        });
         try {
-          return !!Function(`return (${js});`)();
+          return !!Function('context', 'with(context){ return (' + js + '); }')(proxy);
         } catch (err) {
           console.warn('Failed to evaluate condition', js, err);
-          return false;
+          return conditionFallback;
         }
       };
 
-      let viable = outgoing.filter(flow => evaluate(flow.businessObject?.conditionExpression));
+      let viable = outgoing.filter(flow =>
+        evaluate(flow.businessObject?.conditionExpression, simulationContext)
+      );
 
       if (!viable.length) {
         const defBo = token.element.businessObject?.default;
@@ -558,7 +580,9 @@ let nextTokenId = 1;
     tokenStream,
     tokenLogStream,
     pathsStream,
-    elementHandlers
+    elementHandlers,
+    setContext,
+    getContext
   };
 }
 
