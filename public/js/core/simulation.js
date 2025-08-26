@@ -312,7 +312,8 @@ let nextTokenId = 1;
     const incomingCount = (token.element.incoming || []).length;
     const diverging =
       outgoing.length > 1 &&
-      (direction === 'Diverging' || (!direction && incomingCount <= 1));
+      (direction === 'Diverging' ||
+        ((!direction || direction === 'Unspecified') && incomingCount <= 1));
     if (!diverging) {
       return handleDefault(token, outgoing);
     }
