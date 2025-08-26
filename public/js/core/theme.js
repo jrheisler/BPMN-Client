@@ -346,6 +346,24 @@ function applyThemeToPage(theme, container = document.body) {
   container.style.fontFamily = fonts.base || 'sans-serif';
   container.style.transition = 'background-color 0.3s ease, color 0.3s ease';
 
+  const vars = {
+    '--bg': colors.bg || colors.background,
+    '--panel': colors.panel || colors.primary,
+    '--panel2': colors.panel2 || colors.surface,
+    '--text': colors.text || colors.foreground,
+    '--muted': colors.muted,
+    '--accent': colors.accent,
+    '--accent-2': colors['accent-2'] || colors.accent2 || colors.accent,
+    '--border': colors.border,
+    '--ok': colors.ok,
+    '--warn': colors.warn,
+    '--err': colors.err
+  };
+
+  Object.entries(vars).forEach(([key, value]) => {
+    if (value) container.style.setProperty(key, value);
+  });
+
   // Optional: smooth font weight rendering
   container.style.webkitFontSmoothing = 'antialiased';
   container.style.mozOsxFontSmoothing = 'grayscale';

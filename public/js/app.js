@@ -108,13 +108,22 @@ Object.assign(document.body.style, {
   const canvasEl = document.getElementById('canvas');
 
   const helpGuideEl = document.getElementById('help-guide');
-
   window.openHelpGuideModal = () => {
     if (!helpGuideEl) return;
     helpGuideEl.hidden = false;
   };
 
   if (helpGuideEl) {
+    const iframe = helpGuideEl.querySelector('iframe');
+    if (iframe) {
+      iframe.addEventListener('load', () => {
+        const body = iframe.contentDocument?.body;
+        if (!body) return;
+        applyThemeToPage(currentTheme.get(), body);
+        currentTheme.subscribe(theme => applyThemeToPage(theme, body));
+      });
+    }
+
     const helpGuideCloseBtn = document.getElementById('help-guide-close');
     if (helpGuideCloseBtn) {
       helpGuideCloseBtn.addEventListener('click', () => {
