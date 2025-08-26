@@ -8,6 +8,7 @@ firebase-debug.log*
 firebase-debug.*.log*
 public/js/firebase.js
 add ons/Orpheus-bpmn.html
+add ons/bpmn_help_guide_embeddable_html.html
 
 # Firebase cache
 .firebase/
