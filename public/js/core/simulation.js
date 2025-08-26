@@ -254,6 +254,11 @@ let nextTokenId = 1;
   }
 
   function handleInclusiveGateway(token, outgoing, flowIds) {
+    const direction = token.element.businessObject?.gatewayDirection;
+    if (direction !== 'Diverging' || outgoing.length <= 1) {
+      return handleDefault(token, outgoing);
+    }
+
     const ids = Array.isArray(flowIds) ? flowIds : flowIds ? [flowIds] : null;
     if (!ids || ids.length === 0) {
       console.log('Awaiting inclusive decision at gateway', token.element.id);
