@@ -433,7 +433,7 @@ function headerContainer(titleStream) {
 }
 
 
-function openFlowSelectionModal(flows, themeStream = currentTheme) {
+function openFlowSelectionModal(flows, themeStream = currentTheme, allowMultiple = false) {
   const pickStream = new Stream(null);
 
   // Overlay
@@ -476,21 +476,40 @@ function openFlowSelectionModal(flows, themeStream = currentTheme) {
   content.appendChild(list);
 
   flows.forEach(flow => {
-    const item = document.createElement('div');
-    item.textContent = flow.target?.businessObject?.name || flow.target?.id;
-    Object.assign(item.style, {
+    const label = document.createElement('label');
+    Object.assign(label.style, {
       padding: '0.5rem 1rem',
       borderRadius: '4px',
-      cursor: 'pointer'
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      gap: '0.5rem'
     });
 
-    item.addEventListener('click', () => {
-      pickStream.set(flow);
-      modal.remove();
-    });
+    const input = document.createElement('input');
+    input.type = allowMultiple ? 'checkbox' : 'radio';
+    input.name = 'flowSelection';
 
-    list.appendChild(item);
+    const span = document.createElement('span');
+    span.textContent = flow.target?.businessObject?.name || flow.target?.id;
+
+    label.appendChild(input);
+    label.appendChild(span);
+    list.appendChild(label);
   });
+
+  const confirmBtn = document.createElement('button');
+  confirmBtn.textContent = 'Confirm';
+  confirmBtn.style.marginTop = '1rem';
+  confirmBtn.addEventListener('click', () => {
+    const selected = [];
+    list.querySelectorAll('input').forEach((input, idx) => {
+      if (input.checked) selected.push(flows[idx]);
+    });
+    pickStream.set(selected);
+    modal.remove();
+  });
+  content.appendChild(confirmBtn);
 
   modal.appendChild(content);
   document.body.appendChild(modal);
@@ -506,6 +525,10 @@ function openFlowSelectionModal(flows, themeStream = currentTheme) {
       child.onmouseover = () => child.style.backgroundColor = colors.accent + '55';
       child.onmouseout = () => child.style.backgroundColor = colors.primary || '#f9f9f9';
     });
+    confirmBtn.style.backgroundColor = colors.primary || '#f9f9f9';
+    confirmBtn.style.border = `1px solid ${colors.border || '#ccc'}`;
+    confirmBtn.onmouseover = () => confirmBtn.style.backgroundColor = colors.accent + '55';
+    confirmBtn.onmouseout = () => confirmBtn.style.backgroundColor = colors.primary || '#f9f9f9';
   };
 
   themeStream.subscribe(applyStyles);
@@ -513,7 +536,7 @@ function openFlowSelectionModal(flows, themeStream = currentTheme) {
 
   modal.addEventListener('click', e => {
     if (e.target === modal) {
-      pickStream.set(null);
+      pickStream.set([]);
       modal.remove();
     }
   });

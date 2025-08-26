@@ -519,11 +519,17 @@ Object.assign(document.body.style, {
   // Prompt user to choose path at gateways
   simulation.pathsStream.subscribe(flows => {
     if (!flows || !flows.length) return;
+    const gatewayType = flows[0].source?.type;
+    const isInclusive = gatewayType === 'bpmn:InclusiveGateway';
     // Access modal helper via `window` to avoid ReferenceError when used
     // within modules or strict scopes
-    window.openFlowSelectionModal(flows, currentTheme).subscribe(chosen => {
-      if (chosen) {
-        simulation.step(chosen.id);
+    window.openFlowSelectionModal(flows, currentTheme, isInclusive).subscribe(chosen => {
+      if (chosen && chosen.length) {
+        if (isInclusive) {
+          simulation.step(chosen.map(f => f.id));
+        } else {
+          simulation.step(chosen[0].id);
+        }
       }
     });
   });
