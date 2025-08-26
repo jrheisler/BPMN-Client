@@ -67,9 +67,10 @@
     const content = document.createElement('div');
     panel.appendChild(content);
 
-    const response = await fetch('bpmn_help_guide_embeddable_html.html');
+    const response = await fetch('/bpmn_help_guide_embeddable_html.html');
     const html = await response.text();
-    content.innerHTML = DOMPurify.sanitize(html);
+    const parsed = new DOMParser().parseFromString(html, 'text/html');
+    content.innerHTML = DOMPurify.sanitize(parsed.body.innerHTML);
 
     function applyTheme(theme){
       const colors = theme.colors || {};
