@@ -53,18 +53,18 @@ function buildDiagram() {
   return [start, gw, a, b, f0, fa, fb];
 }
 
-test('exclusive gateway auto-selects one path when multiple conditions are true', () => {
-  // Exclusive gateways evaluate outgoing sequence flows in order and should
-  // automatically pick the first flow whose condition is true. Even if
-  // multiple conditions evaluate to true, only a single token continues and no
-  // user decision is requested.
+test('exclusive gateway pauses for choice when multiple conditions are true', () => {
+  // Exclusive gateways should pause and expose all viable flows when more than
+  // one condition evaluates to true so that a caller can choose explicitly.
   const diagram = buildDiagram();
   const sim = createSimulationInstance(diagram, { delay: 0 });
   sim.reset();
   sim.step(); // start -> gateway
-  sim.step(); // gateway auto-selects first matching flow
+  sim.step(); // gateway evaluates and waits for a decision
   const tokens = Array.from(sim.tokenStream.get(), t => t.element.id);
-  assert.deepStrictEqual(tokens, ['a']);
-  assert.strictEqual(sim.pathsStream.get(), null);
+  assert.deepStrictEqual(tokens, ['gw']);
+  const paths = sim.pathsStream.get();
+  assert.ok(paths);
+  assert.deepStrictEqual(paths.flows.map(f => f.id), ['fa', 'fb']);
 });
 
