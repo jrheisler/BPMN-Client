@@ -34,9 +34,15 @@ function createSimulationInstance(elements, opts = {}) {
   return createSimulation({ elementRegistry, canvas }, opts);
 }
 
-function buildSplitJoinDiagram(extraTaskOnB = false) {
+function buildSplitJoinDiagram(extraTaskOnB = false, omitDirection = false) {
   const start = { id: 'start', type: 'bpmn:StartEvent', outgoing: [], incoming: [], businessObject: { $type: 'bpmn:StartEvent' } };
-  const split = { id: 'split', type: 'bpmn:InclusiveGateway', businessObject: { gatewayDirection: 'Diverging' }, incoming: [], outgoing: [] };
+  const split = {
+    id: 'split',
+    type: 'bpmn:InclusiveGateway',
+    businessObject: omitDirection ? {} : { gatewayDirection: 'Diverging' },
+    incoming: [],
+    outgoing: []
+  };
   const join = { id: 'join', type: 'bpmn:InclusiveGateway', businessObject: { gatewayDirection: 'Converging' }, incoming: [], outgoing: [] };
   const end = { id: 'end', type: 'bpmn:Task', incoming: [], outgoing: [] };
   const a = { id: 'a', type: 'bpmn:Task', incoming: [], outgoing: [] };
@@ -113,5 +119,21 @@ test('inclusive split/join waits for all selected branches', () => {
   sim.step(); // join -> end
   const afterMerge = Array.from(sim.tokenStream.get(), t => t.element.id);
   assert.deepStrictEqual(afterMerge, ['end']);
+});
+
+test('inclusive split without gatewayDirection waits for explicit flow selection', () => {
+  const diagram = buildSplitJoinDiagram(false, true);
+  const sim = createSimulationInstance(diagram, { delay: 0 });
+  sim.reset();
+  sim.step(); // start -> split
+  sim.step(); // process gateway, should wait for decision
+  const paths = sim.pathsStream.get();
+  assert.ok(paths && paths.flows.length === 2);
+  const atGateway = Array.from(sim.tokenStream.get(), t => t.element.id);
+  assert.deepStrictEqual(atGateway, ['split']);
+  sim.step(['fa']); // choose path a
+  sim.step(); // a -> join
+  const after = Array.from(sim.tokenStream.get(), t => t.element.id);
+  assert.deepStrictEqual(after, ['join']);
 });
 

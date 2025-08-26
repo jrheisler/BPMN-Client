@@ -305,7 +305,11 @@ let nextTokenId = 1;
 
   function handleInclusiveGateway(token, outgoing, flowIds) {
     const direction = token.element.businessObject?.gatewayDirection;
-    if (direction !== 'Diverging' || outgoing.length <= 1) {
+    const incomingCount = (token.element.incoming || []).length;
+    const diverging =
+      outgoing.length > 1 &&
+      (direction === 'Diverging' || (!direction && incomingCount <= 1));
+    if (!diverging) {
       return handleDefault(token, outgoing);
     }
 
