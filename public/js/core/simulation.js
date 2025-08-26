@@ -187,7 +187,7 @@ let nextTokenId = 1;
   function handleExclusiveGateway(token, outgoing, flowId) {
     if (!flowId) {
       console.log('Awaiting decision at gateway', token.element.id);
-      pathsStream.set(outgoing);
+      pathsStream.set({ flows: outgoing, type: token.element.type });
       awaitingToken = token;
       resumeAfterChoice = running;
       pause();
@@ -218,7 +218,7 @@ let nextTokenId = 1;
     const ids = Array.isArray(flowIds) ? flowIds : flowIds ? [flowIds] : null;
     if (!ids || ids.length === 0) {
       console.log('Awaiting inclusive decision at gateway', token.element.id);
-      pathsStream.set(outgoing);
+      pathsStream.set({ flows: outgoing, type: token.element.type });
       awaitingToken = token;
       resumeAfterChoice = running;
       pause();
@@ -242,7 +242,7 @@ let nextTokenId = 1;
   function handleEventBasedGateway(token, outgoing, flowId) {
     if (!flowId) {
       console.log('Awaiting event at gateway', token.element.id);
-      pathsStream.set(outgoing);
+      pathsStream.set({ flows: outgoing, type: token.element.type });
       awaitingToken = token;
       resumeAfterChoice = running;
       pause();
