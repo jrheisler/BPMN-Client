@@ -116,12 +116,18 @@ Object.assign(document.body.style, {
   if (helpGuideEl) {
     const iframe = helpGuideEl.querySelector('iframe');
     if (iframe) {
-      iframe.addEventListener('load', () => {
+      const applyIframeTheme = () => {
         const body = iframe.contentDocument?.body;
         if (!body) return;
         applyThemeToPage(currentTheme.get(), body);
         currentTheme.subscribe(theme => applyThemeToPage(theme, body));
-      });
+      };
+
+      if (iframe.contentDocument?.readyState === 'complete') {
+        applyIframeTheme();
+      }
+
+      iframe.addEventListener('load', applyIframeTheme);
     }
 
     const helpGuideCloseBtn = document.getElementById('help-guide-close');
