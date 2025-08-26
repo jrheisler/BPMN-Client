@@ -253,3 +253,31 @@
   display: none;
 }
 
+#help-guide {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 2000;
+}
+
+#help-guide iframe {
+  width: 80%;
+  height: 80%;
+  border: none;
+  background: #fff;
+}
+
+#help-guide-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
