@@ -145,6 +145,11 @@
     <div id="canvas"></div>
   </div>
 
+  <div id="help-guide" hidden>
+    <button id="help-guide-close" aria-label="Close">&times;</button>
+    <iframe src="bpmn_help_guide_embeddable_html.html"></iframe>
+  </div>
+
   <!-- 3) Modeler UMD bundle (this defines window.BpmnJS) -->
   <script src="https://unpkg.com/bpmn-js@18.6.2/dist/bpmn-modeler.development.js"></script>
   <!-- 4) auto-layout + navigator -->
@@ -175,7 +180,6 @@
   <script src="js/components/addOnFilter.js"></script>
     <script src="js/components/addOnLegend.js"></script>
     <script src="js/components/tokenListPanel.js"></script>
-    <script src="js/components/helpGuide.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/js-sha256@0.11.0/build/sha256.min.js"></script>
   <script src="js/blockchain.js"></script>
   <!-- 6) Your application code -->
