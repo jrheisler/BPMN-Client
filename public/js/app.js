@@ -24,6 +24,7 @@ let currentUser = null;
 
 
 const notesStream = new Stream(null);
+window.notesStream = notesStream;
 const defaultXml = `<?xml version="1.0" encoding="UTF-8"?>
   <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
                     xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
