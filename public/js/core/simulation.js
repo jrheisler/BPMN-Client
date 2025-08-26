@@ -216,41 +216,63 @@ let nextTokenId = 1;
 
   function findInclusiveJoin(split) {
     const outgoings = split.outgoing || [];
-    let common = null;
+    const pathJoins = [];
 
-    function collect(el, result, visited) {
-      if (!el || visited.has(el.id)) return;
-      visited.add(el.id);
-      if (
-        el.type === 'bpmn:InclusiveGateway' &&
-        el.businessObject?.gatewayDirection === 'Converging'
-      ) {
-        result.add(el.id);
-        return;
+    function traverse(start) {
+      const joins = {};
+      const queue = [{ el: start, dist: 1 }];
+      const visited = new Map();
+      while (queue.length) {
+        const { el, dist } = queue.shift();
+        const prev = visited.get(el.id);
+        if (prev !== undefined && prev <= dist) continue;
+        visited.set(el.id, dist);
+        if (
+          el.type === 'bpmn:InclusiveGateway' &&
+          el.businessObject?.gatewayDirection === 'Converging'
+        ) {
+          if (joins[el.id] === undefined || dist < joins[el.id]) {
+            joins[el.id] = dist;
+          }
+        }
+        (el.outgoing || []).forEach(flow => {
+          if (flow.target) queue.push({ el: flow.target, dist: dist + 1 });
+        });
       }
-      (el.outgoing || []).forEach(flow => {
-        if (flow.target) collect(flow.target, result, visited);
-      });
+      return joins;
     }
 
     outgoings.forEach(flow => {
-      if (!flow.target) return;
-      const joins = new Set();
-      collect(flow.target, joins, new Set([split.id]));
-      const joinIds = new Set([...joins]);
-      if (common === null) {
-        common = joinIds;
-      } else {
-        common = new Set([...common].filter(id => joinIds.has(id)));
+      if (flow.target) {
+        pathJoins.push(traverse(flow.target));
       }
     });
 
-    if (common && common.size) {
-      const [id] = [...common];
-      return elementRegistry.get(id);
+    if (!pathJoins.length) return [];
+
+    // find common join ids across all paths
+    let commonIds = Object.keys(pathJoins[0]);
+    for (let i = 1; i < pathJoins.length; i++) {
+      const ids = Object.keys(pathJoins[i]);
+      commonIds = commonIds.filter(id => ids.includes(id));
     }
 
-    return null;
+    if (!commonIds.length) return [];
+
+    // select nearest joins based on maximal distance among paths
+    let nearest = [];
+    let minMax = Infinity;
+    commonIds.forEach(id => {
+      const max = Math.max(...pathJoins.map(j => j[id]));
+      if (max < minMax) {
+        minMax = max;
+        nearest = [id];
+      } else if (max === minMax) {
+        nearest.push(id);
+      }
+    });
+
+    return nearest.map(id => elementRegistry.get(id)).filter(Boolean);
   }
 
   function handleInclusiveGateway(token, outgoing, flowIds) {
@@ -268,13 +290,17 @@ let nextTokenId = 1;
       pause();
       return null;
     }
-    const join = findInclusiveJoin(token.element);
+    const joins = findInclusiveJoin(token.element);
     return ids
       .map((id, idx) => {
         const flow = elementRegistry.get(id);
         if (!flow) return null;
         const pendingJoins = { ...(token.pendingJoins || {}) };
-        if (join) pendingJoins[join.id] = ids.length;
+        if (joins && joins.length) {
+          joins.forEach(join => {
+            pendingJoins[join.id] = ids.length;
+          });
+        }
         const next = {
           id: idx === 0 ? token.id : nextTokenId++,
           element: flow.target,
