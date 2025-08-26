@@ -9,7 +9,11 @@ const themes = {
       primary:    '#1e1e1e',
       accent:     '#ff00ff',
       surface:    '#1e1e1e',
-      border:     '#666'
+      border:     '#666',
+      muted:      '#888888',
+      ok:         '#00e676',
+      warn:       '#ffb300',
+      err:        '#ff5252'
     },
     bpmn: {
       shape:      { fill: '#1e1e1e', stroke: '#666', strokeWidth: 2 },
@@ -32,7 +36,11 @@ const themes = {
       primary:    '#f5f5f5',
       accent:     '#6200ee',
       surface:    '#f7f7f7',
-      border:     '#ccc'
+      border:     '#ccc',
+      muted:      '#666666',
+      ok:         '#4caf50',
+      warn:       '#fb8c00',
+      err:        '#f44336'
     },
     bpmn: {
       shape:      { fill: '#f7f7f7', stroke: '#ccc', strokeWidth: 2 },
@@ -55,7 +63,11 @@ const themes = {
       primary:    '#112240',
       accent:     '#ff00ff',
       surface:    '#0e2438',
-      border:     '#1c3a5f'
+      border:     '#1c3a5f',
+      muted:      '#6a7b8c',
+      ok:         '#00e6a8',
+      warn:       '#ffa726',
+      err:        '#ff4d6d'
     },
     bpmn: {
       shape:      { fill: '#0e2438', stroke: '#1c3a5f', strokeWidth: 2 },
@@ -78,7 +90,11 @@ const themes = {
       primary:    '#073642',
       accent:     '#ff00ff',
       surface:    '#003847',
-      border:     '#586e75'
+      border:     '#586e75',
+      muted:      '#93a1a1',
+      ok:         '#859900',
+      warn:       '#b58900',
+      err:        '#dc322f'
     },
     bpmn: {
       shape:      { fill: '#003847', stroke: '#586e75', strokeWidth: 2 },
@@ -101,7 +117,11 @@ const themes = {
       primary:    '#eee8d5',
       accent:     '#268bd2',
       surface:    '#faf3dc',
-      border:     '#93a1a1'
+      border:     '#93a1a1',
+      muted:      '#93a1a1',
+      ok:         '#859900',
+      warn:       '#b58900',
+      err:        '#dc322f'
     },
     bpmn: {
       shape:      { fill: '#faf3dc', stroke: '#93a1a1', strokeWidth: 2 },
@@ -124,7 +144,11 @@ const themes = {
       primary:    '#3a4d37',
       accent:     '#ff00ff',
       surface:    '#2d4f3a',
-      border:     '#4caf50'
+      border:     '#4caf50',
+      muted:      '#99ccb3',
+      ok:         '#4caf50',
+      warn:       '#ffb74d',
+      err:        '#e57373'
     },
     bpmn: {
       shape:      { fill: '#2d4f3a', stroke: '#4caf50', strokeWidth: 2 },
@@ -147,7 +171,11 @@ const themes = {
       primary:    '#ffd6f3',
       accent:     '#ff69b4',
       surface:    '#fff0f9',
-      border:     '#ff99cc'
+      border:     '#ff99cc',
+      muted:      '#b26ba6',
+      ok:         '#66bb6a',
+      warn:       '#ffb74d',
+      err:        '#ef5350'
     },
     bpmn: {
       shape:      { fill: '#fff0f9', stroke: '#ff99cc', strokeWidth: 2 },
@@ -170,7 +198,11 @@ const themes = {
       primary:    '#16213e',
       accent:     '#ff00ff',
       surface:    '#202040',
-      border:     '#2a2a5c'
+      border:     '#2a2a5c',
+      muted:      '#7a7a9a',
+      ok:         '#00e676',
+      warn:       '#ffb74d',
+      err:        '#ff5252'
     },
     bpmn: {
       shape:      { fill: '#202040', stroke: '#2a2a5c', strokeWidth: 2 },
@@ -193,7 +225,11 @@ const themes = {
       primary:    '#e6beae',
       accent:     '#9bc1bc',
       surface:    '#fcecc9',
-      border:     '#c5a880'
+      border:     '#c5a880',
+      muted:      '#6e6e69',
+      ok:         '#6b8e23',
+      warn:       '#b8860b',
+      err:        '#8b0000'
     },
     bpmn: {
       shape:      { fill: '#fcecc9', stroke: '#c5a880', strokeWidth: 2 },
@@ -216,7 +252,11 @@ const themes = {
       primary:    '#004400',
       accent:     '#00ff00',
       surface:    '#002200',
-      border:     '#00aa00'
+      border:     '#00aa00',
+      muted:      '#008800',
+      ok:         '#00ff00',
+      warn:       '#ffff00',
+      err:        '#ff0000'
     },
     bpmn: {
       shape:      { fill: '#002200', stroke: '#00aa00', strokeWidth: 2 },
@@ -351,17 +391,17 @@ function applyThemeToPage(theme, container = document.body) {
     '--panel': colors.panel || colors.primary,
     '--panel2': colors.panel2 || colors.surface,
     '--text': colors.text || colors.foreground,
-    '--muted': colors.muted,
-    '--accent': colors.accent,
-    '--accent-2': colors['accent-2'] || colors.accent2 || colors.accent,
-    '--border': colors.border,
-    '--ok': colors.ok,
-    '--warn': colors.warn,
-    '--err': colors.err
+    '--muted': colors.muted || colors.foreground,
+    '--accent': colors.accent || colors.foreground,
+    '--accent-2': colors['accent-2'] || colors.accent2 || colors.accent || colors.foreground,
+    '--border': colors.border || colors.foreground,
+    '--ok': colors.ok || colors.accent || colors.foreground,
+    '--warn': colors.warn || colors.accent || colors.foreground,
+    '--err': colors.err || colors.accent || colors.foreground
   };
 
   Object.entries(vars).forEach(([key, value]) => {
-    if (value) container.style.setProperty(key, value);
+    container.style.setProperty(key, value);
   });
 
   // Optional: smooth font weight rendering
