@@ -119,6 +119,10 @@ Object.assign(document.body.style, {
     if (e.target === helpGuideEl) helpGuideEl.hidden = true;
   });
 
+  window.openHelpGuideModal = () => {
+    helpGuideEl.hidden = false;
+  };
+
   // Touch interactions are handled via CSS (see `touch-action: none`).
   // Previously, we suppressed page scrolling by preventing the default
   // `touchmove` behavior on the canvas element which also blocked BPMN's
@@ -1068,9 +1072,7 @@ function rebuildMenu() {
   controls.push(
     reactiveButton(
       new Stream('❔'),
-      () => {
-        helpGuideEl.hidden = !helpGuideEl.hidden;
-      },
+      () => window.openHelpGuideModal(),
       { outline: true, title: 'Help guide' }
     )
   );
