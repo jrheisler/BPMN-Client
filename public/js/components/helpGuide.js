@@ -67,10 +67,18 @@
     const content = document.createElement('div');
     panel.appendChild(content);
 
-    const response = await fetch('/bpmn_help_guide_embeddable_html.html');
-    const html = await response.text();
-    const parsed = new DOMParser().parseFromString(html, 'text/html');
-    content.innerHTML = DOMPurify.sanitize(parsed.body.innerHTML);
+    try {
+      const response = await fetch('/bpmn_help_guide_embeddable_html.html');
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+      const html = await response.text();
+      const parsed = new DOMParser().parseFromString(html, 'text/html');
+      content.innerHTML = DOMPurify.sanitize(parsed.body.innerHTML);
+    } catch (err) {
+      console.error('Failed to load help guide:', err);
+      content.textContent = 'Error loading help guide.';
+    }
 
     function applyTheme(theme){
       const colors = theme.colors || {};
