@@ -34,7 +34,7 @@ function createSimulationInstance(elements, opts = {}) {
   return createSimulation({ elementRegistry, canvas }, opts);
 }
 
-function buildMultipleConditionalDiagram() {
+function buildDiagram() {
   const start = { id: 'start', type: 'bpmn:StartEvent', outgoing: [], incoming: [], businessObject: { $type: 'bpmn:StartEvent' } };
   const gw = { id: 'gw', type: 'bpmn:ExclusiveGateway', businessObject: { gatewayDirection: 'Diverging' }, incoming: [], outgoing: [] };
   const a = { id: 'a', type: 'bpmn:Task', incoming: [], outgoing: [] };
@@ -44,25 +44,27 @@ function buildMultipleConditionalDiagram() {
   start.outgoing = [f0];
   gw.incoming = [f0];
 
-  const f1 = { id: 'f1', source: gw, target: a, businessObject: { conditionExpression: { body: '${true}' } } };
-  const f2 = { id: 'f2', source: gw, target: b, businessObject: { conditionExpression: { body: '${true}' } } };
-  gw.outgoing = [f1, f2];
-  a.incoming = [f1];
-  b.incoming = [f2];
+  const fa = { id: 'fa', source: gw, target: a, businessObject: { conditionExpression: { body: '${true}' } } };
+  const fb = { id: 'fb', source: gw, target: b, businessObject: { conditionExpression: { body: '${true}' } } };
+  gw.outgoing = [fa, fb];
+  a.incoming = [fa];
+  b.incoming = [fb];
 
-  return [start, gw, a, b, f0, f1, f2];
+  return [start, gw, a, b, f0, fa, fb];
 }
 
-test('exclusive gateway pauses when multiple flows are viable', () => {
-  const diagram = buildMultipleConditionalDiagram();
+test('exclusive gateway exposes flows and waits for explicit choice', () => {
+  const diagram = buildDiagram();
   const sim = createSimulationInstance(diagram, { delay: 0 });
   sim.reset();
   sim.step(); // start -> gateway
-  sim.step(); // gateway evaluates and waits for choice
-  const after = Array.from(sim.tokenStream.get(), t => t.element.id);
-  assert.deepStrictEqual(after, ['gw']);
+  sim.step(); // evaluate and pause
   const paths = sim.pathsStream.get();
   assert.ok(paths);
-  assert.deepStrictEqual(paths.flows.map(f => f.id), ['f1', 'f2']);
+  assert.deepStrictEqual(paths.flows.map(f => f.id), ['fa', 'fb']);
+  sim.step('fb'); // choose second flow
+  const after = Array.from(sim.tokenStream.get(), t => t.element.id);
+  assert.deepStrictEqual(after, ['b']);
+  assert.strictEqual(sim.pathsStream.get(), null);
 });
 

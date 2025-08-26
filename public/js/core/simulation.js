@@ -210,14 +210,18 @@ let nextTokenId = 1;
         }
       }
 
-      const flow = viable[0];
-      if (flow) {
+      if (viable.length === 1) {
+        const flow = viable[0];
         const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins };
         logToken(next);
         return [next];
       }
 
-      return [];
+      pathsStream.set({ flows: viable, type: token.element.type });
+      awaitingToken = token;
+      resumeAfterChoice = running;
+      pause();
+      return null;
     }
 
     // Flow was chosen explicitly
