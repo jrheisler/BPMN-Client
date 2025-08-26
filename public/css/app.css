@@ -258,7 +258,8 @@
   inset: 0;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgb(from var(--bg) r g b / 0.6);
+  color: var(--text);
   z-index: 2000;
 }
 
@@ -274,7 +275,8 @@
   width: 80%;
   height: 80%;
   border: none;
-  background: #fff;
+  background: var(--bg);
+  color: var(--text);
 }
 
 #help-guide-close {
@@ -283,7 +285,7 @@
   right: 1rem;
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--text);
   font-size: 2rem;
   cursor: pointer;
 }
