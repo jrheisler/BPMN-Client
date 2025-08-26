@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BPMN Help Guide</title>
   <style>
-    :root{
+    .help-guide-content{
       --bg:#0f0f14; --panel:#15151c; --panel2:#1c1c26; --text:#e8e8f0; --muted:#b8b8c2; --accent:#7c4dff; --accent-2:#9b6bff; --border:#262637; --ok:#2ecc71; --warn:#f39c12; --err:#e74c3c;
       --radius:14px;
+      height:100%;
+      margin:0;font:16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji"; background:var(--bg); color:var(--text);
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;font:16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji"; background:var(--bg); color:var(--text)}
+    .help-guide-content *{box-sizing:border-box}
     .wrap{max-width:1100px;margin:0 auto;padding:32px 20px}
     header{display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;margin-bottom:20px}
     h1{font-size:28px;margin:0;letter-spacing:0.3px}
@@ -42,8 +42,9 @@
     a{color:#c9b6ff}
   </style>
 </head>
-<body>
-  <div class="wrap">
+  <body>
+    <div class="help-guide-content">
+      <div class="wrap">
     <header>
       <h1>🎯 BPMN Quick Help (for bpmn-js)</h1>
       <div class="search" role="search">
@@ -59,9 +60,11 @@
     <footer>
       Optimized for dark-mode UIs. Drop this file into your app and mount within a modal or side panel. Content focuses on modeling with <code>bpmn-js</code> quick menu actions.
     </footer>
-  </div>
+      </div>
 
-  <script>
+    </div>
+
+    <script>
   // ---- Data Model ---------------------------------------------------------
   const HELP = [
     {
