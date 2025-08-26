@@ -497,11 +497,10 @@ Object.assign(document.body.style, {
   function applyAddOnsToElements(data) {
     Object.entries(data || {}).forEach(([id, addOns]) => {
       const el = elementRegistry.get(id);
-      if (el && el.businessObject) {
-        const bo = el.businessObject;
-        bo.$attrs = bo.$attrs || {};
-        bo.$attrs.addOns = JSON.stringify(addOns);
-        delete bo.addOns;
+      if (el) {
+        modeling.updateProperties(el, {
+          addOns: JSON.stringify(addOns)
+        });
       }
     });
   }
