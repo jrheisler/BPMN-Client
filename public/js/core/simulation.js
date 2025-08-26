@@ -210,20 +210,11 @@ let nextTokenId = 1;
         }
       }
 
-      if (viable.length === 1) {
-        const flow = viable[0];
+      const flow = viable[0];
+      if (flow) {
         const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins };
         logToken(next);
         return [next];
-      }
-
-      if (viable.length > 1) {
-        console.log('Awaiting decision at gateway', token.element.id);
-        pathsStream.set({ flows: viable, type: token.element.type });
-        awaitingToken = token;
-        resumeAfterChoice = running;
-        pause();
-        return null;
       }
 
       return [];
