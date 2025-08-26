@@ -185,14 +185,51 @@ let nextTokenId = 1;
   }
 
   function handleExclusiveGateway(token, outgoing, flowId) {
+    // Determine viable flows based on conditions when no flowId is provided
     if (!flowId) {
-      console.log('Awaiting decision at gateway', token.element.id);
-      pathsStream.set({ flows: outgoing, type: token.element.type });
-      awaitingToken = token;
-      resumeAfterChoice = running;
-      pause();
-      return null;
+      const evaluate = expr => {
+        if (!expr) return true;
+        const raw = (expr.body || expr.value || '').toString().trim();
+        const js = raw.replace(/^\$\{?|\}$/g, '');
+        if (!js) return true;
+        try {
+          return !!Function(`return (${js});`)();
+        } catch (err) {
+          console.warn('Failed to evaluate condition', js, err);
+          return false;
+        }
+      };
+
+      let viable = outgoing.filter(flow => evaluate(flow.businessObject?.conditionExpression));
+
+      if (!viable.length) {
+        const defBo = token.element.businessObject?.default;
+        if (defBo) {
+          const defFlow = elementRegistry.get(defBo.id) || defBo;
+          if (defFlow) viable = [defFlow];
+        }
+      }
+
+      if (viable.length === 1) {
+        const flow = viable[0];
+        const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins };
+        logToken(next);
+        return [next];
+      }
+
+      if (viable.length > 1) {
+        console.log('Awaiting decision at gateway', token.element.id);
+        pathsStream.set({ flows: viable, type: token.element.type });
+        awaitingToken = token;
+        resumeAfterChoice = running;
+        pause();
+        return null;
+      }
+
+      return [];
     }
+
+    // Flow was chosen explicitly
     const flow = elementRegistry.get(flowId);
     if (flow) {
       const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins };

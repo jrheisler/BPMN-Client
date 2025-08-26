@@ -522,6 +522,11 @@ Object.assign(document.body.style, {
     const { flows, type } = data;
     if (!flows || !flows.length) return;
     const isInclusive = type === 'bpmn:InclusiveGateway';
+    // If only one flow is viable for exclusive gateways, auto-select it
+    if (!isInclusive && flows.length === 1) {
+      simulation.step(flows[0].id);
+      return;
+    }
     // Access modal helper via `window` to avoid ReferenceError when used
     // within modules or strict scopes
     window.openFlowSelectionModal(flows, currentTheme, isInclusive).subscribe(chosen => {
