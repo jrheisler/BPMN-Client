@@ -108,20 +108,24 @@ Object.assign(document.body.style, {
   const canvasEl = document.getElementById('canvas');
 
   const helpGuideEl = document.getElementById('help-guide');
-  const helpGuideCloseBtn = document.getElementById('help-guide-close');
-  if (helpGuideCloseBtn) {
-    helpGuideCloseBtn.addEventListener('click', () => {
-      helpGuideEl.hidden = true;
-    });
-  }
-
-  helpGuideEl.addEventListener('click', e => {
-    if (e.target === helpGuideEl) helpGuideEl.hidden = true;
-  });
 
   window.openHelpGuideModal = () => {
+    if (!helpGuideEl) return;
     helpGuideEl.hidden = false;
   };
+
+  if (helpGuideEl) {
+    const helpGuideCloseBtn = document.getElementById('help-guide-close');
+    if (helpGuideCloseBtn) {
+      helpGuideCloseBtn.addEventListener('click', () => {
+        helpGuideEl.hidden = true;
+      });
+    }
+
+    helpGuideEl.addEventListener('click', e => {
+      if (e.target === helpGuideEl) helpGuideEl.hidden = true;
+    });
+  }
 
   // Touch interactions are handled via CSS (see `touch-action: none`).
   // Previously, we suppressed page scrolling by preventing the default
