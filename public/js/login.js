@@ -215,7 +215,6 @@ function openDiagramPickerModal(currentUser, themeStream = currentTheme) {
 
         const name = entry.name || `Untitled (${entry.id})`;
         const notes = entry.notes || '';
-        console.log("194", notes);
 
         // Text container (left side)
         const textContainer = document.createElement('div');
@@ -944,10 +943,8 @@ function openAddOnModal(currentUser, mode = 'add', addOnData = null, themeStream
 
 async function refreshAddOns() {
   try {
-    console.log("Fetching AddOns...");
     const snap = await db.collection('users').doc(currentUser.uid).get();
     const list = (snap.data()?.addOns) || [];
-    console.log("Fetched AddOns: ", list);
     addOnsStream.set(list);
   } catch (err) {
     console.error("Failed to fetch AddOns: ", err);

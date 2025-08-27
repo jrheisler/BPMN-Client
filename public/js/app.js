@@ -588,7 +588,6 @@ async function appendXml(xml) {
     // Example: Optionally adjust the position of the imported elements
     modeling.moveElements([/* elements to move */], { x: 100, y: 100 });
 
-    console.log('Successfully appended BPMN diagram!');
   } catch (err) {
     console.error("Error appending BPMN XML:", err);
   }
@@ -659,14 +658,12 @@ const saveBtn = reactiveButton(
     // Destructure metadata from currentDiagramData
     const { name: initialName, versions } = currentDiagramData;
     const initialNotes = currentNotes;
-    console.log("185", initialNotes); // Check the current diagram data in console
 
     // Prompt the user to edit metadata (if necessary)
     promptDiagramMetadata(initialName, initialNotes, currentTheme).subscribe(async metadata => {
       if (!metadata) return; // If metadata is null, exit
 
-      // Check and log the metadata received
-      console.log("Metadata received:", metadata);
+      // Metadata received
 
       const localTimestamp = Date.now();
 
@@ -797,9 +794,7 @@ function buildDropdownOptions() {
         onClick: () => {
           openDiagramPickerModal(currentUser).subscribe(result => {
             if (result === null) {
-              console.log("🚫 Cancelled");
             } else if (result.new) {
-              console.log("🆕 Start new diagram");
               currentDiagramId = null;
               diagramDataStream.set(null);
               diagramName = null;
@@ -959,7 +954,6 @@ function buildDropdownOptions() {
           openAddOnChooserModal(currentUser).subscribe(selectedAddOn => {
             if (selectedAddOn) {
               // Process the selected AddOn (either picked, newly added, or edited)
-              console.log('Selected or newly added AddOn:', selectedAddOn);
 
               // 👉 Here you can attach it to your diagram element, if needed.
               // e.g., handleAttachmentSelection(selectedAddOn.address, ...);
@@ -996,7 +990,6 @@ function buildDropdownOptions() {
       onClick: () => {
         if (currentUser) {
           firebase.auth().signOut().then(() => {
-            console.log("👋 Logged out");
             logUser.set('👤 Login');
             avatarStream.set('flow.png');
             showSaveButton.set(false);
@@ -1009,11 +1002,9 @@ function buildDropdownOptions() {
           const userStream = reactiveLoginModal(currentTheme);
           userStream.subscribe(result => {
             if (result instanceof Error) {
-              showToast("Error: + result.message", { type: 'error' });                          
+              showToast("Error: + result.message", { type: 'error' });
             } else if (result === null) {
-              console.log("🚫 User cancelled login");
             } else {
-              console.log("✅ Logged in as", result.email);
               currentUser = result;
               logUser.set('👤 Logout');
               avatarStream.set('flowLoggedIn.png');
@@ -1219,7 +1210,6 @@ function clearModeler() {
     canvas.zoom('fit-viewport');
     diagramXMLStream.set(defaultXml);
     isDirty.set(false);
-    console.log("🧼 Modeler cleared and reset.");
   }).catch(err => {
     console.error("Failed to clear modeler:", err);
   });

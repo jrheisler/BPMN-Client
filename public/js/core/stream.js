@@ -98,7 +98,7 @@ function fieldStream(sourceStream, fieldName) {
  *
  * Usage:
  * const [tickStream, stop] = intervalStream(1000, () => Date.now());
- * const unsub = tickStream.subscribe(console.log);
+ * const unsub = tickStream.subscribe(value => {/* handle value */});
  * // later: stop(); unsub();
  */
 function intervalStream(ms, fn) {
@@ -114,7 +114,7 @@ function intervalStream(ms, fn) {
  *
  * Usage:
  * const [doneStream, cancel] = timeoutStream(5000, 'done');
- * doneStream.subscribe(console.log);
+ * doneStream.subscribe(value => {/* handle completion */});
  * // later: cancel();
  */
 function timeoutStream(ms, value) {

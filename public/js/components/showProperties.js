@@ -324,8 +324,6 @@ function showProperties(element, modeling, moddle, currentUser) {
       openAddOnChooserModal(currentUser, currentTheme).subscribe(selectedAddOn => {
         if (!selectedAddOn) return;
 
-        console.log("Selected AddOn:", selectedAddOn);
-
         const newEntry = {
           id: selectedAddOn.address,
           ...selectedAddOn
@@ -346,7 +344,6 @@ function showProperties(element, modeling, moddle, currentUser) {
           addOnStore.setAddOns(bo.id, currentAddOns);
         }
 
-        console.log("Updated AddOns array:", currentAddOns);
       });
     },
     { accent: true },

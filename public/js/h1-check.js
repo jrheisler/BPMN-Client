@@ -10,7 +10,7 @@
     }
 
     Object.keys(obj).forEach(function (key) {
-      console.log(key, obj[key]);
+      // noop: removed console output
     });
   }
 
