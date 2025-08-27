@@ -234,20 +234,6 @@ Object.assign(document.body.style, {
 
 
   let treeBtn;
-
-  const origPanelShow = tokenPanel.show;
-  tokenPanel.show = (...args) => {
-    if (treeBtn) treeBtn.style.display = 'none';
-    return origPanelShow.apply(tokenPanel, args);
-  };
-
-  const origPanelHide = tokenPanel.hide;
-  tokenPanel.hide = (...args) => {
-    const res = origPanelHide.apply(tokenPanel, args);
-    if (treeBtn) treeBtn.style.display = '';
-    return res;
-  };
-
   // render persisted log immediately if entries exist
   if (simulation.tokenLogStream.get().length) {
     tokenPanel.show();
@@ -1105,8 +1091,23 @@ function rebuildMenu() {
   ];
 
   controls.push(saveBtn);
-  treeBtn = reactiveButton(new Stream("🌳"), () => window.diagramTree.togglePanel(), { outline: true, title: "Toggle diagram tree" });
+
+  let treeToggle = () => {};
+  treeBtn = reactiveButton(
+    new Stream("🌳"),
+    () => treeToggle && treeToggle(),
+    { outline: true, title: "Toggle diagram tree" }
+  );
+  treeBtn.id = 'diagram-tree-toggle';
   controls.push(treeBtn);
+
+  (function bindTreeToggle() {
+    if (window.diagramTree?.togglePanel) {
+      treeToggle = window.diagramTree.togglePanel;
+    } else {
+      requestAnimationFrame(bindTreeToggle);
+    }
+  })();
   controls.push(
     reactiveButton(
       new Stream('❔'),
