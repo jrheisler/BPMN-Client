@@ -97,6 +97,8 @@ class Blockchain {
   reset() {
     this.chain = [this.createGenesisBlock()];
     this.persist();
+    this.peers = [];
+    this.difficulty = 2;
   }
 
   addPeer(url) {
