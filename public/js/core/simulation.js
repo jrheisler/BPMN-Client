@@ -220,26 +220,28 @@ let nextTokenId = 1;
         }
       };
 
+      const defBo = token.element.businessObject?.default;
+      const defFlow = defBo ? elementRegistry.get(defBo.id) || defBo : null;
+
       let viable = outgoing.filter(flow =>
+        flow !== defFlow &&
         evaluate(flow.businessObject?.conditionExpression, simulationContext)
       );
 
-      if (!viable.length) {
-        const defBo = token.element.businessObject?.default;
-        if (defBo) {
-          const defFlow = elementRegistry.get(defBo.id) || defBo;
-          if (defFlow) viable = [defFlow];
-        }
+      let defaultOnly = false;
+      if (!viable.length && defFlow) {
+        viable = [defFlow];
+        defaultOnly = true;
       }
 
-      if (viable.length === 1) {
+      if (viable.length === 1 && !defaultOnly) {
         const flow = viable[0];
         const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins };
         logToken(next);
         return [next];
       }
 
-      pathsStream.set({ flows: viable, type: token.element.type });
+      pathsStream.set({ flows: viable, type: token.element.type, isDefaultOnly: defaultOnly });
       awaitingToken = token;
       resumeAfterChoice = running;
       pause();

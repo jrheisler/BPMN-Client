@@ -59,9 +59,14 @@ test('undefined variables evaluate to false by default', () => {
   const sim = createSimulationInstance(diagram, { delay: 0 });
   sim.reset();
   sim.step(); // start -> gateway
-  sim.step(); // evaluate
+  sim.step(); // evaluate and pause with default flow
   const after = Array.from(sim.tokenStream.get(), t => t.element.id);
-  assert.deepStrictEqual(after, ['b']);
+  assert.deepStrictEqual(after, ['gw']);
+  const paths = sim.pathsStream.get();
+  assert.ok(paths);
+  assert.strictEqual(paths.isDefaultOnly, true);
+  assert.strictEqual(paths.flows.length, 1);
+  assert.strictEqual(paths.flows[0].id, 'f2');
 });
 
 test('undefined variables use provided fallback', () => {
@@ -69,11 +74,8 @@ test('undefined variables use provided fallback', () => {
   const sim = createSimulationInstance(diagram, { delay: 0, conditionFallback: true });
   sim.reset();
   sim.step(); // start -> gateway
-  sim.step(); // evaluate and pause since two flows are viable
-  const paths = sim.pathsStream.get();
-  assert.ok(paths);
-  assert.deepStrictEqual(paths.flows.map(f => f.id), ['f1', 'f2']);
-  sim.step('f1'); // choose conditional flow
+  sim.step(); // evaluate and auto-take conditional flow
   const after = Array.from(sim.tokenStream.get(), t => t.element.id);
   assert.deepStrictEqual(after, ['a']);
+  assert.strictEqual(sim.pathsStream.get(), null);
 });

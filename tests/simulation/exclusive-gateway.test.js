@@ -81,14 +81,18 @@ test('exclusive gateway with single conditional flow is taken automatically', ()
   assert.strictEqual(sim.pathsStream.get(), null);
 });
 
-test('exclusive gateway chooses default flow when conditions not met', () => {
+test('exclusive gateway pauses when only default flow is available', () => {
   const diagram = buildDefaultFlowDiagram();
   const sim = createSimulationInstance(diagram, { delay: 0 });
   sim.reset();
   sim.step(); // start -> gateway
-  sim.step(); // gateway evaluates and takes default flow
+  sim.step(); // gateway evaluates and pauses
   const after = Array.from(sim.tokenStream.get(), t => t.element.id);
-  assert.deepStrictEqual(after, ['b']);
-  assert.strictEqual(sim.pathsStream.get(), null);
+  assert.deepStrictEqual(after, ['gw']);
+  const paths = sim.pathsStream.get();
+  assert.ok(paths);
+  assert.strictEqual(paths.isDefaultOnly, true);
+  assert.strictEqual(paths.flows.length, 1);
+  assert.strictEqual(paths.flows[0].id, 'f2');
 });
 
