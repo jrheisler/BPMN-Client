@@ -144,7 +144,7 @@ function reactiveLoginModal(themeStream = currentTheme) {
 
 
 
-function openDiagramPickerModal(currentUser, themeStream = currentTheme) {
+function openDiagramPickerModal(themeStream = currentTheme) {
   const pickStream = new Stream(null); // emits selected diagram or null
 
   // Modal base
@@ -188,7 +188,7 @@ function openDiagramPickerModal(currentUser, themeStream = currentTheme) {
   // Load diagrams from Firestore
   
   db.collection('users')
-  .doc(currentUser.uid)
+  .doc(window.currentUser.uid)
   .get()
   .then(doc => {
     const userData = doc.data();
@@ -250,7 +250,7 @@ function openDiagramPickerModal(currentUser, themeStream = currentTheme) {
             if (!confirmed) return;
 
             try {
-                const userRef = db.collection('users').doc(currentUser.uid);
+                const userRef = db.collection('users').doc(window.currentUser.uid);
                 const diagramRef = userRef.collection('diagrams').doc(entry.id);
 
                 await diagramRef.delete();
@@ -270,7 +270,7 @@ function openDiagramPickerModal(currentUser, themeStream = currentTheme) {
         // Click on main item to load
         item.addEventListener('click', async () => {
           const doc = await db.collection('users')
-            .doc(currentUser.uid)
+            .doc(window.currentUser.uid)
             .collection('diagrams')
             .doc(entry.id)
             .get();
@@ -534,7 +534,7 @@ function selectVersionModal(diagramName, versions, themeStream = currentTheme) {
 function handleAttachmentSelection(attachmentId, versionIndex) {
   // Fetch the attachment from Firestore
   db.collection('users')
-    .doc(currentUser.uid)
+    .doc(window.currentUser.uid)
     .collection('attachments')
     .doc(attachmentId)
     .get()
@@ -710,7 +710,7 @@ function typeChoices(type, ) {
 
 }
 
-function openAddOnModal(currentUser, mode = 'add', addOnData = null, themeStream = currentTheme) {
+function openAddOnModal(mode = 'add', addOnData = null, themeStream = currentTheme) {
   const modalStream = new Stream(null);  // Will emit the created or edited AddOn
   
   // ——— Backdrop ———
@@ -841,7 +841,7 @@ function openAddOnModal(currentUser, mode = 'add', addOnData = null, themeStream
       lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
     };
 
-    const userRef = db.collection('users').doc(currentUser.uid);
+    const userRef = db.collection('users').doc(window.currentUser.uid);
     try {
       if (mode === 'add') {
         const version = {
@@ -941,9 +941,9 @@ function openAddOnModal(currentUser, mode = 'add', addOnData = null, themeStream
   return modalStream;
 }
 
-async function refreshAddOns(currentUser) {
+async function refreshAddOns() {
   try {
-    const snap = await db.collection('users').doc(currentUser.uid).get();
+    const snap = await db.collection('users').doc(window.currentUser.uid).get();
     const list = (snap.data()?.addOns) || [];
     window.addOnsStream.set(list);
   } catch (err) {
@@ -956,9 +956,9 @@ function truncate(str, length = 40) {
   return str.length > length ? str.slice(0, length) + '...' : str;
 }
 
-function openAddOnChooserModal(currentUser, themeStream = currentTheme) {
+function openAddOnChooserModal(themeStream = currentTheme) {
 
-  refreshAddOns(currentUser);
+  refreshAddOns();
   const modalStream = new Stream(null);
 
   const modal = document.createElement('div');
@@ -1071,12 +1071,12 @@ function openAddOnChooserModal(currentUser, themeStream = currentTheme) {
       editBtn.style.cursor = 'pointer';
       editBtn.onclick = async () => {
         try {
-          const fullData = await loadLatestAddOnVersion(currentUser, addOn.address);
-          const editStream = openAddOnModal(currentUser, 'edit', fullData, themeStream);
+          const fullData = await loadLatestAddOnVersion(addOn.address);
+          const editStream = openAddOnModal('edit', fullData, themeStream);
           editStream.subscribe(updated => {
             if (updated) {
               showToast("AddOn updated!", { type: 'success' });
-              refreshAddOns(currentUser);
+              refreshAddOns();
             }
           });
         } catch (err) {
@@ -1110,11 +1110,11 @@ function openAddOnChooserModal(currentUser, themeStream = currentTheme) {
   }, { outline: true }, themeStream);
 
   const newBtn = reactiveButton(new Stream("➕ New AddOn"), () => {
-    const addStream = openAddOnModal(currentUser, 'add', null, themeStream);
+    const addStream = openAddOnModal('add', null, themeStream);
     addStream.subscribe(newAddOn => {
       if (newAddOn) {
         showToast("AddOn added!", { type: 'success' });
-        refreshAddOns(currentUser);
+        refreshAddOns();
       }
     });
   }, { accent: true }, themeStream);
@@ -1137,9 +1137,9 @@ function openAddOnChooserModal(currentUser, themeStream = currentTheme) {
 
 
 
-async function loadLatestAddOnVersion(currentUser, addOnId) {
+async function loadLatestAddOnVersion(addOnId) {
   const doc = await db.collection('users')
-    .doc(currentUser.uid)
+    .doc(window.currentUser.uid)
     .collection('addOns')
     .doc(addOnId)
     .get();
@@ -1158,7 +1158,7 @@ async function loadLatestAddOnVersion(currentUser, addOnId) {
 }
 
 
-function openAddOnHistoryModal(currentUser, addOnId, themeStream = currentTheme) {
+function openAddOnHistoryModal(addOnId, themeStream = currentTheme) {
   const modal = document.createElement('div');
   Object.assign(modal.style, {
     position: 'fixed',
@@ -1205,7 +1205,7 @@ function openAddOnHistoryModal(currentUser, addOnId, themeStream = currentTheme)
   const loadHistory = async () => {
     try {
       const doc = await db.collection('users')
-        .doc(currentUser.uid)
+        .doc(window.currentUser.uid)
         .collection('addOns')
         .doc(addOnId)
         .get();
