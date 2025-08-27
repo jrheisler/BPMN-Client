@@ -945,7 +945,7 @@ async function refreshAddOns(currentUser) {
   try {
     const snap = await db.collection('users').doc(currentUser.uid).get();
     const list = (snap.data()?.addOns) || [];
-    addOnsStream.set(list);
+    window.addOnsStream.set(list);
   } catch (err) {
     console.error("Failed to fetch AddOns: ", err);
   }
@@ -1016,7 +1016,7 @@ function openAddOnChooserModal(currentUser, themeStream = currentTheme) {
     'Information': 'ℹ️'
   };
 
-  addOnsStream.subscribe(addOns => {
+  window.addOnsStream.subscribe(addOns => {
     listContainer.replaceChildren();
 
     if (!addOns.length) {
@@ -1088,7 +1088,7 @@ function openAddOnChooserModal(currentUser, themeStream = currentTheme) {
         const confirmed = await showConfirmationDialog("Are you sure you want to remove this AddOn from this list?", themeStream);
         if (confirmed) {
           addOns.splice(addOns.indexOf(addOn), 1);
-          addOnsStream.set([...addOns]);
+          window.addOnsStream.set([...addOns]);
         }
       }, {        
         padding: '0.25rem 0.75rem',
