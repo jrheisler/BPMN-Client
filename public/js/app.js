@@ -250,9 +250,16 @@ Object.assign(document.body.style, {
     tokenPanel.show();
   }
 
+  let blockchain;
+  let processedTokens = 0;
+  window.blockchain = blockchain;
+
   const origStart = simulation.start;
   simulation.start = (...args) => {
     tokenPanel.hide();
+    blockchain = new Blockchain();
+    window.blockchain = blockchain;
+    processedTokens = 0;
     tokenPanel.show();
     return origStart.apply(simulation, args);
   };
@@ -260,17 +267,16 @@ Object.assign(document.body.style, {
   const origReset = simulation.reset;
   simulation.reset = (...args) => {
     tokenPanel.hide();
+    blockchain = new Blockchain();
+    window.blockchain = blockchain;
     processedTokens = 0;
     const res = origReset.apply(simulation, args);
     return res;
   };
 
-  const blockchain = new Blockchain();
-  window.blockchain = blockchain;
-
   if (tokenPanel.setDownloadHandler)
     tokenPanel.setDownloadHandler(() => {
-      const data = JSON.stringify(blockchain.chain, null, 2);
+      const data = JSON.stringify(blockchain?.chain ?? [], null, 2);
       const blob = new Blob([data], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -282,7 +288,6 @@ Object.assign(document.body.style, {
       URL.revokeObjectURL(url);
     });
 
-  let processedTokens = 0;
   simulation.tokenLogStream.subscribe(entries => {
     if (entries.length) {
       tokenPanel.show();
@@ -290,7 +295,7 @@ Object.assign(document.body.style, {
       tokenPanel.hide();
     }
 
-    if (entries.length > processedTokens) {
+    if (blockchain && entries.length > processedTokens) {
       for (let i = processedTokens; i < entries.length; i++) {
         blockchain.addBlock(entries[i]);
       }
