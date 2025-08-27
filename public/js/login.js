@@ -276,7 +276,7 @@ function openDiagramPickerModal(currentUser, themeStream = currentTheme) {
             .doc(entry.id)
             .get();
 
-          window.notesStream.set(entry.notes);
+          if (window.notesStream) window.notesStream.set(entry.notes);
 
           pickStream.set({ id: entry.id, data: doc.data() });
           modal.remove();
