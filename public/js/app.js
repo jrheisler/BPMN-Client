@@ -15,6 +15,7 @@ import customReplaceModule from './modules/customReplaceMenuProvider.js';
     'Tool': '🧰',
     'Information': 'ℹ️'
   };
+  window.typeIcons = typeIcons;
 // A reactive store of the current user’s addOns
 const addOnsStream = new Stream([]);
 window.addOnsStream = addOnsStream;
