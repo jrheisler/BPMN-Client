@@ -519,11 +519,11 @@ Object.assign(document.body.style, {
   // Prompt user to choose path at gateways
   simulation.pathsStream.subscribe(data => {
     if (!data) return;
-    const { flows, type } = data;
+    const { flows, type, isDefaultOnly } = data;
     if (!flows || !flows.length) return;
     const isInclusive = type === 'bpmn:InclusiveGateway';
-    // If only one flow is viable for exclusive gateways, auto-select it
-    if (!isInclusive && flows.length === 1) {
+    // If only one flow is viable for exclusive gateways, auto-select it unless it's the default flow
+    if (!isInclusive && flows.length === 1 && !isDefaultOnly) {
       simulation.step(flows[0].id);
       return;
     }
