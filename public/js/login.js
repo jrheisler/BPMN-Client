@@ -1001,20 +1001,6 @@ function openAddOnChooserModal(themeStream = currentTheme) {
   });
   content.appendChild(listContainer);
 
-  const typeIcons = {
-    'Knowledge': '📚',
-    'Business': '💼',
-    'Requirement': '📝',
-    'Lifecycle': '🔄',
-    'Measurement': '📊',
-    'Condition': '⚖️',
-    'Material': '🧱',
-    'Role': '👤',
-    'Equipment': '🛠️',
-    'System': '⚙️',
-    'Tool': '🧰',
-    'Information': 'ℹ️'
-  };
 
   window.addOnsStream.subscribe(addOns => {
     listContainer.replaceChildren();
@@ -1048,7 +1034,7 @@ function openAddOnChooserModal(themeStream = currentTheme) {
       });
 
       const icon = document.createElement('span');
-      icon.textContent = typeIcons[addOn.type] || '❓';
+      icon.textContent = (window.typeIcons || {})[addOn.type] || '❓';
       icon.style.fontSize = '1.5rem';
       item.appendChild(icon);
 

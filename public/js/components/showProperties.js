@@ -383,7 +383,7 @@ function showProperties(element, modeling, moddle) {
   row1.style.gap = '0.5rem';
 
   const icon = document.createElement('span');
-  icon.textContent = typeIcons[addOn.type] || '❓';
+  icon.textContent = (window.typeIcons || {})[addOn.type] || '❓';
   icon.style.fontSize = '1.5rem';
   row1.appendChild(icon);
 
