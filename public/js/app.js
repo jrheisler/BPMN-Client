@@ -22,6 +22,7 @@ window.addOnsStream = addOnsStream;
 const avatarOptions = { width: '60px', height: '60px', rounded: true };
 const logUser = new Stream('👤 Login');
 let currentUser = null;
+window.currentUser = currentUser;
 
 
 const notesStream = new Stream(null);
@@ -322,7 +323,7 @@ Object.assign(document.body.style, {
     const element = elementRegistry.get(id);
     if (element) {
       selectionService.select(element);
-      showProperties(element, modeling, moddle, currentUser);
+      showProperties(element, modeling, moddle);
     }
     window.diagramTree.setSelectedId(id);
   };
@@ -804,7 +805,7 @@ function buildDropdownOptions() {
         {
         label: "📋 Select or New Diagram",
         onClick: () => {
-          openDiagramPickerModal(currentUser).subscribe(result => {
+          openDiagramPickerModal().subscribe(result => {
             if (result === null) {
             } else if (result.new) {
               currentDiagramId = null;
@@ -962,8 +963,8 @@ function buildDropdownOptions() {
       },
       {
         label: "🧩 Add AddOns", 
-        onClick: () => {          
-          openAddOnChooserModal(currentUser).subscribe(selectedAddOn => {
+        onClick: () => {
+          openAddOnChooserModal().subscribe(selectedAddOn => {
             if (selectedAddOn) {
               // Process the selected AddOn (either picked, newly added, or edited)
 
@@ -1006,9 +1007,10 @@ function buildDropdownOptions() {
             avatarStream.set('flow.png');
             showSaveButton.set(false);
             currentUser = null;
+            window.currentUser = currentUser;
             rebuildMenu();
           }).catch(err => {
-            showToast("Logout failed: ", { type: 'error' });            
+            showToast("Logout failed: ", { type: 'error' });
           });
         } else {
           const userStream = reactiveLoginModal(currentTheme);
@@ -1018,6 +1020,7 @@ function buildDropdownOptions() {
             } else if (result === null) {
             } else {
               currentUser = result;
+              window.currentUser = currentUser;
               logUser.set('👤 Logout');
               avatarStream.set('flowLoggedIn.png');
               showSaveButton.set(true);
@@ -1132,7 +1135,7 @@ function rebuildMenu() {
   // 6) Wire up double-click on any BPMN element
   eventBus.on('element.dblclick', ({ element }) => {
     if (element.type && element.type.startsWith('bpmn:')) {
-      showProperties(element, modeling, moddle, currentUser);
+      showProperties(element, modeling, moddle);
     }
   });
 

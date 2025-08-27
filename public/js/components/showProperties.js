@@ -274,7 +274,7 @@ function openUrlModal(url) {
   document.body.appendChild(modal);
 }
 
-function showProperties(element, modeling, moddle, currentUser) {
+function showProperties(element, modeling, moddle) {
   const bo = element.businessObject;
   const type = element.businessObject.$type;
   const fieldKeys = BPMN_PROPERTY_MAP[type] || [];
@@ -321,7 +321,7 @@ function showProperties(element, modeling, moddle, currentUser) {
   const attachBtn = reactiveButton(
     new Stream("Attach AddOn"),
     () => {
-      openAddOnChooserModal(currentUser, currentTheme).subscribe(selectedAddOn => {
+      openAddOnChooserModal(currentTheme).subscribe(selectedAddOn => {
         if (!selectedAddOn) return;
 
         const newEntry = {
