@@ -252,6 +252,7 @@ Object.assign(document.body.style, {
 
   let blockchain;
   let processedTokens = 0;
+  let blockchainPersistPromise = Promise.resolve();
   window.blockchain = blockchain;
 
   const origStart = simulation.start;
@@ -296,10 +297,14 @@ Object.assign(document.body.style, {
     }
 
     if (blockchain && entries.length > processedTokens) {
-      for (let i = processedTokens; i < entries.length; i++) {
-        blockchain.addBlock(entries[i]);
-      }
-      processedTokens = entries.length;
+      const toPersist = entries.slice(processedTokens);
+      blockchainPersistPromise = blockchainPersistPromise.then(() => {
+        for (let i = 0; i < toPersist.length; i++) {
+          blockchain.addBlock(toPersist[i]);
+        }
+        processedTokens = entries.length;
+        window.dispatchEvent(new Event('blockchain-persisted'));
+      });
     }
   });
 
@@ -307,7 +312,7 @@ Object.assign(document.body.style, {
   simulation.tokenStream.subscribe(tokens => {
     if (prevTokenCount > 0 && tokens.length === 0) {
       tokenPanel.show();
-      tokenPanel.showDownload();
+      blockchainPersistPromise.then(() => tokenPanel.showDownload());
     }
     prevTokenCount = tokens.length;
   });
