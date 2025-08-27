@@ -144,6 +144,9 @@
       if (global.simulation && typeof global.simulation.clearTokenLog === 'function') {
         global.simulation.clearTokenLog();
       }
+      if (global.blockchain && typeof global.blockchain.reset === 'function') {
+        global.blockchain.reset();
+      }
     });
 
     closeBtn.addEventListener('click', hide);
