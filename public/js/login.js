@@ -941,7 +941,7 @@ function openAddOnModal(currentUser, mode = 'add', addOnData = null, themeStream
   return modalStream;
 }
 
-async function refreshAddOns() {
+async function refreshAddOns(currentUser) {
   try {
     const snap = await db.collection('users').doc(currentUser.uid).get();
     const list = (snap.data()?.addOns) || [];
@@ -958,7 +958,7 @@ function truncate(str, length = 40) {
 
 function openAddOnChooserModal(currentUser, themeStream = currentTheme) {
 
-  refreshAddOns();
+  refreshAddOns(currentUser);
   const modalStream = new Stream(null);
 
   const modal = document.createElement('div');
@@ -1076,7 +1076,7 @@ function openAddOnChooserModal(currentUser, themeStream = currentTheme) {
           editStream.subscribe(updated => {
             if (updated) {
               showToast("AddOn updated!", { type: 'success' });
-              refreshAddOns();
+              refreshAddOns(currentUser);
             }
           });
         } catch (err) {
@@ -1114,7 +1114,7 @@ function openAddOnChooserModal(currentUser, themeStream = currentTheme) {
     addStream.subscribe(newAddOn => {
       if (newAddOn) {
         showToast("AddOn added!", { type: 'success' });
-        refreshAddOns();
+        refreshAddOns(currentUser);
       }
     });
   }, { accent: true }, themeStream);
