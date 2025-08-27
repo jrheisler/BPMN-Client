@@ -17,6 +17,7 @@ import customReplaceModule from './modules/customReplaceMenuProvider.js';
   };
 // A reactive store of the current user’s addOns
 const addOnsStream = new Stream([]);
+window.addOnsStream = addOnsStream;
 // Example options for the avatar (styling options)
 const avatarOptions = { width: '60px', height: '60px', rounded: true };
 const logUser = new Stream('👤 Login');
