@@ -576,7 +576,7 @@ const form = column([
   row([
     spacer(),
     reactiveButton(Stream('Save'), () => {
-      console.log('Name:', name.get(), 'Category:', category.get());
+      /* handle save action */
     })
   ])
 ], { gap: '1rem', padding: '1rem' });
@@ -591,8 +591,8 @@ const form = column([
 ```js
 const userAvatar = Stream('/images/user.png');
 const menuItems = [
-  { label: 'Profile', onClick: () => console.log('Profile') },
-  { label: 'Logout', onClick: () => console.log('Logout') },
+  { label: 'Profile', onClick: () => {/* profile */} },
+  { label: 'Logout', onClick: () => {/* logout */} },
 ];
 
 const header = row([
@@ -612,7 +612,7 @@ const header = row([
 const onDelete = async () => {
   const confirmed = await showConfirmationDialog('Are you sure you want to delete this?', currentTheme);
   if (confirmed) {
-    console.log('Deleted!');
+    /* deletion confirmed */
   }
 };
 

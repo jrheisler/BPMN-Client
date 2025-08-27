@@ -146,7 +146,6 @@ let nextTokenId = 1;
 
   // --- Default element handlers ---
   elementHandlers.set('bpmn:UserTask', (token, api) => {
-    console.log('Waiting at user task', token.element.id);
     api.pause();
     const to = setTimeout(() => {
       skipHandlerFor.add(token.id);
@@ -157,7 +156,6 @@ let nextTokenId = 1;
   });
 
   elementHandlers.set('bpmn:TimerEvent', (token, api) => {
-    console.log('Timer event triggered', token.element.id);
     api.pause();
     const to = setTimeout(() => {
       skipHandlerFor.add(token.id);
@@ -344,7 +342,6 @@ let nextTokenId = 1;
 
     const ids = Array.isArray(flowIds) ? flowIds : flowIds ? [flowIds] : null;
     if (!ids || ids.length === 0) {
-      console.log('Awaiting inclusive decision at gateway', token.element.id);
       pathsStream.set({ flows: outgoing, type: token.element.type });
       awaitingToken = token;
       resumeAfterChoice = running;
@@ -375,7 +372,6 @@ let nextTokenId = 1;
 
   function handleEventBasedGateway(token, outgoing, flowId) {
     if (!flowId) {
-      console.log('Awaiting event at gateway', token.element.id);
       pathsStream.set({ flows: outgoing, type: token.element.type });
       awaitingToken = token;
       resumeAfterChoice = running;
@@ -434,7 +430,6 @@ let nextTokenId = 1;
       pathsStream.set(null);
       tokenStream.set(tokens);
       if (!tokens.length) {
-        console.log('No outgoing flow, simulation finished');
         pause();
         cleanup();
         return;
@@ -503,7 +498,6 @@ let nextTokenId = 1;
     pathsStream.set(null);
 
     if (!tokens.length) {
-      console.log('No outgoing flow, simulation finished');
       pause();
       cleanup();
       return;
@@ -531,7 +525,6 @@ let nextTokenId = 1;
     tokens = [t];
     tokenStream.set(tokens);
     logToken(t);
-    console.log('Simulation started');
     running = true;
     schedule();
   }
@@ -539,7 +532,6 @@ let nextTokenId = 1;
   function resume() {
     if (running) return;
     clearHandlerState();
-    console.log('Simulation resumed');
     running = true;
     schedule();
   }
@@ -547,7 +539,6 @@ let nextTokenId = 1;
   function pause() {
     running = false;
     clearTimeout(timer);
-    console.log('Simulation paused');
     if (!tokens.length) {
       cleanup();
     }
@@ -568,7 +559,6 @@ let nextTokenId = 1;
     tokenStream.set(tokens);
     logToken(t);
     pathsStream.set(null);
-    console.log('Simulation reset to start element', startEl && startEl.id);
   }
 
   return {

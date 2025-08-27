@@ -19,7 +19,7 @@ const sim = createSimulation({ elementRegistry, canvas });
 sim.elementHandlers.set('bpmn:UserTask', (token, api) => {
   api.pause();
   // perform asynchronous work or wait for user input
-  api.addCleanup(() => console.log('cleanup')); // optional
+  api.addCleanup(() => {/* cleanup */}); // optional
   api.resume();
   return [token]; // keep or modify tokens
 });
