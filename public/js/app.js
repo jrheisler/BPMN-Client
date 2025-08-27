@@ -260,6 +260,7 @@ Object.assign(document.body.style, {
   const origReset = simulation.reset;
   simulation.reset = (...args) => {
     tokenPanel.hide();
+    processedTokens = 0;
     const res = origReset.apply(simulation, args);
     return res;
   };
