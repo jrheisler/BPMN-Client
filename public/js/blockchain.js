@@ -94,6 +94,11 @@ class Blockchain {
     this.persist();
   }
 
+  reset() {
+    this.chain = [this.createGenesisBlock()];
+    this.persist();
+  }
+
   addPeer(url) {
     if (!this.peers.includes(url)) {
       this.peers.push(url);
