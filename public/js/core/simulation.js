@@ -95,22 +95,37 @@ let nextTokenId = 1;
   const skipHandlerFor = new Set();
 
   // Visual highlighting of the active elements
-  let previousIds = new Set();
+  let previousElementIds = new Set();
+  let previousFlowIds = new Set();
   tokenStream.subscribe(list => {
-    const currentIds = new Set(
+    const currentElementIds = new Set(
       list.filter(t => t.element).map(t => t.element.id)
     );
-    previousIds.forEach(id => {
-      if (!currentIds.has(id) && elementRegistry.get(id)) {
+    const currentFlowIds = new Set(
+      list.map(t => t.viaFlow).filter(Boolean)
+    );
+    previousElementIds.forEach(id => {
+      if (!currentElementIds.has(id) && elementRegistry.get(id)) {
         canvas.removeMarker(id, 'active');
       }
     });
-    currentIds.forEach(id => {
-      if (!previousIds.has(id)) {
+    currentElementIds.forEach(id => {
+      if (!previousElementIds.has(id)) {
         canvas.addMarker(id, 'active');
       }
     });
-    previousIds = currentIds;
+    previousFlowIds.forEach(id => {
+      if (!currentFlowIds.has(id) && elementRegistry.get(id)) {
+        canvas.removeMarker(id, 'active');
+      }
+    });
+    currentFlowIds.forEach(id => {
+      if (!previousFlowIds.has(id)) {
+        canvas.addMarker(id, 'active');
+      }
+    });
+    previousElementIds = currentElementIds;
+    previousFlowIds = currentFlowIds;
   });
 
   loadTokenLog();
@@ -121,6 +136,7 @@ let nextTokenId = 1;
       tokenId: token.id,
       elementId: el ? el.id : null,
       elementName: el ? el.businessObject?.name || el.name || null : null,
+      flowId: token.viaFlow || null,
       timestamp: Date.now()
     };
     tokenLogStream.set([...tokenLogStream.get(), entry]);
@@ -178,20 +194,24 @@ let nextTokenId = 1;
     pathsStream.set(null);
     tokens = [];
     tokenStream.set(tokens);
-    previousIds.forEach(id => {
+    previousElementIds.forEach(id => {
       if (elementRegistry.get(id)) canvas.removeMarker(id, 'active');
     });
-    previousIds = new Set();
+    previousFlowIds.forEach(id => {
+      if (elementRegistry.get(id)) canvas.removeMarker(id, 'active');
+    });
+    previousElementIds = new Set();
+    previousFlowIds = new Set();
   }
 
   function handleDefault(token, outgoing) {
     const flow = outgoing[0];
     if (flow) {
-      const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins };
+      const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins, viaFlow: flow.id };
       logToken(next);
       return [next];
     }
-    logToken({ id: token.id, element: null });
+    logToken({ id: token.id, element: null, viaFlow: token.viaFlow });
     return [];
   }
 
@@ -234,7 +254,7 @@ let nextTokenId = 1;
 
       if (viable.length === 1 && !defaultOnly) {
         const flow = viable[0];
-        const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins };
+        const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins, viaFlow: flow.id };
         logToken(next);
         return [next];
       }
@@ -249,7 +269,7 @@ let nextTokenId = 1;
     // Flow was chosen explicitly
     const flow = elementRegistry.get(flowId);
     if (flow) {
-      const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins };
+      const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins, viaFlow: flow.id };
       logToken(next);
       return [next];
     }
@@ -261,7 +281,8 @@ let nextTokenId = 1;
       const next = {
         id: idx === 0 ? token.id : nextTokenId++,
         element: flow.target,
-        pendingJoins: token.pendingJoins
+        pendingJoins: token.pendingJoins,
+        viaFlow: flow.id
       };
       logToken(next);
       return next;
@@ -362,7 +383,8 @@ let nextTokenId = 1;
         const next = {
           id: idx === 0 ? token.id : nextTokenId++,
           element: flow.target,
-          pendingJoins
+          pendingJoins,
+          viaFlow: flow.id
         };
         logToken(next);
         return next;
@@ -380,7 +402,7 @@ let nextTokenId = 1;
     }
     const flow = elementRegistry.get(flowId);
     if (flow) {
-      const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins };
+      const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins, viaFlow: flow.id };
       logToken(next);
       return [next];
     }
@@ -515,13 +537,17 @@ let nextTokenId = 1;
     clearTokenLog();
     pathsStream.set(null);
     awaitingToken = null;
-    previousIds.forEach(id => {
+    previousElementIds.forEach(id => {
       if (elementRegistry.get(id)) canvas.removeMarker(id, 'active');
     });
-    previousIds = new Set();
+    previousFlowIds.forEach(id => {
+      if (elementRegistry.get(id)) canvas.removeMarker(id, 'active');
+    });
+    previousElementIds = new Set();
+    previousFlowIds = new Set();
 
     const startEl = getStart();
-    const t = { id: nextTokenId++, element: startEl };
+    const t = { id: nextTokenId++, element: startEl, viaFlow: null };
     tokens = [t];
     tokenStream.set(tokens);
     logToken(t);
@@ -554,7 +580,7 @@ let nextTokenId = 1;
     cleanup();
     clearTokenLog();
     const startEl = getStart();
-    const t = { id: nextTokenId++, element: startEl };
+    const t = { id: nextTokenId++, element: startEl, viaFlow: null };
     tokens = [t];
     tokenStream.set(tokens);
     logToken(t);
