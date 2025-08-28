@@ -67,6 +67,21 @@
   // ---- Data Model ---------------------------------------------------------
   const HELP = [
     {
+      id: 'avatar-menu',
+      group: 'Menu',
+      title: 'Avatar Menu — Quick actions',
+      subtitle: 'Access diagram, version, add-on, and account options.',
+      tags: ['menu','diagrams','addons'],
+      blocks: [
+        { h3: 'Select or New Diagram', items: ['Choose an existing diagram or start a fresh one when beginning work.']},
+        { h3: 'Switch Version', items: ['Move between BPMN client versions to test compatibility or features.']},
+        { h3: 'Add AddOns', items: ['Enable extra tools only when you need additional functionality.']},
+        { h3: 'Import BPMN', items: ['Load a BPMN XML file when bringing in work from elsewhere.']},
+        { h3: 'Download XML', items: ['Export the current diagram as BPMN XML for sharing or backups.']},
+        { h3: 'Login/Logout', items: ['Sign in to sync diagrams or sign out to end your session.']}
+      ]
+    },
+    {
       id: 'start',
       group: 'Events',
       title: 'StartEvent — Entry point of the process',
