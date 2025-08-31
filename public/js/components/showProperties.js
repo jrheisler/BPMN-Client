@@ -10,7 +10,8 @@ const BPMN_PROPERTY_MAP = {
     'estimatedDuration', 'actualDuration',
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
-  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
+  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
+  'variables', 'inputMappings', 'outputMappings',
   'kpiNotes'
   ],
   'bpmn:UserTask': [
@@ -18,14 +19,15 @@ const BPMN_PROPERTY_MAP = {
     'estimatedDuration', 'actualDuration',
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
-  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',   'kpiNotes'
+  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 'variables', 'inputMappings', 'outputMappings', 'kpiNotes'
   ],
   'bpmn:ServiceTask': [
     'name', 'documentation', 'implementation',
     'estimatedDuration', 'actualDuration',
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
-  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
+  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
+  'variables', 'inputMappings', 'outputMappings',
   'kpiNotes'
   ],
   'bpmn:ScriptTask': [
@@ -33,7 +35,8 @@ const BPMN_PROPERTY_MAP = {
     'estimatedDuration', 'actualDuration',
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
-  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
+  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
+  'variables', 'inputMappings', 'outputMappings',
   'kpiNotes'
   ],
   'bpmn:CallActivity': [
@@ -41,14 +44,15 @@ const BPMN_PROPERTY_MAP = {
     'estimatedDuration', 'actualDuration',
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
-  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',   'kpiNotes'
+  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 'variables', 'inputMappings', 'outputMappings', 'kpiNotes'
   ],
   'bpmn:SubProcess': [
     'name', 'documentation',
     'estimatedDuration', 'actualDuration',
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
-  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
+  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
+  'variables', 'inputMappings', 'outputMappings',
   'kpiNotes'
   ],
   'bpmn:StartEvent': [
@@ -198,6 +202,9 @@ const BPMN_PROPERTY_MAP = {
   { key: 'implementation',    label: 'Implementation',      type: 'text' },
   { key: 'default',           label: 'Default Flow ID',     type: 'text' },
   { key: 'conditionExpression', label: 'Condition (for flow)', type: 'textarea' },
+  { key: 'variables',        label: 'Variables',           type: 'array' },
+  { key: 'inputMappings',    label: 'Input Mappings',      type: 'array' },
+  { key: 'outputMappings',   label: 'Output Mappings',     type: 'array' },
   { key: 'itemSubjectRef',    label: 'Data Type (ItemRef)', type: 'text' },
   { key: 'processRef',        label: 'Linked Process ID',   type: 'text' },
   { key: 'text',              label: 'Annotation Text',     type: 'textarea' },
@@ -501,18 +508,32 @@ function showProperties(element, modeling, moddle) {
       const data = new FormData(form);
       const props = {};
       const standardKeys = BPMN_PROPERTY_MAP[bo.$type] || [];
+      const arrayKeys = ['variables', 'inputMappings', 'outputMappings'];
+
+      bo.$attrs = bo.$attrs || {};
 
       standardKeys.forEach(key => {
         const val = data.get(key);
         if (val !== null) {
-          props[key] = val;
+          if (arrayKeys.includes(key)) {
+            if (val) {
+              bo.$attrs[key] = val;
+            } else {
+              delete bo.$attrs[key];
+            }
+          } else {
+            props[key] = val;
+          }
         }
       });
 
       modeling.updateProperties(element, props);
 
+      arrayKeys.forEach(k => {
+        delete bo[k];
+      });
+
       // Store addOns under $attrs for custom serialization
-      bo.$attrs = bo.$attrs || {};
       if (addOnsField.value) {
         bo.$attrs.addOns = addOnsField.value;
       } else {
@@ -569,6 +590,91 @@ function showProperties(element, modeling, moddle) {
   fieldsToShow.forEach(({ key, label, type }) => {
     if (key === 'addOns') {
       // Already handled
+      return;
+    }
+
+    if (type === 'array') {
+      const wrapper = document.createElement('div');
+      wrapper.style.marginBottom = '0.75rem';
+
+      const lbl = document.createElement('label');
+      lbl.textContent = label;
+      lbl.style.display = 'block';
+      wrapper.appendChild(lbl);
+
+      const listContainer = document.createElement('div');
+      listContainer.style.display = 'flex';
+      listContainer.style.flexDirection = 'column';
+      listContainer.style.gap = '0.5rem';
+      wrapper.appendChild(listContainer);
+
+      const hiddenInput = document.createElement('input');
+      hiddenInput.type = 'hidden';
+      hiddenInput.name = key;
+      wrapper.appendChild(hiddenInput);
+
+      let items = [];
+      let existingVal = bo?.$attrs?.[key] || bo.get(key);
+      if (existingVal) {
+        try {
+          items = typeof existingVal === 'string' ? JSON.parse(existingVal) : existingVal;
+        } catch (e) {
+          items = [];
+        }
+      }
+
+      function renderItems() {
+        listContainer.replaceChildren();
+        items.forEach((it, idx) => {
+          const rowEl = document.createElement('div');
+          rowEl.style.display = 'flex';
+          rowEl.style.gap = '0.25rem';
+
+          ['name', 'type', 'default'].forEach(field => {
+            const inp = document.createElement('input');
+            inp.type = 'text';
+            inp.placeholder = field.charAt(0).toUpperCase() + field.slice(1);
+            inp.value = it[field] || '';
+            inp.addEventListener('input', () => {
+              it[field] = inp.value;
+              hiddenInput.value = JSON.stringify(items);
+            });
+            rowEl.appendChild(inp);
+          });
+
+          const removeBtn = reactiveButton(
+            new Stream('Remove'),
+            () => {
+              items.splice(idx, 1);
+              hiddenInput.value = JSON.stringify(items);
+              renderItems();
+            },
+            { padding: '0.25rem 0.5rem' },
+            currentTheme
+          );
+
+          rowEl.appendChild(removeBtn);
+          listContainer.appendChild(rowEl);
+        });
+
+        hiddenInput.value = items.length ? JSON.stringify(items) : '';
+      }
+
+      const addBtn = reactiveButton(
+        new Stream('Add'),
+        () => {
+          items.push({ name: '', type: '', default: '' });
+          hiddenInput.value = JSON.stringify(items);
+          renderItems();
+        },
+        { accent: true, padding: '0.25rem 0.5rem', marginBottom: '0.5rem' },
+        currentTheme
+      );
+
+      wrapper.insertBefore(addBtn, listContainer);
+
+      renderItems();
+      form.appendChild(wrapper);
       return;
     }
 
