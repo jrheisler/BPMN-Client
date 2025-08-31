@@ -522,12 +522,12 @@ Object.assign(document.body.style, {
   // Prompt user to choose path at gateways
   simulation.pathsStream.subscribe(data => {
     if (!data) return;
-    const { flows, type } = data;
-    if (!flows || !flows.length) return;
+    const { flows: flowOptions, type } = data;
+    if (!flowOptions || !flowOptions.length) return;
     const isInclusive = type === 'bpmn:InclusiveGateway';
     // Access modal helper via `window` to avoid ReferenceError when used
     // within modules or strict scopes
-    window.openFlowSelectionModal(flows, currentTheme, isInclusive).subscribe(chosen => {
+    window.openFlowSelectionModal(flowOptions, currentTheme, isInclusive).subscribe(chosen => {
       if (chosen && chosen.length) {
         if (isInclusive) {
           simulation.step(chosen.map(f => f.id));

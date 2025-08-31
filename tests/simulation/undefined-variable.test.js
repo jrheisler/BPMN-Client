@@ -65,8 +65,12 @@ test('undefined variables evaluate to false by default', () => {
   const paths = sim.pathsStream.get();
   assert.ok(paths);
   assert.strictEqual(paths.isDefaultOnly, true);
-  assert.strictEqual(paths.flows.length, 1);
-  assert.strictEqual(paths.flows[0].id, 'f2');
+  assert.strictEqual(paths.flows.length, 2);
+  const f1 = paths.flows.find(f => f.flow.id === 'f1');
+  const f2 = paths.flows.find(f => f.flow.id === 'f2');
+  assert.ok(f1 && f2);
+  assert.strictEqual(f1.satisfied, false);
+  assert.strictEqual(f2.satisfied, true);
 });
 
 test('undefined variables use provided fallback but still require explicit choice', () => {
@@ -79,7 +83,11 @@ test('undefined variables use provided fallback but still require explicit choic
   assert.deepStrictEqual(tokens, ['gw']);
   const paths = sim.pathsStream.get();
   assert.ok(paths);
-  assert.deepStrictEqual(paths.flows.map(f => f.id), ['f1']);
+  const f1 = paths.flows.find(f => f.flow.id === 'f1');
+  const f2 = paths.flows.find(f => f.flow.id === 'f2');
+  assert.ok(f1 && f2);
+  assert.strictEqual(f1.satisfied, true);
+  assert.strictEqual(f2.satisfied, false);
   sim.step('f1');
   const after = Array.from(sim.tokenStream.get(), t => t.element.id);
   assert.deepStrictEqual(after, ['a']);

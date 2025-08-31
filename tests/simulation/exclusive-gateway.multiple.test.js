@@ -63,6 +63,6 @@ test('exclusive gateway pauses when multiple flows are viable', () => {
   assert.deepStrictEqual(after, ['gw']);
   const paths = sim.pathsStream.get();
   assert.ok(paths);
-  assert.deepStrictEqual(paths.flows.map(f => f.id), ['f1', 'f2']);
+  assert.deepStrictEqual(paths.flows.map(f => f.flow.id), ['f1', 'f2']);
 });
 

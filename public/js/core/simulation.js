@@ -244,21 +244,27 @@ let nextTokenId = 1;
         }
       };
 
+      const mapped = outgoing.map(flow => ({
+        flow,
+        satisfied: evaluate(flow.businessObject?.conditionExpression, token.context)
+      }));
       const defBo = token.element.businessObject?.default;
       const defFlow = defBo ? elementRegistry.get(defBo.id) || defBo : null;
-
-      let viable = outgoing.filter(flow =>
-        flow !== defFlow &&
-        evaluate(flow.businessObject?.conditionExpression, token.context)
-      );
-
       let defaultOnly = false;
-      if (!viable.length && defFlow) {
-        viable = [defFlow];
-        defaultOnly = true;
+      if (defFlow) {
+        const defEntry = mapped.find(f => f.flow === defFlow);
+        const others = mapped.filter(f => f.flow !== defFlow && f.satisfied);
+        if (defEntry) {
+          if (others.length) {
+            defEntry.satisfied = false;
+          } else {
+            defEntry.satisfied = true;
+            defaultOnly = true;
+          }
+        }
       }
 
-      pathsStream.set({ flows: viable, type: token.element.type, isDefaultOnly: defaultOnly });
+      pathsStream.set({ flows: mapped, type: token.element.type, isDefaultOnly: defaultOnly });
       awaitingToken = token;
       resumeAfterChoice = running;
       pause();
@@ -389,17 +395,26 @@ let nextTokenId = 1;
 
     const ids = Array.isArray(flowIds) ? flowIds : flowIds ? [flowIds] : null;
     if (!ids || ids.length === 0) {
+      const mapped = outgoing.map(flow => ({
+        flow,
+        satisfied: evaluate(flow.businessObject?.conditionExpression, token.context)
+      }));
       const defBo = token.element.businessObject?.default;
       const defFlow = defBo ? elementRegistry.get(defBo.id) || defBo : null;
-      let viable = outgoing.filter(
-        flow => flow !== defFlow && evaluate(flow.businessObject?.conditionExpression, token.context)
-      );
       let defaultOnly = false;
-      if (!viable.length && defFlow) {
-        viable = [defFlow];
-        defaultOnly = true;
+      if (defFlow) {
+        const defEntry = mapped.find(f => f.flow === defFlow);
+        const others = mapped.filter(f => f.flow !== defFlow && f.satisfied);
+        if (defEntry) {
+          if (others.length) {
+            defEntry.satisfied = false;
+          } else {
+            defEntry.satisfied = true;
+            defaultOnly = true;
+          }
+        }
       }
-      pathsStream.set({ flows: viable, type: token.element.type, isDefaultOnly: defaultOnly });
+      pathsStream.set({ flows: mapped, type: token.element.type, isDefaultOnly: defaultOnly });
       awaitingToken = token;
       resumeAfterChoice = running;
       pause();

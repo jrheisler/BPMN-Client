@@ -83,7 +83,7 @@ test('inclusive gateway without gatewayDirection waits for explicit flow selecti
   sim.step(); // start -> gateway
   sim.step(); // process gateway, should wait for decision
   const paths = sim.pathsStream.get();
-  assert.ok(paths && paths.flows.map(f => f.id).sort().join(',') === 'fa,fb');
+  assert.ok(paths && paths.flows.map(f => f.flow.id).sort().join(',') === 'fa,fb');
   const tokens = Array.from(sim.tokenStream.get(), t => t.element.id);
   assert.deepStrictEqual(tokens, ['gw']);
 });
@@ -97,7 +97,7 @@ test('inclusive gateway with "Unspecified" direction waits for explicit flow sel
   sim.step(); // start -> gateway
   sim.step(); // process gateway, should wait for decision
   const paths = sim.pathsStream.get();
-  assert.ok(paths && paths.flows.map(f => f.id).sort().join(',') === 'fa,fb');
+  assert.ok(paths && paths.flows.map(f => f.flow.id).sort().join(',') === 'fa,fb');
   const tokens = Array.from(sim.tokenStream.get(), t => t.element.id);
   assert.deepStrictEqual(tokens, ['gw']);
 });

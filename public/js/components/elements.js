@@ -469,7 +469,7 @@ function openFlowSelectionModal(flows, themeStream = currentTheme, allowMultiple
   list.style.gap = '0.5rem';
   content.appendChild(list);
 
-  flows.forEach(flow => {
+  flows.forEach(({ flow, satisfied }) => {
     const label = document.createElement('label');
     Object.assign(label.style, {
       padding: '0.5rem 1rem',
@@ -483,17 +483,23 @@ function openFlowSelectionModal(flows, themeStream = currentTheme, allowMultiple
     const input = document.createElement('input');
     input.type = allowMultiple ? 'checkbox' : 'radio';
     input.name = 'flowSelection';
+    input.disabled = !satisfied;
 
     const span = document.createElement('span');
     span.textContent = flow.target?.businessObject?.name || flow.target?.id;
 
-    const condition = flow.businessObject?.conditionExpression?.body;
+    const expr = flow.businessObject?.conditionExpression;
+    const condText = expr ? expr.body || expr.value : 'default';
     const condSpan = document.createElement('span');
-    condSpan.textContent = ` — ${condition || 'default'}`;
+    condSpan.textContent = ` — ${condText}`;
     condSpan.style.fontSize = '0.8em';
     condSpan.style.opacity = '0.7';
 
     span.appendChild(condSpan);
+
+    if (!satisfied) {
+      label.style.opacity = '0.5';
+    }
 
     label.appendChild(input);
     label.appendChild(span);
@@ -506,7 +512,7 @@ function openFlowSelectionModal(flows, themeStream = currentTheme, allowMultiple
   confirmBtn.addEventListener('click', () => {
     const selected = [];
     list.querySelectorAll('input').forEach((input, idx) => {
-      if (input.checked) selected.push(flows[idx]);
+      if (input.checked) selected.push(flows[idx].flow);
     });
     pickStream.set(selected);
     modal.remove();
