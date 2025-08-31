@@ -70,20 +70,22 @@
     flex-direction: column;
     transition: right 0.3s;
     z-index: 1100;
-    width: 300px;
+    width: 420px;
+    max-width: 90vw;
+    resize: horizontal;
   }
 
   .props-sidebar.open {
     right: 0;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     .props-sidebar {
       width: 80vw;
     }
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: 600px) {
     .props-sidebar {
       width: 100vw;
     }
