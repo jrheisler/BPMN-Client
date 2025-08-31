@@ -143,7 +143,7 @@ test('exclusive gateway exposes flows and waits for explicit choice', () => {
   sim.step(); // evaluate and pause
   const paths = sim.pathsStream.get();
   assert.ok(paths);
-  assert.deepStrictEqual(paths.flows.map(f => f.id), ['fa', 'fb']);
+  assert.deepStrictEqual(paths.flows.map(f => f.flow.id), ['fa', 'fb']);
   sim.step('fb'); // choose second flow
   const after = Array.from(sim.tokenStream.get(), t => t.element.id);
   assert.deepStrictEqual(after, ['b']);
@@ -160,7 +160,11 @@ test('exclusive gateway pauses even when only one flow is viable', () => {
   assert.deepStrictEqual(tokens, ['gw']);
   const paths = sim.pathsStream.get();
   assert.ok(paths);
-  assert.deepStrictEqual(paths.flows.map(f => f.id), ['fa']);
+  const fA = paths.flows.find(f => f.flow.id === 'fa');
+  const fB = paths.flows.find(f => f.flow.id === 'fb');
+  assert.ok(fA && fB);
+  assert.strictEqual(fA.satisfied, true);
+  assert.strictEqual(fB.satisfied, false);
   sim.step('fa');
   const after = Array.from(sim.tokenStream.get(), t => t.element.id);
   assert.deepStrictEqual(after, ['a']);
@@ -190,17 +194,51 @@ test('flow selection modal displays condition text', () => {
   const { sandbox, document } = loadElements();
   const flows = [
     {
-      target: { id: 'a', businessObject: { name: 'Task A' } },
-      businessObject: { conditionExpression: { body: '${x>5}' } }
+      flow: {
+        target: { id: 'a', businessObject: { name: 'Task A' } },
+        businessObject: { conditionExpression: { body: '${x>5}' } }
+      },
+      satisfied: true
     },
     {
-      target: { id: 'b', businessObject: { name: 'Task B' } },
-      businessObject: {}
+      flow: {
+        target: { id: 'b', businessObject: { name: 'Task B' } },
+        businessObject: {}
+      },
+      satisfied: true
     }
   ];
   sandbox.window.openFlowSelectionModal(flows);
   const labels = document.querySelectorAll('label > span');
   assert.ok(labels[0].textContent.includes('${x>5}'));
   assert.ok(labels[1].textContent.includes('default'));
+});
+
+test('flow selection modal disables unsatisfied flows', () => {
+  const { sandbox, document } = loadElements();
+  const flows = [
+    {
+      flow: {
+        target: { id: 'a', businessObject: { name: 'Task A' } },
+        businessObject: { conditionExpression: { body: '${true}' } }
+      },
+      satisfied: true
+    },
+    {
+      flow: {
+        target: { id: 'b', businessObject: { name: 'Task B' } },
+        businessObject: { conditionExpression: { body: '${false}' } }
+      },
+      satisfied: false
+    }
+  ];
+  sandbox.window.openFlowSelectionModal(flows);
+  const inputs = document.querySelectorAll('input');
+  assert.strictEqual(inputs.length, 2);
+  assert.strictEqual(inputs[0].disabled, false);
+  assert.strictEqual(inputs[1].disabled, true);
+  const labels = document.querySelectorAll('label > span');
+  assert.ok(labels[0].textContent.includes('${true}'));
+  assert.ok(labels[1].textContent.includes('${false}'));
 });
 
