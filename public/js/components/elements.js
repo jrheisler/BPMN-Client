@@ -483,7 +483,6 @@ function openFlowSelectionModal(flows, themeStream = currentTheme, allowMultiple
     const input = document.createElement('input');
     input.type = allowMultiple ? 'checkbox' : 'radio';
     input.name = 'flowSelection';
-    input.disabled = !satisfied;
 
     const span = document.createElement('span');
     span.textContent = flow.target?.businessObject?.name || flow.target?.id;
@@ -498,7 +497,11 @@ function openFlowSelectionModal(flows, themeStream = currentTheme, allowMultiple
     span.appendChild(condSpan);
 
     if (!satisfied) {
-      label.style.opacity = '0.5';
+      const unsat = document.createElement('span');
+      unsat.textContent = ' (unsatisfied)';
+      unsat.style.color = 'red';
+      unsat.style.fontSize = '0.8em';
+      span.appendChild(unsat);
     }
 
     label.appendChild(input);

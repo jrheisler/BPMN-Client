@@ -214,7 +214,7 @@ test('flow selection modal displays condition text', () => {
   assert.ok(labels[1].textContent.includes('default'));
 });
 
-test('flow selection modal disables unsatisfied flows', () => {
+test('flow selection modal indicates unsatisfied flows but keeps them enabled', () => {
   const { sandbox, document } = loadElements();
   const flows = [
     {
@@ -235,10 +235,46 @@ test('flow selection modal disables unsatisfied flows', () => {
   sandbox.window.openFlowSelectionModal(flows);
   const inputs = document.querySelectorAll('input');
   assert.strictEqual(inputs.length, 2);
-  assert.strictEqual(inputs[0].disabled, false);
-  assert.strictEqual(inputs[1].disabled, true);
+  assert.ok(!inputs[0].disabled);
+  assert.ok(!inputs[1].disabled);
   const labels = document.querySelectorAll('label > span');
   assert.ok(labels[0].textContent.includes('${true}'));
   assert.ok(labels[1].textContent.includes('${false}'));
+  assert.ok(labels[1].textContent.includes('unsatisfied'));
+});
+
+test('simulation allows choice when all gateway conditions are unsatisfied', () => {
+  function buildAllFalseDiagram() {
+    const start = { id: 'start', type: 'bpmn:StartEvent', outgoing: [], incoming: [], businessObject: { $type: 'bpmn:StartEvent' } };
+    const gw = { id: 'gw', type: 'bpmn:ExclusiveGateway', businessObject: { gatewayDirection: 'Diverging' }, incoming: [], outgoing: [] };
+    const a = { id: 'a', type: 'bpmn:Task', incoming: [], outgoing: [] };
+    const b = { id: 'b', type: 'bpmn:Task', incoming: [], outgoing: [] };
+
+    const f0 = { id: 'f0', source: start, target: gw };
+    start.outgoing = [f0];
+    gw.incoming = [f0];
+
+    const fa = { id: 'fa', source: gw, target: a, businessObject: { conditionExpression: { body: '${false}' } } };
+    const fb = { id: 'fb', source: gw, target: b, businessObject: { conditionExpression: { body: '${false}' } } };
+    gw.outgoing = [fa, fb];
+    a.incoming = [fa];
+    b.incoming = [fb];
+
+    return [start, gw, a, b, f0, fa, fb];
+  }
+
+  const diagram = buildAllFalseDiagram();
+  const sim = createSimulationInstance(diagram, { delay: 0 });
+  sim.reset();
+  sim.step(); // start -> gateway
+  sim.step(); // evaluate and pause
+  const paths = sim.pathsStream.get();
+  assert.ok(paths);
+  assert.deepStrictEqual(paths.flows.map(f => f.flow.id), ['fa', 'fb']);
+  assert.ok(paths.flows.every(f => f.satisfied === false));
+  sim.step('fa'); // choose a flow despite unsatisfied condition
+  const after = Array.from(sim.tokenStream.get(), t => t.element.id);
+  assert.deepStrictEqual(after, ['a']);
+  assert.strictEqual(sim.pathsStream.get(), null);
 });
 
