@@ -70,12 +70,18 @@ function buildDefaultFlowDiagram() {
   return [start, gw, a, b, f0, f1, f2];
 }
 
-test('exclusive gateway with single conditional flow is taken automatically', () => {
+test('exclusive gateway waits for choice when a single conditional flow is viable', () => {
   const diagram = buildSingleConditionalDiagram();
   const sim = createSimulationInstance(diagram, { delay: 0 });
   sim.reset();
   sim.step(); // start -> gateway
-  sim.step(); // gateway evaluates and takes conditional flow
+  sim.step(); // gateway evaluates and pauses
+  const atGateway = Array.from(sim.tokenStream.get(), t => t.element.id);
+  assert.deepStrictEqual(atGateway, ['gw']);
+  const paths = sim.pathsStream.get();
+  assert.ok(paths);
+  assert.deepStrictEqual(paths.flows.map(f => f.id), ['f1']);
+  sim.step('f1');
   const after = Array.from(sim.tokenStream.get(), t => t.element.id);
   assert.deepStrictEqual(after, ['a']);
   assert.strictEqual(sim.pathsStream.get(), null);

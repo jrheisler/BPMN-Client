@@ -82,23 +82,35 @@ function buildDeliveryCheckDiagram() {
   return [start, gw, success, dispute, other, f0, fSuccess, fDispute, fOther];
 }
 
-test('token proceeds beyond Gateway_DeliveryCheck when deliveryStatus matches', () => {
+test('token waits for explicit selection when deliveryStatus matches a single branch', () => {
   const diagram = buildDeliveryCheckDiagram();
   const sim = createSimulationInstance(diagram, { delay: 0 });
   sim.reset();
   sim.setContext({ deliveryStatus: 'successful' });
   sim.step(); // start -> gateway
-  sim.step(); // gateway evaluates condition
+  sim.step(); // gateway evaluates and pauses
+  const tokens = Array.from(sim.tokenStream.get(), t => t.element.id);
+  assert.deepStrictEqual(tokens, ['Gateway_DeliveryCheck']);
+  const paths = sim.pathsStream.get();
+  assert.ok(paths);
+  assert.deepStrictEqual(paths.flows.map(f => f.id), ['fSuccess']);
+  sim.step('fSuccess');
   const after = Array.from(sim.tokenStream.get(), t => t.element.id);
   assert.deepStrictEqual(after, ['Task_DeliverySuccess']);
 });
 
-test('token takes fallback branch when deliveryStatus is unset', () => {
+test('token takes fallback branch after explicit choice when deliveryStatus is unset', () => {
   const diagram = buildDeliveryCheckDiagram();
   const sim = createSimulationInstance(diagram, { delay: 0 });
   sim.reset();
   sim.step(); // start -> gateway
-  sim.step(); // gateway evaluates and takes default
+  sim.step(); // gateway evaluates and pauses
+  const tokens = Array.from(sim.tokenStream.get(), t => t.element.id);
+  assert.deepStrictEqual(tokens, ['Gateway_DeliveryCheck']);
+  const paths = sim.pathsStream.get();
+  assert.ok(paths);
+  assert.deepStrictEqual(paths.flows.map(f => f.id), ['fOther']);
+  sim.step('fOther');
   const after = Array.from(sim.tokenStream.get(), t => t.element.id);
   assert.deepStrictEqual(after, ['Task_Investigate']);
 });

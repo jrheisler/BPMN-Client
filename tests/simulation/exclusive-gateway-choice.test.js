@@ -116,6 +116,25 @@ function buildDiagram() {
   return [start, gw, a, b, f0, fa, fb];
 }
 
+function buildSingleViableDiagram() {
+  const start = { id: 'start', type: 'bpmn:StartEvent', outgoing: [], incoming: [], businessObject: { $type: 'bpmn:StartEvent' } };
+  const gw = { id: 'gw', type: 'bpmn:ExclusiveGateway', businessObject: { gatewayDirection: 'Diverging' }, incoming: [], outgoing: [] };
+  const a = { id: 'a', type: 'bpmn:Task', incoming: [], outgoing: [] };
+  const b = { id: 'b', type: 'bpmn:Task', incoming: [], outgoing: [] };
+
+  const f0 = { id: 'f0', source: start, target: gw };
+  start.outgoing = [f0];
+  gw.incoming = [f0];
+
+  const fa = { id: 'fa', source: gw, target: a, businessObject: { conditionExpression: { body: '${true}' } } };
+  const fb = { id: 'fb', source: gw, target: b, businessObject: { conditionExpression: { body: '${false}' } } };
+  gw.outgoing = [fa, fb];
+  a.incoming = [fa];
+  b.incoming = [fb];
+
+  return [start, gw, a, b, f0, fa, fb];
+}
+
 test('exclusive gateway exposes flows and waits for explicit choice', () => {
   const diagram = buildDiagram();
   const sim = createSimulationInstance(diagram, { delay: 0 });
@@ -128,6 +147,23 @@ test('exclusive gateway exposes flows and waits for explicit choice', () => {
   sim.step('fb'); // choose second flow
   const after = Array.from(sim.tokenStream.get(), t => t.element.id);
   assert.deepStrictEqual(after, ['b']);
+  assert.strictEqual(sim.pathsStream.get(), null);
+});
+
+test('exclusive gateway pauses even when only one flow is viable', () => {
+  const diagram = buildSingleViableDiagram();
+  const sim = createSimulationInstance(diagram, { delay: 0 });
+  sim.reset();
+  sim.step(); // start -> gateway
+  sim.step(); // evaluate and pause
+  const tokens = Array.from(sim.tokenStream.get(), t => t.element.id);
+  assert.deepStrictEqual(tokens, ['gw']);
+  const paths = sim.pathsStream.get();
+  assert.ok(paths);
+  assert.deepStrictEqual(paths.flows.map(f => f.id), ['fa']);
+  sim.step('fa');
+  const after = Array.from(sim.tokenStream.get(), t => t.element.id);
+  assert.deepStrictEqual(after, ['a']);
   assert.strictEqual(sim.pathsStream.get(), null);
 });
 
