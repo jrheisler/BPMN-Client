@@ -258,19 +258,6 @@ let nextTokenId = 1;
         defaultOnly = true;
       }
 
-      if (viable.length === 1 && !defaultOnly) {
-        const flow = viable[0];
-        const next = {
-          id: token.id,
-          element: flow.target,
-          pendingJoins: token.pendingJoins,
-          viaFlow: flow.id,
-          context: { ...token.context }
-        };
-        logToken(next);
-        return [next];
-      }
-
       pathsStream.set({ flows: viable, type: token.element.type, isDefaultOnly: defaultOnly });
       awaitingToken = token;
       resumeAfterChoice = running;
