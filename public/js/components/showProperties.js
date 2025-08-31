@@ -514,23 +514,42 @@ function showProperties(element, modeling, moddle) {
 
       standardKeys.forEach(key => {
         const val = data.get(key);
-        if (val !== null) {
-          if (arrayKeys.includes(key)) {
-            if (val) {
-              bo.$attrs[key] = val;
-            } else {
-              delete bo.$attrs[key];
-            }
-          } else {
-            props[key] = val;
-          }
+        if (val !== null && !arrayKeys.includes(key)) {
+          props[key] = val;
         }
       });
 
       modeling.updateProperties(element, props);
 
-      arrayKeys.forEach(k => {
-        delete bo[k];
+      // handle array-based custom elements
+      const extEl = getOrCreateExtEl(bo, moddle);
+      arrayKeys.forEach(key => {
+        const val = data.get(key);
+        const type = key === 'variables' ? 'custom:Variable' : 'custom:Mapping';
+        const direction = key === 'inputMappings' ? 'input' : key === 'outputMappings' ? 'output' : null;
+
+        // remove existing elements of this kind
+        extEl.values = (extEl.values || []).filter(v => {
+          if (v.$type !== type) return true;
+          if (type === 'custom:Mapping' && direction) return v.direction !== direction;
+          return false;
+        });
+
+        if (val) {
+          let items;
+          try {
+            items = JSON.parse(val);
+          } catch (e) {
+            items = [];
+          }
+          items.forEach(it => {
+            const attrs = { ...it };
+            if (direction) attrs.direction = direction;
+            extEl.values.push(moddle.create(type, attrs));
+          });
+        }
+
+        delete bo[key];
       });
 
       // Store addOns under $attrs for custom serialization
@@ -614,12 +633,26 @@ function showProperties(element, modeling, moddle) {
       wrapper.appendChild(hiddenInput);
 
       let items = [];
-      let existingVal = bo?.$attrs?.[key] || bo.get(key);
-      if (existingVal) {
-        try {
-          items = typeof existingVal === 'string' ? JSON.parse(existingVal) : existingVal;
-        } catch (e) {
-          items = [];
+      const extVals = (bo.extensionElements && bo.extensionElements.values) || [];
+      if (key === 'variables') {
+        items = extVals
+          .filter(v => v.$type === 'custom:Variable')
+          .map(v => ({ name: v.name || '', type: v.type || '', default: v.default || '' }));
+      } else if (key === 'inputMappings' || key === 'outputMappings') {
+        const dir = key === 'inputMappings' ? 'input' : 'output';
+        items = extVals
+          .filter(v => v.$type === 'custom:Mapping' && v.direction === dir)
+          .map(v => ({ name: v.name || '', type: v.type || '', default: v.default || '' }));
+      }
+
+      if (!items.length) {
+        let existingVal = bo?.$attrs?.[key] || bo.get(key);
+        if (existingVal) {
+          try {
+            items = typeof existingVal === 'string' ? JSON.parse(existingVal) : existingVal;
+          } catch (e) {
+            items = [];
+          }
         }
       }
 

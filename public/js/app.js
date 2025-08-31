@@ -192,11 +192,14 @@ Object.assign(document.body.style, {
   const additionalModules = [ customReplaceModule ];
   if (navModule) additionalModules.push(navModule);
 
+  // load custom moddle descriptor for variables and mappings
+  const customModdle = await fetch('js/custom-moddle.json').then(r => r.json());
 
   const modeler = new BpmnJS({
     container:       canvasEl,
     selection:       { mode: 'multiple' },
-    additionalModules
+    additionalModules,
+    moddleExtensions: { custom: customModdle }
     });
   const eventBus     = modeler.get('eventBus');
   const commandStack = modeler.get('commandStack');
