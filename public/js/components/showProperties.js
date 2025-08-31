@@ -519,10 +519,13 @@ function showProperties(element, modeling, moddle) {
 
       standardKeys.forEach(key => {
         const val = data.get(key);
-        if (val !== null && !arrayKeys.includes(key)) {
+        if (val !== null && !arrayKeys.includes(key) && key !== 'conditionExpression') {
           props[key] = val;
         }
       });
+
+      const expr = data.get('conditionExpression')?.trim();
+      props.conditionExpression = expr ? moddle.create('bpmn:FormalExpression', { body: expr }) : undefined;
 
       modeling.updateProperties(element, props);
 
@@ -762,7 +765,11 @@ function showProperties(element, modeling, moddle) {
         if (ext) val = ext.value;
       }
     }
-    if (val != null) input.value = val;
+    if (key === 'conditionExpression') {
+      input.value = val?.body || '';
+    } else if (val != null) {
+      input.value = val;
+    }
 
     if (key === 'url') {
       let link = document.createElement('a');
