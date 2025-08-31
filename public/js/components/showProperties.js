@@ -98,7 +98,8 @@ const BPMN_PROPERTY_MAP = {
     'estimatedDuration', 'actualDuration',
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
-  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
+  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
+  'variables', 'inputMappings', 'outputMappings',
   'kpiNotes'
   ],
   'bpmn:InclusiveGateway': [
@@ -106,7 +107,8 @@ const BPMN_PROPERTY_MAP = {
     'estimatedDuration', 'actualDuration',
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
-  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
+  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
+  'variables', 'inputMappings', 'outputMappings',
   'kpiNotes'
   ],
   'bpmn:ParallelGateway': [
@@ -114,7 +116,8 @@ const BPMN_PROPERTY_MAP = {
     'estimatedDuration', 'actualDuration',
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
-  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
+  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
+  'variables', 'inputMappings', 'outputMappings',
   'kpiNotes'
   ],
   'bpmn:ComplexGateway': [
@@ -122,7 +125,8 @@ const BPMN_PROPERTY_MAP = {
     'estimatedDuration', 'actualDuration',
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
-    'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
+    'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
+  'variables', 'inputMappings', 'outputMappings',
   'kpiNotes'
   ],
   'bpmn:EventBasedGateway': [
@@ -130,7 +134,8 @@ const BPMN_PROPERTY_MAP = {
     'estimatedDuration', 'actualDuration',
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
-  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
+  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
+  'variables', 'inputMappings', 'outputMappings',
   'kpiNotes'
   ],
   'bpmn:SequenceFlow': [
