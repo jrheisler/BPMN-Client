@@ -487,6 +487,14 @@ function openFlowSelectionModal(flows, themeStream = currentTheme, allowMultiple
     const span = document.createElement('span');
     span.textContent = flow.target?.businessObject?.name || flow.target?.id;
 
+    const condition = flow.businessObject?.conditionExpression?.body;
+    const condSpan = document.createElement('span');
+    condSpan.textContent = ` — ${condition || 'default'}`;
+    condSpan.style.fontSize = '0.8em';
+    condSpan.style.opacity = '0.7';
+
+    span.appendChild(condSpan);
+
     label.appendChild(input);
     label.appendChild(span);
     list.appendChild(label);

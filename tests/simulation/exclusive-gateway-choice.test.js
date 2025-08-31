@@ -4,6 +4,69 @@ const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
+class Element {
+  constructor(tag) {
+    this.tagName = tag;
+    this.children = [];
+    this.style = {};
+    this._text = '';
+    this.parentNode = null;
+    this.events = {};
+  }
+  set textContent(val) {
+    this._text = String(val);
+  }
+  get textContent() {
+    return this._text + this.children.map(c => c.textContent).join('');
+  }
+  appendChild(child) {
+    this.children.push(child);
+    child.parentNode = this;
+  }
+  remove() {
+    if (this.parentNode) {
+      const idx = this.parentNode.children.indexOf(this);
+      if (idx >= 0) this.parentNode.children.splice(idx, 1);
+      this.parentNode = null;
+    }
+  }
+  addEventListener(type, fn) {
+    this.events[type] = fn;
+  }
+  contains(el) {
+    if (this === el) return true;
+    return this.children.some(child => child.contains && child.contains(el));
+  }
+  querySelectorAll(selector) {
+    const results = [];
+    const traverse = node => {
+      node.children.forEach(child => {
+        if (selector === 'input' && child.tagName === 'input') results.push(child);
+        if (selector === 'label > span' && child.tagName === 'label') {
+          child.children.forEach(grand => {
+            if (grand.tagName === 'span') results.push(grand);
+          });
+        }
+        traverse(child);
+      });
+    };
+    traverse(this);
+    return results;
+  }
+}
+
+class Document {
+  constructor() {
+    this.body = new Element('body');
+  }
+  createElement(tag) {
+    return new Element(tag);
+  }
+  querySelectorAll(selector) {
+    return this.body.querySelectorAll(selector);
+  }
+}
+
 function loadSimulation() {
   const sandbox = {
     console,
@@ -66,5 +129,42 @@ test('exclusive gateway exposes flows and waits for explicit choice', () => {
   const after = Array.from(sim.tokenStream.get(), t => t.element.id);
   assert.deepStrictEqual(after, ['b']);
   assert.strictEqual(sim.pathsStream.get(), null);
+});
+
+function loadElements() {
+  const document = new Document();
+  const window = { document };
+  const sandbox = {
+    window,
+    document,
+    Node: Element,
+    console,
+    setTimeout,
+    clearTimeout
+  };
+  const streamCode = fs.readFileSync(path.resolve(__dirname, '../../public/js/core/stream.js'), 'utf8');
+  vm.runInNewContext(streamCode, sandbox);
+  vm.runInNewContext('currentTheme = new Stream({ colors: {}, fonts: {} });', sandbox);
+  const elementsCode = fs.readFileSync(path.resolve(__dirname, '../../public/js/components/elements.js'), 'utf8');
+  vm.runInNewContext(elementsCode, sandbox);
+  return { sandbox, document };
+}
+
+test('flow selection modal displays condition text', () => {
+  const { sandbox, document } = loadElements();
+  const flows = [
+    {
+      target: { id: 'a', businessObject: { name: 'Task A' } },
+      businessObject: { conditionExpression: { body: '${x>5}' } }
+    },
+    {
+      target: { id: 'b', businessObject: { name: 'Task B' } },
+      businessObject: {}
+    }
+  ];
+  sandbox.window.openFlowSelectionModal(flows);
+  const labels = document.querySelectorAll('label > span');
+  assert.ok(labels[0].textContent.includes('${x>5}'));
+  assert.ok(labels[1].textContent.includes('default'));
 });
 
