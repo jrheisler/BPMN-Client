@@ -661,18 +661,31 @@ function showProperties(element, modeling, moddle) {
         items.forEach((it, idx) => {
           const rowEl = document.createElement('div');
           rowEl.style.display = 'flex';
-          rowEl.style.gap = '0.25rem';
+          rowEl.style.flexDirection = 'column';
+          rowEl.style.gap = '0.5rem';
 
           ['name', 'type', 'default'].forEach(field => {
+            const fieldWrap = document.createElement('div');
+            fieldWrap.style.display = 'flex';
+            fieldWrap.style.flexDirection = 'column';
+            fieldWrap.style.gap = '0.25rem';
+
+            const lbl = document.createElement('label');
+            lbl.textContent = field.charAt(0).toUpperCase() + field.slice(1);
+            fieldWrap.appendChild(lbl);
+
             const inp = document.createElement('input');
             inp.type = 'text';
             inp.placeholder = field.charAt(0).toUpperCase() + field.slice(1);
+            inp.style.width = '100%';
             inp.value = it[field] || '';
             inp.addEventListener('input', () => {
               it[field] = inp.value;
               hiddenInput.value = JSON.stringify(items);
             });
-            rowEl.appendChild(inp);
+
+            fieldWrap.appendChild(inp);
+            rowEl.appendChild(fieldWrap);
           });
 
           const removeBtn = reactiveButton(
@@ -686,6 +699,7 @@ function showProperties(element, modeling, moddle) {
             currentTheme
           );
 
+          removeBtn.style.alignSelf = 'flex-start';
           rowEl.appendChild(removeBtn);
           listContainer.appendChild(rowEl);
         });
