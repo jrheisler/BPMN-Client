@@ -20,14 +20,14 @@ function createSimulation(services, opts = {}) {
     ? opts.conditionFallback
     : false;
 
-  let simulationContext = { ...initialContext };
-
-  function setContext(obj) {
-    simulationContext = { ...simulationContext, ...obj };
+  function setContext(obj, token = tokens[0]) {
+    if (token) {
+      token.context = { ...(token.context || {}), ...obj };
+    }
   }
 
-  function getContext() {
-    return { ...simulationContext };
+  function getContext(token = tokens[0]) {
+    return token ? { ...(token.context || {}) } : {};
   }
 
   // Stream of currently active tokens [{ id, element }]
@@ -62,7 +62,7 @@ function createSimulation(services, opts = {}) {
           if (last.elementId) {
             const el = elementRegistry.get(last.elementId);
             if (el) {
-              tokens = [{ id: last.tokenId, element: el }];
+              tokens = [{ id: last.tokenId, element: el, context: { ...initialContext } }];
               tokenStream.set(tokens);
             }
           }
@@ -207,7 +207,13 @@ let nextTokenId = 1;
   function handleDefault(token, outgoing) {
     const flow = outgoing[0];
     if (flow) {
-      const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins, viaFlow: flow.id };
+      const next = {
+        id: token.id,
+        element: flow.target,
+        pendingJoins: token.pendingJoins,
+        viaFlow: flow.id,
+        context: { ...token.context }
+      };
       logToken(next);
       return [next];
     }
@@ -243,7 +249,7 @@ let nextTokenId = 1;
 
       let viable = outgoing.filter(flow =>
         flow !== defFlow &&
-        evaluate(flow.businessObject?.conditionExpression, simulationContext)
+        evaluate(flow.businessObject?.conditionExpression, token.context)
       );
 
       let defaultOnly = false;
@@ -254,7 +260,13 @@ let nextTokenId = 1;
 
       if (viable.length === 1 && !defaultOnly) {
         const flow = viable[0];
-        const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins, viaFlow: flow.id };
+        const next = {
+          id: token.id,
+          element: flow.target,
+          pendingJoins: token.pendingJoins,
+          viaFlow: flow.id,
+          context: { ...token.context }
+        };
         logToken(next);
         return [next];
       }
@@ -269,7 +281,13 @@ let nextTokenId = 1;
     // Flow was chosen explicitly
     const flow = elementRegistry.get(flowId);
     if (flow) {
-      const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins, viaFlow: flow.id };
+      const next = {
+        id: token.id,
+        element: flow.target,
+        pendingJoins: token.pendingJoins,
+        viaFlow: flow.id,
+        context: { ...token.context }
+      };
       logToken(next);
       return [next];
     }
@@ -282,7 +300,8 @@ let nextTokenId = 1;
         id: idx === 0 ? token.id : nextTokenId++,
         element: flow.target,
         pendingJoins: token.pendingJoins,
-        viaFlow: flow.id
+        viaFlow: flow.id,
+        context: { ...token.context }
       };
       logToken(next);
       return next;
@@ -361,9 +380,39 @@ let nextTokenId = 1;
       return handleDefault(token, outgoing);
     }
 
+    const evaluate = (expr, data) => {
+      if (!expr) return true;
+      const raw = (expr.body || expr.value || '').toString().trim();
+      const js = raw.replace(/^\$\{?|\}$/g, '');
+      if (!js) return true;
+      const proxy = new Proxy(data || {}, {
+        has: () => true,
+        get(target, prop) {
+          if (prop === Symbol.unscopables) return undefined;
+          return prop in target ? target[prop] : conditionFallback;
+        }
+      });
+      try {
+        return !!Function('context', 'with(context){ return (' + js + '); }')(proxy);
+      } catch (err) {
+        console.warn('Failed to evaluate condition', js, err);
+        return conditionFallback;
+      }
+    };
+
     const ids = Array.isArray(flowIds) ? flowIds : flowIds ? [flowIds] : null;
     if (!ids || ids.length === 0) {
-      pathsStream.set({ flows: outgoing, type: token.element.type });
+      const defBo = token.element.businessObject?.default;
+      const defFlow = defBo ? elementRegistry.get(defBo.id) || defBo : null;
+      let viable = outgoing.filter(
+        flow => flow !== defFlow && evaluate(flow.businessObject?.conditionExpression, token.context)
+      );
+      let defaultOnly = false;
+      if (!viable.length && defFlow) {
+        viable = [defFlow];
+        defaultOnly = true;
+      }
+      pathsStream.set({ flows: viable, type: token.element.type, isDefaultOnly: defaultOnly });
       awaitingToken = token;
       resumeAfterChoice = running;
       pause();
@@ -374,6 +423,7 @@ let nextTokenId = 1;
       .map((id, idx) => {
         const flow = elementRegistry.get(id);
         if (!flow) return null;
+        if (!evaluate(flow.businessObject?.conditionExpression, token.context)) return null;
         const pendingJoins = { ...(token.pendingJoins || {}) };
         if (joins && joins.length) {
           joins.forEach(join => {
@@ -384,7 +434,8 @@ let nextTokenId = 1;
           id: idx === 0 ? token.id : nextTokenId++,
           element: flow.target,
           pendingJoins,
-          viaFlow: flow.id
+          viaFlow: flow.id,
+          context: { ...token.context }
         };
         logToken(next);
         return next;
@@ -402,7 +453,13 @@ let nextTokenId = 1;
     }
     const flow = elementRegistry.get(flowId);
     if (flow) {
-      const next = { id: token.id, element: flow.target, pendingJoins: token.pendingJoins, viaFlow: flow.id };
+      const next = {
+        id: token.id,
+        element: flow.target,
+        pendingJoins: token.pendingJoins,
+        viaFlow: flow.id,
+        context: { ...token.context }
+      };
       logToken(next);
       return [next];
     }
@@ -418,7 +475,9 @@ let nextTokenId = 1;
         const api = {
           pause,
           resume,
-          addCleanup: fn => handlerCleanups.add(fn)
+          addCleanup: fn => handlerCleanups.add(fn),
+          setContext: obj => setContext(obj, token),
+          getContext: () => getContext(token)
         };
         const res = elHandler(token, api, flowIds);
         if (Array.isArray(res)) return res;
@@ -483,10 +542,11 @@ let nextTokenId = 1;
           newTokens.push(...group);
           continue;
         }
-        const merged = { id: group[0].id, element: el };
+        const merged = { id: group[0].id, element: el, context: { ...group[0].context } };
         const mergedPending = {};
         group.forEach(t => {
           if (t.pendingJoins) Object.assign(mergedPending, t.pendingJoins);
+          Object.assign(merged.context, t.context);
         });
         if (mergedPending[el.id]) delete mergedPending[el.id];
         if (Object.keys(mergedPending).length) {
@@ -547,7 +607,7 @@ let nextTokenId = 1;
     previousFlowIds = new Set();
 
     const startEl = getStart();
-    const t = { id: nextTokenId++, element: startEl, viaFlow: null };
+    const t = { id: nextTokenId++, element: startEl, viaFlow: null, context: { ...initialContext } };
     tokens = [t];
     tokenStream.set(tokens);
     logToken(t);
@@ -580,7 +640,7 @@ let nextTokenId = 1;
     cleanup();
     clearTokenLog();
     const startEl = getStart();
-    const t = { id: nextTokenId++, element: startEl, viaFlow: null };
+    const t = { id: nextTokenId++, element: startEl, viaFlow: null, context: { ...initialContext } };
     tokens = [t];
     tokenStream.set(tokens);
     logToken(t);
