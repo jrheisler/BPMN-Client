@@ -722,7 +722,12 @@ function showProperties(element, modeling, moddle) {
     let input;
     if (type === 'textarea') {
       input = document.createElement('textarea');
-      input.rows = 3;
+      if (key === 'conditionExpression') {
+        input.rows = 4;
+        input.wrap = 'soft';
+      } else {
+        input.rows = 3;
+      }
     } else {
       input = document.createElement('input');
       input.type = type;
