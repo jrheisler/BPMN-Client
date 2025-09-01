@@ -1,4 +1,5 @@
 import customReplaceModule from './modules/customReplaceMenuProvider.js';
+import './components/raciMatrix.js';
 
 // js/app.js
   const typeIcons = {
@@ -1032,6 +1033,68 @@ function rebuildMenu() {
   
   avatarMenu = avatarDropdown(avatarStream, avatarOptions, currentTheme, buildDropdownOptions());
 
+  function openRaciMatrixModal() {
+    const matrix = window.raciMatrix?.createRaciMatrix(modeler);
+    if (!matrix) return;
+
+    const modal = document.createElement('div');
+    Object.assign(modal.style, {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100vw',
+      height: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      zIndex: 10000
+    });
+
+    const box = document.createElement('div');
+    Object.assign(box.style, {
+      maxHeight: '80vh',
+      overflowY: 'auto',
+      padding: '1rem',
+      borderRadius: '8px'
+    });
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = 'Close';
+    closeBtn.style.marginBottom = '0.5rem';
+
+    box.appendChild(closeBtn);
+    box.appendChild(matrix);
+    modal.appendChild(box);
+    document.body.appendChild(modal);
+
+    function applyTheme(theme) {
+      const { colors } = theme;
+      box.style.background = colors.surface;
+      box.style.color = colors.foreground;
+      closeBtn.style.background = 'transparent';
+      closeBtn.style.color = colors.foreground;
+      closeBtn.style.border = `1px solid ${colors.border}`;
+    }
+
+    const unsubscribe = currentTheme.subscribe(applyTheme);
+    applyTheme(currentTheme.get());
+
+    function close() {
+      closeBtn.removeEventListener('click', close);
+      modal.removeEventListener('click', onOverlayClick);
+      unsubscribe();
+      modal.remove();
+    }
+
+    function onOverlayClick(e) {
+      if (e.target === modal) close();
+    }
+
+    closeBtn.addEventListener('click', close);
+    modal.addEventListener('click', onOverlayClick);
+  }
+
   const controls = [
   // 1) avatar menu
   avatarMenu,
@@ -1106,6 +1169,13 @@ function rebuildMenu() {
       requestAnimationFrame(bindTreeToggle);
     }
   })();
+  controls.push(
+    reactiveButton(
+      new Stream('RACI Matrix'),
+      openRaciMatrixModal,
+      { outline: true, title: 'RACI Matrix' }
+    )
+  );
   controls.push(
     reactiveButton(
       new Stream('❔'),
