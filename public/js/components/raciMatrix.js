@@ -68,11 +68,12 @@
 
     // Controls container
     const controls = document.createElement('div');
-    controls.style.marginBottom = '0.5rem';
+    controls.classList.add('raci-controls');
 
     // Export CSV button
     const exportBtn = document.createElement('button');
     exportBtn.textContent = 'Export CSV';
+    exportBtn.classList.add('raci-matrix-btn');
     exportBtn.addEventListener('click', () => {
       const rows = table.querySelectorAll('tr');
       const csv = Array.from(rows)
@@ -95,7 +96,7 @@
     // Print button
     const printBtn = document.createElement('button');
     printBtn.textContent = 'Print';
-    printBtn.style.marginLeft = '0.5rem';
+    printBtn.classList.add('raci-matrix-btn');
     printBtn.addEventListener('click', () => {
       const win = window.open('', '_blank');
       if (!win) return;
@@ -109,6 +110,10 @@
     const container = document.createElement('div');
     container.appendChild(controls);
     container.appendChild(table);
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'RACI Matrix';
+    container.prepend(heading);
 
     return container;
   }
