@@ -1171,9 +1171,9 @@ function rebuildMenu() {
   })();
   controls.push(
     reactiveButton(
-      new Stream('RACI Matrix'),
+      new Stream('📊'),
       openRaciMatrixModal,
-      { outline: true, title: 'RACI Matrix' }
+      { outline: true, title: 'RACI Matrix', 'aria-label': 'RACI Matrix' }
     )
   );
   controls.push(
