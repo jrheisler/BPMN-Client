@@ -533,6 +533,25 @@ function showProperties(element, modeling, moddle) {
 
       modeling.updateProperties(element, props);
 
+      const raciKeys = ['responsible','accountable','consulted','informed'];
+      bo.$attrs = bo.$attrs || {};
+      let raciEl = (bo.extensionElements?.values || []).find(v => v.$type === 'custom:Raci');
+      if (!raciEl) {
+        const extEl = getOrCreateExtEl(bo, moddle);
+        raciEl = moddle.create('custom:Raci', {});
+        extEl.values.push(raciEl);
+      }
+      raciKeys.forEach(k => {
+        const v = data.get(k) || '';
+        if (v) {
+          bo.$attrs[k] = v;
+          raciEl[k] = v;
+        } else {
+          delete bo.$attrs[k];
+          delete raciEl[k];
+        }
+      });
+
       // handle array-based custom elements
       const extEl = getOrCreateExtEl(bo, moddle);
       arrayKeys.forEach(key => {
