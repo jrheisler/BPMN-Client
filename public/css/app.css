@@ -295,3 +295,32 @@
   cursor: pointer;
 }
 
+.raci-matrix {
+  width: 100%;
+  border-collapse: collapse;
+}
+.raci-matrix th,
+.raci-matrix td {
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+}
+.raci-matrix thead {
+  background: var(--bg);
+}
+.raci-matrix tbody tr:nth-child(even) {
+  background: var(--bg-alt);
+}
+
+.raci-controls {
+  margin-bottom: 0.5rem;
+}
+
+.raci-matrix-btn {
+  margin-right: 0.5rem;
+  padding: 0.25rem 0.5rem;
+}
+.raci-matrix-btn:last-child {
+  margin-right: 0;
+}
+
