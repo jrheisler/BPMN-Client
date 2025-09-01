@@ -227,9 +227,13 @@ const BPMN_PROPERTY_MAP = {
   { key: 'changeOverTime',     label: 'Change Over Time',          type: 'text' },
   { key: 'perCompleteAccurate', label: 'Percent Complete and Accurate',          type: 'text' },
   { key: 'availability ',       label: 'Availability',            type: 'text' },
-  { key: 'leadTime ',           label: 'Lead Time',               type: 'text' },  
+  { key: 'leadTime ',           label: 'Lead Time',               type: 'text' },
   { key: 'kpiNotes',           label: 'KPI Notes',                 type: 'textarea' },
- 
+  { key: 'responsible',       label: 'Responsible',             type: 'text' },
+  { key: 'accountable',       label: 'Accountable',             type: 'text' },
+  { key: 'consulted',         label: 'Consulted',               type: 'text' },
+  { key: 'informed',          label: 'Informed',                type: 'text' },
+
 ];
 
 function openUrlModal(url) {
