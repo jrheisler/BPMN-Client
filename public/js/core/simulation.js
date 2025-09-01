@@ -204,8 +204,27 @@ let nextTokenId = 1;
     previousFlowIds = new Set();
   }
 
-  function handleDefault(token, outgoing) {
-    const flow = outgoing[0];
+  function spawnMessageTokens(token, flows) {
+    const generated = [];
+    flows.forEach(flow => {
+      const target = flow.target;
+      if (target && (/Event$/.test(target.type) || /Task$/.test(target.type))) {
+        const next = {
+          id: nextTokenId++,
+          element: target,
+          pendingJoins: token.pendingJoins,
+          viaFlow: flow.id,
+          context: { ...token.context }
+        };
+        logToken(next);
+        generated.push(next);
+      }
+    });
+    return generated;
+  }
+
+  function handleDefault(token, sequenceFlows) {
+    const flow = sequenceFlows[0];
     if (flow) {
       const next = {
         id: token.id,
@@ -470,6 +489,10 @@ let nextTokenId = 1;
 
   function processToken(token, flowIds) {
     const outgoing = token.element.outgoing || [];
+    const sequenceFlows = outgoing.filter(f => f.type === 'bpmn:SequenceFlow');
+    const messageFlows = outgoing.filter(f => f.type === 'bpmn:MessageFlow');
+
+    const messageTokens = spawnMessageTokens(token, messageFlows);
 
     if (!skipHandlerFor.has(token.id)) {
       const elHandler = elementHandlers.get(token.element.type);
@@ -482,7 +505,9 @@ let nextTokenId = 1;
           getContext: () => getContext(token)
         };
         const res = elHandler(token, api, flowIds);
-        if (Array.isArray(res)) return res;
+        if (Array.isArray(res)) {
+          return { tokens: messageTokens.concat(res), waiting: false };
+        }
       }
     } else {
       skipHandlerFor.delete(token.id);
@@ -496,19 +521,24 @@ let nextTokenId = 1;
     };
     const gatewayHandler = gatewayHandlers[token.element.type];
     if (gatewayHandler) {
-      return gatewayHandler(token, outgoing, flowIds);
+      const res = gatewayHandler(token, sequenceFlows, flowIds);
+      if (res === null) {
+        return { tokens: messageTokens, waiting: true };
+      }
+      return { tokens: messageTokens.concat(res), waiting: false };
     }
     if (/Gateway/.test(token.element.type)) {
       console.warn('Unknown gateway type', token.element.type);
     }
-    return handleDefault(token, outgoing);
+    const res = handleDefault(token, sequenceFlows);
+    return { tokens: messageTokens.concat(res), waiting: false };
   }
 
   function step(flowIds) {
     if (awaitingToken) {
-      const res = processToken(awaitingToken, flowIds);
-      if (res === null) return;
-      tokens = tokens.filter(t => t.id !== awaitingToken.id).concat(res);
+      const { tokens: resTokens, waiting } = processToken(awaitingToken, flowIds);
+      if (waiting) return;
+      tokens = tokens.filter(t => t.id !== awaitingToken.id).concat(resTokens);
       awaitingToken = null;
       pathsStream.set(null);
       tokenStream.set(tokens);
@@ -554,26 +584,28 @@ let nextTokenId = 1;
         if (Object.keys(mergedPending).length) {
           merged.pendingJoins = mergedPending;
         }
-        const res = processToken(merged);
-        if (res === null) {
+        const { tokens: resTokens, waiting } = processToken(merged);
+        if (waiting) {
           awaitingToken = merged;
           newTokens.push(merged);
+          newTokens.push(...resTokens);
           tokens = newTokens.concat(tokens.filter(t => !processed.has(t.id)));
           tokenStream.set(tokens);
           return;
         }
-        newTokens.push(...res);
+        newTokens.push(...resTokens);
       } else {
         processed.add(token.id);
-        const res = processToken(token);
-        if (res === null) {
+        const { tokens: resTokens, waiting } = processToken(token);
+        if (waiting) {
           awaitingToken = token;
           newTokens.push(token);
+          newTokens.push(...resTokens);
           tokens = newTokens.concat(tokens.filter(t => !processed.has(t.id)));
           tokenStream.set(tokens);
           return;
         }
-        newTokens.push(...res);
+        newTokens.push(...resTokens);
       }
     }
 
