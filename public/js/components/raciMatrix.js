@@ -64,7 +64,51 @@
     });
     table.appendChild(tbody);
 
-    return table;
+    // Controls container
+    const controls = document.createElement('div');
+    controls.style.marginBottom = '0.5rem';
+
+    // Export CSV button
+    const exportBtn = document.createElement('button');
+    exportBtn.textContent = 'Export CSV';
+    exportBtn.addEventListener('click', () => {
+      const rows = table.querySelectorAll('tr');
+      const csv = Array.from(rows)
+        .map(row => Array.from(row.children)
+          .map(cell => '"' + (cell.textContent || '').replace(/"/g, '""') + '"')
+          .join(','))
+        .join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'raci-matrix.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+    controls.appendChild(exportBtn);
+
+    // Print button
+    const printBtn = document.createElement('button');
+    printBtn.textContent = 'Print';
+    printBtn.style.marginLeft = '0.5rem';
+    printBtn.addEventListener('click', () => {
+      const win = window.open('', '_blank');
+      if (!win) return;
+      win.document.write('<html><head><title>RACI Matrix</title></head><body>' + table.outerHTML + '</body></html>');
+      win.document.close();
+      win.focus();
+      win.print();
+    });
+    controls.appendChild(printBtn);
+
+    const container = document.createElement('div');
+    container.appendChild(controls);
+    container.appendChild(table);
+
+    return container;
   }
 
   global.raciMatrix = {
