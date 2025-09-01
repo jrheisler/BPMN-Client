@@ -14,13 +14,15 @@
       .filter(el => !el.labelTarget)
       .map(el => {
         const bo = el.businessObject || {};
+        const raci = (bo.extensionElements?.values || []).find(v => v.$type === 'custom:Raci');
+        const attrs = bo.$attrs || {};
         return {
           id: el.id,
           name: bo.name || '',
-          responsible: bo.responsible || '',
-          accountable: bo.accountable || '',
-          consulted: bo.consulted || '',
-          informed: bo.informed || ''
+          responsible: bo.responsible || raci?.responsible || attrs.responsible || '',
+          accountable: bo.accountable || raci?.accountable || attrs.accountable || '',
+          consulted:  bo.consulted  || raci?.consulted  || attrs.consulted  || '',
+          informed:   bo.informed   || raci?.informed   || attrs.informed   || ''
         };
       });
   }
