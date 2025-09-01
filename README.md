@@ -35,10 +35,20 @@ Flow Control Center is a browser‑based BPMN modeling and simulation client. It
 ## RACI role assignments
 
 Tasks and other flow elements support RACI metadata to capture
-responsible, accountable, consulted and informed roles. When an element
-is selected, the property sidebar exposes four fields labelled
-**Responsible**, **Accountable**, **Consulted** and **Informed** where you
-can enter user names or identifiers.
+responsible, accountable, consulted and informed roles.
+
+### Assigning roles in the sidebar
+
+1. Select a task or other flow element in the diagram.
+2. Open the property sidebar (right‑hand panel).
+3. Enter one or more identifiers in the **Responsible**, **Accountable**,
+   **Consulted** and **Informed** fields.
+4. Close the sidebar or click away to persist the values.
+
+### Viewing the RACI matrix
+
+Click the **RACI Matrix** button in the top toolbar to open a modal
+showing a table of all elements and their assigned roles.
 
 ### XML representation
 
