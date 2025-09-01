@@ -763,6 +763,13 @@ function showProperties(element, modeling, moddle) {
 
     let val = bo.get(key);
     if (val == null) {
+      val = bo.$attrs?.[key];
+    }
+    if (val == null && ['responsible','accountable','consulted','informed'].includes(key)) {
+      const raci = (bo.extensionElements?.values || []).find(v => v.$type === 'custom:Raci');
+      val = raci?.[key];
+    }
+    if (val == null) {
       const extEl = bo.extensionElements;
       if (extEl) {
         const ext = (extEl.values || []).find(v => v.$type === 'custom:Attribute' && v.name === key);
