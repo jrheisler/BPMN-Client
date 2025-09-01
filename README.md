@@ -32,6 +32,30 @@ Flow Control Center is a browser‑based BPMN modeling and simulation client. It
 5. Each save stores a new version in Firestore, preserving the diagram XML, notes, and add‑on configuration.
 6. Use the “Select or New Diagram” option to reload or start fresh.
 
+## RACI role assignments
+
+Tasks and other flow elements support RACI metadata to capture
+responsible, accountable, consulted and informed roles. When an element
+is selected, the property sidebar exposes four fields labelled
+**Responsible**, **Accountable**, **Consulted** and **Informed** where you
+can enter user names or identifiers.
+
+### XML representation
+
+RACI entries are stored as extension elements in the BPMN XML. A task
+with all four roles specified looks like this:
+
+```xml
+<bpmn:task id="Task_1">
+  <bpmn:extensionElements>
+    <custom:raci responsible="alice"
+                 accountable="bob"
+                 consulted="carol"
+                 informed="dave" />
+  </bpmn:extensionElements>
+</bpmn:task>
+```
+
 ## Repository structure
 
 - `public/` – front‑end assets and scripts
