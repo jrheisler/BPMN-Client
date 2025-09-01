@@ -3,6 +3,8 @@ const propsSidebar = document.createElement('div');
 propsSidebar.classList.add('props-sidebar');
 document.body.appendChild(propsSidebar);
 
+const RACI_FIELDS = ['responsible', 'accountable', 'consulted', 'informed'];
+const RACI_MRU_KEY = 'raciMru';
 
 const BPMN_PROPERTY_MAP = {
   'bpmn:Task': [
@@ -304,6 +306,20 @@ function showProperties(element, modeling, moddle) {
 
   const form = document.createElement('form');
 
+  const raciDatalist = document.createElement('datalist');
+  raciDatalist.id = 'raci-mru';
+  let raciMru = JSON.parse(localStorage.getItem(RACI_MRU_KEY) || '[]');
+  function renderRaciOptions() {
+    raciDatalist.replaceChildren();
+    raciMru.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v;
+      raciDatalist.appendChild(opt);
+    });
+  }
+  renderRaciOptions();
+  form.appendChild(raciDatalist);
+
   // Local AddOns array
   let currentAddOns = [];
 
@@ -533,7 +549,7 @@ function showProperties(element, modeling, moddle) {
 
       modeling.updateProperties(element, props);
 
-      const raciKeys = ['responsible','accountable','consulted','informed'];
+      const raciKeys = RACI_FIELDS;
       bo.$attrs = bo.$attrs || {};
       let raciEl = (bo.extensionElements?.values || []).find(v => v.$type === 'custom:Raci');
       if (!raciEl) {
@@ -784,7 +800,7 @@ function showProperties(element, modeling, moddle) {
     if (val == null) {
       val = bo.$attrs?.[key];
     }
-    if (val == null && ['responsible','accountable','consulted','informed'].includes(key)) {
+    if (val == null && RACI_FIELDS.includes(key)) {
       const raci = (bo.extensionElements?.values || []).find(v => v.$type === 'custom:Raci');
       val = raci?.[key];
     }
@@ -819,6 +835,23 @@ function showProperties(element, modeling, moddle) {
           link.style.display = 'none';
         }
       });
+    }
+
+    if (RACI_FIELDS.includes(key)) {
+      input.setAttribute('list', 'raci-mru');
+      const updateRaciMru = () => {
+        const value = input.value.trim();
+        if (!value) return;
+        let mru = JSON.parse(localStorage.getItem(RACI_MRU_KEY) || '[]');
+        mru = mru.filter(v => v !== value);
+        mru.unshift(value);
+        if (mru.length > 10) mru = mru.slice(0, 10);
+        localStorage.setItem(RACI_MRU_KEY, JSON.stringify(mru));
+        raciMru = mru;
+        renderRaciOptions();
+      };
+      input.addEventListener('change', updateRaciMru);
+      input.addEventListener('blur', updateRaciMru);
     }
 
     wrapper.appendChild(input);
