@@ -24,6 +24,16 @@
         { "name": "default", "type": "String", "isAttr": true },
         { "name": "direction", "type": "String", "isAttr": true }
       ]
+    },
+    {
+      "name": "Raci",
+      "superClass": [ "Element" ],
+      "properties": [
+        { "name": "responsible", "type": "String", "isAttr": true },
+        { "name": "accountable", "type": "String", "isAttr": true },
+        { "name": "consulted",  "type": "String", "isAttr": true },
+        { "name": "informed",   "type": "String", "isAttr": true }
+      ]
     }
   ]
 }
