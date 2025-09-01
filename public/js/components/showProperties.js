@@ -12,14 +12,14 @@ const BPMN_PROPERTY_MAP = {
   'inputQuality', 'outputQuality',
   'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
   'variables', 'inputMappings', 'outputMappings',
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:UserTask': [
     'name', 'documentation', 'assignee',
     'estimatedDuration', 'actualDuration',
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
-  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 'variables', 'inputMappings', 'outputMappings', 'kpiNotes'
+  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 'variables', 'inputMappings', 'outputMappings', 'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:ServiceTask': [
     'name', 'documentation', 'implementation',
@@ -28,7 +28,7 @@ const BPMN_PROPERTY_MAP = {
   'inputQuality', 'outputQuality',
   'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
   'variables', 'inputMappings', 'outputMappings',
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:ScriptTask': [
     'name', 'documentation', 'script', 'scriptFormat',
@@ -37,14 +37,14 @@ const BPMN_PROPERTY_MAP = {
   'inputQuality', 'outputQuality',
   'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
   'variables', 'inputMappings', 'outputMappings',
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:CallActivity': [
     'name', 'documentation', 'calledElement',
     'estimatedDuration', 'actualDuration',
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
-  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 'variables', 'inputMappings', 'outputMappings', 'kpiNotes'
+  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 'variables', 'inputMappings', 'outputMappings', 'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:SubProcess': [
     'name', 'documentation',
@@ -53,14 +53,14 @@ const BPMN_PROPERTY_MAP = {
   'inputQuality', 'outputQuality',
   'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
   'variables', 'inputMappings', 'outputMappings',
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:StartEvent': [
     'name', 'documentation',
     'estimatedDuration', 'actualDuration',
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
-  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',   'kpiNotes'
+  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',   'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:EndEvent': [
     'name', 'documentation',
@@ -68,7 +68,7 @@ const BPMN_PROPERTY_MAP = {
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
     'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:IntermediateCatchEvent': [
     'name', 'documentation',
@@ -76,7 +76,7 @@ const BPMN_PROPERTY_MAP = {
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
   'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:IntermediateThrowEvent': [
     'name', 'documentation',
@@ -84,14 +84,14 @@ const BPMN_PROPERTY_MAP = {
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
   'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:BoundaryEvent': [
     'name', 'documentation',
     'estimatedDuration', 'actualDuration',
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
-  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',   'kpiNotes'
+  'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',   'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:ExclusiveGateway': [
     'name', 'documentation', 'default',
@@ -100,7 +100,7 @@ const BPMN_PROPERTY_MAP = {
   'inputQuality', 'outputQuality',
   'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
   'variables', 'inputMappings', 'outputMappings',
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:InclusiveGateway': [
     'name', 'documentation',
@@ -109,7 +109,7 @@ const BPMN_PROPERTY_MAP = {
   'inputQuality', 'outputQuality',
   'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
   'variables', 'inputMappings', 'outputMappings',
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:ParallelGateway': [
     'name', 'documentation',
@@ -118,7 +118,7 @@ const BPMN_PROPERTY_MAP = {
   'inputQuality', 'outputQuality',
   'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
   'variables', 'inputMappings', 'outputMappings',
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:ComplexGateway': [
     'name', 'documentation',
@@ -127,7 +127,7 @@ const BPMN_PROPERTY_MAP = {
   'inputQuality', 'outputQuality',
     'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
   'variables', 'inputMappings', 'outputMappings',
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:EventBasedGateway': [
     'name', 'documentation',
@@ -136,7 +136,7 @@ const BPMN_PROPERTY_MAP = {
   'inputQuality', 'outputQuality',
   'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime',
   'variables', 'inputMappings', 'outputMappings',
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:SequenceFlow': [
     'name', 'documentation', 'conditionExpression',
@@ -144,7 +144,7 @@ const BPMN_PROPERTY_MAP = {
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
     'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:DataObjectReference': [
     'name', 'itemSubjectRef',
@@ -152,7 +152,7 @@ const BPMN_PROPERTY_MAP = {
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
   'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:DataStoreReference': [
     'name', 'itemSubjectRef',
@@ -160,7 +160,7 @@ const BPMN_PROPERTY_MAP = {
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
     'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:Participant': [
     'name', 'processRef',
@@ -168,7 +168,7 @@ const BPMN_PROPERTY_MAP = {
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
   'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:Lane': [
     'name',
@@ -176,7 +176,7 @@ const BPMN_PROPERTY_MAP = {
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
   'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:TextAnnotation': [
     'text',
@@ -184,7 +184,7 @@ const BPMN_PROPERTY_MAP = {
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
     'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ],
   'bpmn:Group': [
     'name', 'categoryValueRef',
@@ -192,7 +192,7 @@ const BPMN_PROPERTY_MAP = {
   'costEstimate', 'ownerRole',
   'inputQuality', 'outputQuality',
   'processOwner', 'creator', 'downTime', 'upTime', 'changeOverTime', 'perCompleteAccurate', 'availability', 'leadTime', 
-  'kpiNotes'
+  'kpiNotes', 'responsible', 'accountable', 'consulted', 'informed'
   ]
 };
 
