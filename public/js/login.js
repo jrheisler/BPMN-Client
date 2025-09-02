@@ -21,31 +21,7 @@ function reactiveLoginModal(themeStream = currentTheme) {
   const emailStream = new Stream('');
   const passwordStream = new Stream('');
 
-  // Modal container
-  const modal = document.createElement('div');
-  modal.style.position = 'fixed';
-  modal.style.top = '0';
-  modal.style.left = '0';
-  modal.style.width = '100vw';
-  modal.style.height = '100vh';
-  modal.style.display = 'flex';
-  modal.style.alignItems = 'center';
-  modal.style.justifyContent = 'center';
-  modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-  modal.style.zIndex = '9999';
-
-  // Modal content box
-  const content = document.createElement('div');
-  content.classList.add('responsive-modal');
-  content.style.padding = '2rem';
-  content.style.borderRadius = '8px';
-  content.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-  content.style.maxWidth = '90%';
-  content.style.backgroundColor = themeStream.get().colors.surface || '#fff';
-  content.style.color = themeStream.get().colors.foreground || '#000';
-  content.style.display = 'flex';
-  content.style.flexDirection = 'column';
-  content.style.gap = '1rem';
+  const { modal, content } = createModal(themeStream, () => loginStream.set(null));
 
   const title = document.createElement('h2');
   title.textContent = 'Log in to Flow Control Center';
@@ -128,17 +104,6 @@ function reactiveLoginModal(themeStream = currentTheme) {
   btnRow.appendChild(loginBtn);
   content.appendChild(btnRow);
 
-  modal.appendChild(content);
-  document.body.appendChild(modal);
-
-  // Close on outside click
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      loginStream.set(null);
-      modal.remove();
-    }
-  });
-
   return loginStream;
 }
 
@@ -147,33 +112,9 @@ function reactiveLoginModal(themeStream = currentTheme) {
 function openDiagramPickerModal(themeStream = currentTheme) {
   const pickStream = new Stream(null); // emits selected diagram or null
 
-  // Modal base
-  const modal = document.createElement('div');
-  modal.style.position = 'fixed';
-  modal.style.top = '0';
-  modal.style.left = '0';
-  modal.style.width = '100vw';
-  modal.style.height = '100vh';
-  modal.style.display = 'flex';
-  modal.style.alignItems = 'center';
-  modal.style.justifyContent = 'center';
-  modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-  modal.style.zIndex = '9999';
-
-  // Content box
-  const content = document.createElement('div');
-  content.classList.add('responsive-modal');
-  content.style.padding = '2rem';
-  content.style.borderRadius = '8px';
-  content.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-  content.style.maxWidth = '90%';
+  const { modal, content } = createModal(themeStream, () => pickStream.set(null));
   content.style.maxHeight = '80vh';
   content.style.overflowY = 'auto';
-  content.style.backgroundColor = themeStream.get().colors.surface || '#fff';
-  content.style.color = themeStream.get().colors.foreground || '#000';
-  content.style.display = 'flex';
-  content.style.flexDirection = 'column';
-  content.style.gap = '1rem';
 
   const title = document.createElement('h2');
   title.textContent = 'Select a Diagram';
@@ -317,16 +258,6 @@ function openDiagramPickerModal(themeStream = currentTheme) {
   btnRow.appendChild(cancelBtn);
   btnRow.appendChild(newBtn);
   content.appendChild(btnRow);
-
-  modal.appendChild(content);
-  document.body.appendChild(modal);
-
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      pickStream.set(null);
-      modal.remove();
-    }
-  });
 
   return pickStream;
 }
