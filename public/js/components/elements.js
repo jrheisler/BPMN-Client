@@ -141,8 +141,8 @@ function reactiveImage(stream, options = {}, themeStream = currentTheme) {
 
   const unsub1 = themeStream.subscribe(theme => applyStyles(theme));
   applyStyles(themeStream.get());
-  
-  observeDOMRemoval(el, unsub1, unsub2); // 🔥 Auto cleanup when node removed
+
+  observeDOMRemoval(img, unsub1, unsub2); // 🔥 Auto cleanup when node removed
 
   return img;
 }
