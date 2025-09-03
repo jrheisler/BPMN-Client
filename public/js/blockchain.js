@@ -97,14 +97,7 @@ class Blockchain {
   reset() {
     this.chain = [this.createGenesisBlock()];
     this.persist();
-    this.peers = [];
     this.difficulty = 2;
-  }
-
-  addPeer(url) {
-    if (!this.peers.includes(url)) {
-      this.peers.push(url);
-    }
   }
 
   broadcastBlock(block) {
