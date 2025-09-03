@@ -20,7 +20,7 @@ Flow Control Center is a browser‑based BPMN modeling and simulation client. It
    Serve the `public/` directory using your preferred static server (e.g. `npx http-server public` or `firebase serve`).
 4. **Run tests** *(optional but recommended)*
    ```bash
-   node --test
+   npm test
    ```
 
 ## Saving diagrams and notes
@@ -69,7 +69,7 @@ with all four roles specified looks like this:
 ## Repository structure
 
 - `public/` – front‑end assets and scripts
-- `test/` and `tests/` – automated tests using Node's built‑in test runner
+- `test/` – automated tests using Node's built‑in test runner
 - `sample*.bpmn` – example diagrams
 
 ## License

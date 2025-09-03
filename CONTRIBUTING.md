@@ -8,15 +8,15 @@ Thanks for your interest in improving this project! The guidelines below help ma
 - Favor modern, vanilla JavaScript; avoid transpilers.
 - Keep functions small and documented when behavior is non‑obvious.
 - Run the test suite before committing:
-  ```bash
-  node --test
-  ```
+   ```bash
+   npm test
+   ```
 
 ## Pull request process
 
 1. Fork the repository and create a feature branch.
 2. Make focused changes with clear commit messages.
-3. Ensure `node --test` passes and add tests for new behavior when possible.
+3. Ensure `npm test` passes and add tests for new behavior when possible.
 4. Update documentation and sample diagrams if your change affects them.
 5. Open a pull request describing the motivation and highlighting any diagrams or notes that reviewers should look at.
 

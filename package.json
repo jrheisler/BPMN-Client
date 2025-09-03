@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "test": "node --test test"
+  },
   "dependencies": {
     "bpmn-auto-layout": "^1.0.1",
     "bpmn-js-properties-panel": "^5.37.0",
