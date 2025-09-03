@@ -1,5 +1,8 @@
 import customReplaceModule from './modules/customReplaceMenuProvider.js';
 import './components/raciMatrix.js';
+import { logUser, currentUser, authMenuOption } from './auth.js';
+import { initAddOnOverlays } from './addOnOverlays.js';
+import { initAddOnFiltering } from './addOnFiltering.js';
 
 // js/app.js
   const typeIcons = {
@@ -22,9 +25,6 @@ const addOnsStream = new Stream([]);
 window.addOnsStream = addOnsStream;
 // Example options for the avatar (styling options)
 const avatarOptions = { width: '60px', height: '60px', rounded: true };
-const logUser = new Stream('👤 Login');
-let currentUser = null;
-window.currentUser = currentUser;
 
 
 const notesStream = new Stream(null);
@@ -78,25 +78,6 @@ const overlay = createDiagramOverlay(
   versionStream,
   currentTheme
 );
-  const { createAddOnFilterPanel, selectedType, selectedSubtype } = window.addOnFilter;
-  let addOnFilterPanelEl = null;
-
-  const filterToggleBtn = document.createElement('button');
-  filterToggleBtn.textContent = 'Filters';
-  filterToggleBtn.classList.add('addon-filter-toggle');
-
-  filterToggleBtn.addEventListener('click', () => {
-    if (!addOnFilterPanelEl) {
-      addOnFilterPanelEl = createAddOnFilterPanel(currentTheme);
-      document.body.appendChild(addOnFilterPanelEl);
-    }
-    const isVisible = addOnFilterPanelEl.style.display === 'flex';
-    if (isVisible) {
-      selectedType.set(null);
-      selectedSubtype.set(null);
-    }
-    addOnFilterPanelEl.style.display = isVisible ? 'none' : 'flex';
-  });
 
 Object.assign(document.body.style, {
     display:      'flex',
@@ -202,10 +183,34 @@ Object.assign(document.body.style, {
     additionalModules,
     moddleExtensions: { custom: customModdle }
     });
+  // ─── expose services ────────────────────────────────────────────────────────
+  const moddle          = modeler.get('moddle');
+  const elementFactory  = modeler.get('elementFactory');
+  const modeling        = modeler.get('modeling');
+  const elementRegistry = modeler.get('elementRegistry');
+  const selectionService= modeler.get('selection');
+  const canvas          = modeler.get('canvas');
+  const simulation      = createSimulation({ elementRegistry, canvas });
+  window.simulation = simulation;
+  const overlays        = modeler.get('overlays');
+
+  const { scheduleOverlayUpdate } = initAddOnOverlays({ overlays, elementRegistry, typeIcons });
+  const { loadAddOnData, applyAddOnsToElements, syncAddOnStoreFromElements } =
+    initAddOnFiltering({
+      currentTheme,
+      elementRegistry,
+      modeling,
+      canvas,
+      scheduleOverlayUpdate,
+      addOnStore,
+      diagramXMLStream,
+      typeIcons
+    });
+
   const eventBus     = modeler.get('eventBus');
   const commandStack = modeler.get('commandStack');
   const isDirty = new Stream(false);
-  const showSaveButton = new Stream(false); 
+  const showSaveButton = new Stream(false);
 
   // push every change into your XML Stream:
   eventBus.on('commandStack.changed', async () => {
@@ -218,18 +223,6 @@ Object.assign(document.body.style, {
         console.error('failed to save current XML:', err);
       }
   });
-
-
-  // ─── expose services ────────────────────────────────────────────────────────
-  const moddle          = modeler.get('moddle');
-  const elementFactory  = modeler.get('elementFactory');
-  const modeling        = modeler.get('modeling');
-  const elementRegistry = modeler.get('elementRegistry');
-  const selectionService= modeler.get('selection');
-  const canvas          = modeler.get('canvas');
-  const simulation      = createSimulation({ elementRegistry, canvas });
-  window.simulation = simulation;
-  const overlays        = modeler.get('overlays');
 
   // Token list panel for simulation log
   const tokenPanel = window.tokenListPanel
@@ -369,158 +362,6 @@ Object.assign(document.body.style, {
     const tree = build(root);
     window.diagramTree?.treeStream.set(tree);
   }
-
-  // Store IDs of overlays we add so they can be cleaned up on update
-  let addOnOverlayIds = [];
-
-  function updateAddOnOverlays() {
-    // remove previous overlays
-    addOnOverlayIds.forEach(id => overlays.remove(id));
-    addOnOverlayIds = [];
-
-    const processed = new Set();
-
-    elementRegistry.getAll().forEach(el => {
-      if (el.type === 'label' || el.labelTarget) return;
-
-      const bo = el.businessObject;
-      const elementId = bo?.id;
-      if (!elementId || processed.has(elementId)) return;
-      processed.add(elementId);
-
-      const raw = bo?.$attrs?.addOns || bo?.addOns;
-      if (!raw) return;
-
-      let addOns;
-      try {
-        addOns = typeof raw === 'string' ? JSON.parse(raw) : raw;
-      } catch (err) {
-        return;
-      }
-
-      if (!Array.isArray(addOns) || !addOns.length) return;
-
-      const icons = addOns
-        .map(a => typeIcons[a.type] || '')
-        .filter(Boolean)
-        .join('');
-
-      if (!icons) return;
-
-      const badge = document.createElement('div');
-      badge.className = 'addon-overlay';
-      badge.style.background = 'rgba(255, 255, 255, 0.8)';
-      badge.style.borderRadius = '4px';
-      badge.style.padding = '2px';
-      badge.style.fontSize = '14px';
-      badge.innerText = icons;
-
-      const overlayId = overlays.add(el, {
-        position: { top: -10, left: -10 },
-        html: badge
-      });
-      addOnOverlayIds.push(overlayId);
-    });
-  }
-
-  let overlayUpdateScheduled = false;
-  function scheduleOverlayUpdate() {
-    if (overlayUpdateScheduled) return;
-    overlayUpdateScheduled = true;
-    setTimeout(() => {
-      overlayUpdateScheduled = false;
-      updateAddOnOverlays();
-    }, 0);
-  }
-
-  if (window.addOnLegend) {
-    const legendEl = addOnLegend.createAddOnLegend(typeIcons, currentTheme);
-    legendEl.prepend(filterToggleBtn);
-    document.body.appendChild(legendEl);
-  }
-
-  // Highlight nodes matching selected type/subtype
-  const highlightedNodes = new Set();
-
-  function updateHighlightedNodes() {
-    // remove previous markers
-    highlightedNodes.forEach(id => canvas.removeMarker(id, 'bpmn-addOn-highlight'));
-    highlightedNodes.clear();
-
-    const type = selectedType.get();
-    if (!type || !window.addOnStore) return;
-
-    const subtype = selectedSubtype.get();
-    const nodeIds = subtype
-      ? addOnStore.findNodesBySubtype(type, subtype)
-      : addOnStore.findNodesByType(type);
-
-    nodeIds.forEach(id => {
-      canvas.addMarker(id, 'bpmn-addOn-highlight');
-      highlightedNodes.add(id);
-    });
-  }
-
-  selectedType.subscribe(updateHighlightedNodes);
-  selectedSubtype.subscribe(updateHighlightedNodes);
-
-  if (window.addOnStore) {
-    const originalSetAddOns = addOnStore.setAddOns;
-    const originalClear = addOnStore.clear;
-
-    addOnStore.setAddOns = function(nodeId, addOns) {
-      originalSetAddOns(nodeId, addOns);
-      scheduleOverlayUpdate();
-      updateHighlightedNodes();
-    };
-
-    addOnStore.clear = function() {
-      originalClear();
-      scheduleOverlayUpdate();
-      updateHighlightedNodes();
-    };
-  }
-
-  // --- Add-on store helpers -------------------------------------------------
-  function syncAddOnStoreFromElements() {
-    if (!window.addOnStore) return;
-    addOnStore.clear();
-    elementRegistry.getAll().forEach(el => {
-      const bo = el.businessObject;
-      const raw = bo?.$attrs?.addOns || bo?.addOns;
-      if (raw) {
-        try {
-          const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
-          addOnStore.setAddOns(bo.id, data);
-        } catch (err) {
-          console.warn('Failed to parse addOns for', bo.id, err);
-        }
-      }
-    });
-  }
-
-  function applyAddOnsToElements(data) {
-    Object.entries(data || {}).forEach(([id, addOns]) => {
-      const el = elementRegistry.get(id);
-      if (el) {
-        modeling.updateProperties(el, {
-          addOns: JSON.stringify(addOns)
-        });
-      }
-    });
-  }
-
-  function loadAddOnData(data = {}) {
-    if (!window.addOnStore) return;
-    addOnStore.clear();
-    Object.entries(data || {}).forEach(([id, addOns]) => {
-      addOnStore.setAddOns(id, addOns);
-    });
-    applyAddOnsToElements(data);
-    scheduleOverlayUpdate();
-    updateHighlightedNodes();
-  }
-
   // Prompt user to choose path at gateways
   simulation.pathsStream.subscribe(data => {
     if (!data) return;
@@ -985,38 +826,7 @@ function buildDropdownOptions() {
         }
       }
     },
-    {
-      label: logUser.get(),
-      onClick: () => {
-        if (currentUser) {
-          firebase.auth().signOut().then(() => {
-            logUser.set('👤 Login');
-            avatarStream.set('flow.png');
-            showSaveButton.set(false);
-            currentUser = null;
-            window.currentUser = currentUser;
-            rebuildMenu();
-          }).catch(err => {
-            showToast("Logout failed: ", { type: 'error' });
-          });
-        } else {
-          const userStream = reactiveLoginModal(currentTheme);
-          userStream.subscribe(result => {
-            if (result instanceof Error) {
-              showToast("Error: + result.message", { type: 'error' });
-            } else if (result === null) {
-            } else {
-              currentUser = result;
-              window.currentUser = currentUser;
-              logUser.set('👤 Logout');
-              avatarStream.set('flowLoggedIn.png');
-              showSaveButton.set(true);
-              rebuildMenu();
-            }
-          });
-        }
-      }
-    }
+    authMenuOption({ avatarStream, showSaveButton, currentTheme, rebuildMenu })
   ];
 }
 
