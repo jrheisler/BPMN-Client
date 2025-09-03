@@ -3,39 +3,17 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const crypto = require('crypto');
+const { loadSimulation, createSimulationInstance } = require('../helpers/simulation');
 
 function loadEnvironment() {
-  const crypto = require('crypto');
-  const sandbox = {
-    console,
-    setTimeout,
-    clearTimeout,
-    localStorage: {
-      _data: {},
-      getItem(key) { return this._data[key] || null; },
-      setItem(key, val) { this._data[key] = String(val); },
-      removeItem(key) { delete this._data[key]; }
-    },
+  const sandbox = loadSimulation({
     sha256: data => crypto.createHash('sha256').update(data).digest('hex')
-  };
+  });
   sandbox.window = sandbox;
-  const streamCode = fs.readFileSync(path.resolve(__dirname, '../../public/js/core/stream.js'), 'utf8');
-  const simulationCode = fs.readFileSync(path.resolve(__dirname, '../../public/js/core/simulation.js'), 'utf8');
   const blockchainCode = fs.readFileSync(path.resolve(__dirname, '../../public/js/blockchain.js'), 'utf8');
-  vm.runInNewContext(streamCode, sandbox);
-  vm.runInNewContext(simulationCode, sandbox);
   vm.runInNewContext(blockchainCode, sandbox);
   return sandbox;
-}
-
-function createSimulationInstance(sandbox, elements, opts = {}) {
-  const map = new Map(elements.map(e => [e.id, e]));
-  const elementRegistry = {
-    get(id) { return map.get(id); },
-    filter(fn) { return Array.from(map.values()).filter(fn); }
-  };
-  const canvas = { addMarker() {}, removeMarker() {} };
-  return sandbox.createSimulation({ elementRegistry, canvas }, opts);
 }
 
 function buildDiagram() {
@@ -61,7 +39,7 @@ function runToCompletion(sim) {
 
 test('simulation run adds blocks to blockchain', () => {
   const sandbox = loadEnvironment();
-  const sim = createSimulationInstance(sandbox, buildDiagram(), { delay: 0 });
+  const sim = createSimulationInstance(buildDiagram(), { delay: 0 }, sandbox);
   const blockchain = new sandbox.Blockchain();
   let processed = 0;
   sim.tokenLogStream.subscribe(entries => {
@@ -78,7 +56,7 @@ test('simulation run adds blocks to blockchain', () => {
 
 test('resetting simulation and blockchain starts fresh chain', () => {
   const sandbox = loadEnvironment();
-  const sim = createSimulationInstance(sandbox, buildDiagram(), { delay: 0 });
+  const sim = createSimulationInstance(buildDiagram(), { delay: 0 }, sandbox);
   const blockchain = new sandbox.Blockchain();
   let processed = 0;
   sim.tokenLogStream.subscribe(entries => {
