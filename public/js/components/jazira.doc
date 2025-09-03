@@ -428,9 +428,9 @@ Here’s the documentation for the theme-related code you provided:
 
 ---
 
-### `themes` Object
+### `themes.json`
 
-* **Description**: This object defines multiple theme configurations for the application. Each theme contains color settings for UI elements, BPMN (Business Process Model and Notation) styling, and font settings for general text and monospace fonts.
+* **Description**: This JSON file defines multiple theme configurations for the application. Each theme contains color settings for UI elements, BPMN (Business Process Model and Notation) styling, and font settings for general text and monospace fonts.
 * **Properties**:
 
   * **`name`**: The name of the theme (e.g., 'Dark', 'Light', 'Ocean').

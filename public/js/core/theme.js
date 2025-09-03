@@ -1,280 +1,47 @@
 // theme.js
 
-const themes = {
-  dark: {
-    name: 'Dark',
-    colors: {
-      background: '#121212',
-      foreground: '#00ffcc',
-      primary:    '#1e1e1e',
-      accent:     '#ff00ff',
-      surface:    '#1e1e1e',
-      border:     '#666',
-      muted:      '#888888',
-      ok:         '#00e676',
-      warn:       '#ffb300',
-      err:        '#ff5252'
-    },
-    bpmn: {
-      shape:      { fill: '#1e1e1e', stroke: '#666', strokeWidth: 2 },
-      connection: { stroke: '#00ffcc', strokeWidth: 2 },
-      marker:     { fill: '#00ffcc', stroke: '#00ffcc' },
-      label:      { fontFamily: 'system-ui, sans-serif', fill: '#00ffcc' },
-      selected:   { stroke: '#ff00ff', strokeWidth: 3 }
-    },
-    fonts: {
-      base:      'system-ui, sans-serif',
-      monospace: 'monospace'
-    }
-  },
+let themes = {};
 
-  light: {
-    name: 'Light',
-    colors: {
-      background: '#ffffff',
-      foreground: '#222222',
-      primary:    '#f5f5f5',
-      accent:     '#6200ee',
-      surface:    '#f7f7f7',
-      border:     '#ccc',
-      muted:      '#666666',
-      ok:         '#4caf50',
-      warn:       '#fb8c00',
-      err:        '#f44336'
-    },
-    bpmn: {
-      shape:      { fill: '#f7f7f7', stroke: '#ccc', strokeWidth: 2 },
-      connection: { stroke: '#222222', strokeWidth: 2 },
-      marker:     { fill: '#222222', stroke: '#222222' },
-      label:      { fontFamily: 'system-ui, sans-serif', fill: '#222222' },
-      selected:   { stroke: '#6200ee', strokeWidth: 3 }
-    },
-    fonts: {
-      base:      'system-ui, sans-serif',
-      monospace: 'monospace'
-    }
-  },
+const currentTheme = new Stream({ colors: {}, fonts: {} });
+window.currentTheme = currentTheme;
 
-  ocean: {
-    name: 'Ocean',
-    colors: {
-      background: '#0a192f',
-      foreground: '#00ffcc',
-      primary:    '#112240',
-      accent:     '#ff00ff',
-      surface:    '#0e2438',
-      border:     '#1c3a5f',
-      muted:      '#6a7b8c',
-      ok:         '#00e6a8',
-      warn:       '#ffa726',
-      err:        '#ff4d6d'
-    },
-    bpmn: {
-      shape:      { fill: '#0e2438', stroke: '#1c3a5f', strokeWidth: 2 },
-      connection: { stroke: '#00ffcc', strokeWidth: 2 },
-      marker:     { fill: '#00ffcc', stroke: '#00ffcc' },
-      label:      { fontFamily: 'Roboto, sans-serif', fill: '#00ffcc' },
-      selected:   { stroke: '#ff00ff', strokeWidth: 3 }
-    },
-    fonts: {
-      base:      'Roboto, sans-serif',
-      monospace: 'Courier New'
-    }
-  },
-
-  solarizedDark: {
-    name: 'Solarized Dark',
-    colors: {
-      background: '#002b36',
-      foreground: '#00ffcc',
-      primary:    '#073642',
-      accent:     '#ff00ff',
-      surface:    '#003847',
-      border:     '#586e75',
-      muted:      '#93a1a1',
-      ok:         '#859900',
-      warn:       '#b58900',
-      err:        '#dc322f'
-    },
-    bpmn: {
-      shape:      { fill: '#003847', stroke: '#586e75', strokeWidth: 2 },
-      connection: { stroke: '#00ffcc', strokeWidth: 2 },
-      marker:     { fill: '#00ffcc', stroke: '#00ffcc' },
-      label:      { fontFamily: 'Arial, sans-serif', fill: '#00ffcc' },
-      selected:   { stroke: '#ff00ff', strokeWidth: 3 }
-    },
-    fonts: {
-      base:      'Arial, sans-serif',
-      monospace: 'Courier New'
-    }
-  },
-
-  solarizedLight: {
-    name: 'Solarized Light',
-    colors: {
-      background: '#fdf6e3',
-      foreground: '#657b83',
-      primary:    '#eee8d5',
-      accent:     '#268bd2',
-      surface:    '#faf3dc',
-      border:     '#93a1a1',
-      muted:      '#93a1a1',
-      ok:         '#859900',
-      warn:       '#b58900',
-      err:        '#dc322f'
-    },
-    bpmn: {
-      shape:      { fill: '#faf3dc', stroke: '#93a1a1', strokeWidth: 2 },
-      connection: { stroke: '#657b83', strokeWidth: 2 },
-      marker:     { fill: '#657b83', stroke: '#657b83' },
-      label:      { fontFamily: 'Georgia, serif', fill: '#657b83' },
-      selected:   { stroke: '#268bd2', strokeWidth: 3 }
-    },
-    fonts: {
-      base:      'Georgia, serif',
-      monospace: 'Courier'
-    }
-  },
-
-  forest: {
-    name: 'Forest',
-    colors: {
-      background: '#2e3d29',
-      foreground: '#00ffcc',
-      primary:    '#3a4d37',
-      accent:     '#ff00ff',
-      surface:    '#2d4f3a',
-      border:     '#4caf50',
-      muted:      '#99ccb3',
-      ok:         '#4caf50',
-      warn:       '#ffb74d',
-      err:        '#e57373'
-    },
-    bpmn: {
-      shape:      { fill: '#2d4f3a', stroke: '#4caf50', strokeWidth: 2 },
-      connection: { stroke: '#00ffcc', strokeWidth: 2 },
-      marker:     { fill: '#00ffcc', stroke: '#00ffcc' },
-      label:      { fontFamily: 'Verdana, sans-serif', fill: '#00ffcc' },
-      selected:   { stroke: '#ff00ff', strokeWidth: 3 }
-    },
-    fonts: {
-      base:      'Verdana, sans-serif',
-      monospace: 'Menlo'
-    }
-  },
-
-  candy: {
-    name: 'Candy',
-    colors: {
-      background: '#ffeefc',
-      foreground: '#6b006b',
-      primary:    '#ffd6f3',
-      accent:     '#ff69b4',
-      surface:    '#fff0f9',
-      border:     '#ff99cc',
-      muted:      '#b26ba6',
-      ok:         '#66bb6a',
-      warn:       '#ffb74d',
-      err:        '#ef5350'
-    },
-    bpmn: {
-      shape:      { fill: '#fff0f9', stroke: '#ff99cc', strokeWidth: 2 },
-      connection: { stroke: '#6b006b', strokeWidth: 2 },
-      marker:     { fill: '#6b006b', stroke: '#6b006b' },
-      label:      { fontFamily: 'Comic Sans MS, cursive', fill: '#6b006b' },
-      selected:   { stroke: '#ff69b4', strokeWidth: 3 }
-    },
-    fonts: {
-      base:      'Comic Sans MS, cursive',
-      monospace: 'Courier'
-    }
-  },
-
-  midnight: {
-    name: 'Midnight',
-    colors: {
-      background: '#1a1a2e',
-      foreground: '#00ffcc',
-      primary:    '#16213e',
-      accent:     '#ff00ff',
-      surface:    '#202040',
-      border:     '#2a2a5c',
-      muted:      '#7a7a9a',
-      ok:         '#00e676',
-      warn:       '#ffb74d',
-      err:        '#ff5252'
-    },
-    bpmn: {
-      shape:      { fill: '#202040', stroke: '#2a2a5c', strokeWidth: 2 },
-      connection: { stroke: '#00ffcc', strokeWidth: 2 },
-      marker:     { fill: '#00ffcc', stroke: '#00ffcc' },
-      label:      { fontFamily: 'Helvetica Neue, sans-serif', fill: '#00ffcc' },
-      selected:   { stroke: '#ff00ff', strokeWidth: 3 }
-    },
-    fonts: {
-      base:      'Helvetica Neue, sans-serif',
-      monospace: 'Courier New'
-    }
-  },
-
-  retro: {
-    name: 'Retro',
-    colors: {
-      background: '#f4f1bb',
-      foreground: '#2d2d2a',
-      primary:    '#e6beae',
-      accent:     '#9bc1bc',
-      surface:    '#fcecc9',
-      border:     '#c5a880',
-      muted:      '#6e6e69',
-      ok:         '#6b8e23',
-      warn:       '#b8860b',
-      err:        '#8b0000'
-    },
-    bpmn: {
-      shape:      { fill: '#fcecc9', stroke: '#c5a880', strokeWidth: 2 },
-      connection: { stroke: '#2d2d2a', strokeWidth: 2 },
-      marker:     { fill: '#2d2d2a', stroke: '#2d2d2a' },
-      label:      { fontFamily: '"Courier Prime", monospace', fill: '#2d2d2a' },
-      selected:   { stroke: '#9bc1bc', strokeWidth: 3 }
-    },
-    fonts: {
-      base:      '"Courier Prime", monospace',
-      monospace: '"Courier Prime", monospace'
-    }
-  },
-
-  matrix: {
-    name: 'Matrix',
-    colors: {
-      background: '#000000',
-      foreground: '#00ff00',
-      primary:    '#004400',
-      accent:     '#00ff00',
-      surface:    '#002200',
-      border:     '#00aa00',
-      muted:      '#008800',
-      ok:         '#00ff00',
-      warn:       '#ffff00',
-      err:        '#ff0000'
-    },
-    bpmn: {
-      shape:      { fill: '#002200', stroke: '#00aa00', strokeWidth: 2 },
-      connection: { stroke: '#00ff00', strokeWidth: 2 },
-      marker:     { fill: '#00ff00', stroke: '#00ff00' },
-      label:      { fontFamily: '"Share Tech Mono", monospace', fill: '#00ff00' },
-      selected:   { stroke: '#00ff00', strokeWidth: 3 }
-    },
-    fonts: {
-      base:      '"Share Tech Mono", monospace',
-      monospace: '"Share Tech Mono", monospace'
-    }
+function validateThemes(data) {
+  const valid = {};
+  if (!data || typeof data !== 'object') {
+    console.warn('Theme data missing or malformed');
+    return valid;
   }
-};
+  Object.entries(data).forEach(([key, theme]) => {
+    if (
+      theme &&
+      typeof theme === 'object' &&
+      typeof theme.colors === 'object' &&
+      typeof theme.fonts === 'object'
+    ) {
+      valid[key] = theme;
+    } else {
+      console.warn(`Invalid theme entry for "${key}"`);
+    }
+  });
+  return valid;
+}
 
+const themesLoaded = fetch('./js/core/themes.json')
+  .then(r => r.json())
+  .then(json => {
+    themes = validateThemes(json);
+    const initial =
+      themes.dark ||
+      Object.values(themes)[0] ||
+      { colors: {}, fonts: {} };
+    currentTheme.set(initial);
+    return themes;
+  })
+  .catch(err => {
+    console.error('Failed to load themes.json', err);
+  });
 
-
-const currentTheme = new Stream(themes.dark); // Start with dark mode
+window.themesLoaded = themesLoaded;
 
 function applyTheme(el, options = {}) {
   const {
@@ -288,7 +55,6 @@ function applyTheme(el, options = {}) {
   } = options;
 
   currentTheme.subscribe(theme => {
-    // Apply to specific element
     el.style.fontSize = size;
     el.style.fontWeight = weight;
     el.style.color = color || theme.foreground;
@@ -299,24 +65,30 @@ function applyTheme(el, options = {}) {
     el.style.fontFamily = theme.font;
     el.style.border = 'none';
 
-    // 🔁 Also update body styles (global background/text)
     document.body.style.backgroundColor = theme.background;
     document.body.style.color = theme.foreground;
     document.body.style.fontFamily = theme.font;
     document.body.style.transition = 'background-color 0.3s, color 0.3s';
   });
 }
+
 function themeToggleButton() {
   const button = document.createElement('button');
   button.textContent = '🌗 Toggle Theme';
 
   button.onclick = () => {
-    const current = currentTheme.get();
-    const next = current === themes.dark ? themes.light : themes.dark;
-    currentTheme.set(next);
+    themesLoaded.then(() => {
+      const current = currentTheme.get();
+      const next = current === themes.dark ? themes.light : themes.dark;
+      if (next) {
+        currentTheme.set(next);
+      } else {
+        console.warn('Toggle theme failed: themes not loaded');
+      }
+    });
   };
 
-  applyTheme(button, { size: '1rem', weight: 'bold' }); // Optional
+  applyTheme(button, { size: '1rem', weight: 'bold' });
   return button;
 }
 
@@ -331,23 +103,26 @@ function themedThemeSelector(themeStream = currentTheme) {
 
   const select = document.createElement('select');
 
-  Object.entries(themes).forEach(([key, theme]) => {
-    const option = document.createElement('option');
-    option.value = key;
-    option.textContent = theme.name;
-    select.appendChild(option);
+  themesLoaded.then(() => {
+    Object.entries(themes).forEach(([key, theme]) => {
+      const option = document.createElement('option');
+      option.value = key;
+      option.textContent = theme.name || key;
+      select.appendChild(option);
+    });
+
+    const savedKey = localStorage.getItem('theme') || 'dark';
+    const selectedTheme =
+      themes[savedKey] || themes.dark || Object.values(themes)[0];
+    if (selectedTheme) {
+      currentTheme.set(selectedTheme);
+      applyThemeToPage(selectedTheme);
+      select.value = savedKey;
+    }
   });
 
-  // Apply saved or default theme
-  const savedKey = localStorage.getItem('theme') || 'dark';
-  const selectedTheme = themes[savedKey] || themes.dark;
-  currentTheme.set(selectedTheme);
-  applyThemeToPage(selectedTheme);  // Apply the theme globally
-  select.value = savedKey;
-
-  // Apply reactive styles
   function applyStyles(theme) {
-    const { colors, fonts } = theme;
+    const { colors = {}, fonts = {} } = theme;
 
     container.style.color = colors.foreground;
     container.style.fontFamily = fonts.base;
@@ -365,17 +140,19 @@ function themedThemeSelector(themeStream = currentTheme) {
   select.onchange = () => {
     const newKey = select.value;
     const newTheme = themes[newKey];
-    localStorage.setItem('theme', newKey);
-    currentTheme.set(newTheme);  // Update currentTheme stream
-    applyThemeToPage(newTheme);  // Apply the new theme globally
+    if (newTheme) {
+      localStorage.setItem('theme', newKey);
+      currentTheme.set(newTheme);
+      applyThemeToPage(newTheme);
+    } else {
+      console.warn(`Theme "${newKey}" not found`);
+    }
   };
 
   container.appendChild(label);
   container.appendChild(select);
   return container;
 }
-
-
 
 function applyThemeToPage(theme, container = document.body) {
   const colors = theme.colors || {};
@@ -393,7 +170,8 @@ function applyThemeToPage(theme, container = document.body) {
     '--text': colors.text || colors.foreground,
     '--muted': colors.muted || colors.foreground,
     '--accent': colors.accent || colors.foreground,
-    '--accent-2': colors['accent-2'] || colors.accent2 || colors.accent || colors.foreground,
+    '--accent-2':
+      colors['accent-2'] || colors.accent2 || colors.accent || colors.foreground,
     '--border': colors.border || colors.foreground,
     '--ok': colors.ok || colors.accent || colors.foreground,
     '--warn': colors.warn || colors.accent || colors.foreground,
@@ -404,7 +182,7 @@ function applyThemeToPage(theme, container = document.body) {
     container.style.setProperty(key, value);
   });
 
-  // Optional: smooth font weight rendering
   container.style.webkitFontSmoothing = 'antialiased';
   container.style.mozOsxFontSmoothing = 'grayscale';
 }
+
