@@ -219,19 +219,6 @@ Here’s the documentation for the additional functions you provided:
 
 ---
 
-### `groupedDocumentGrid(documentsStream, expandedStream, themeStream = currentTheme, keys = ['title', 'status', 'meta', 'filename'])`
-
-* **Description**: Creates a grid layout that groups documents and allows searching, expanding/collapsing document categories, and controlling the view with buttons. The grid automatically updates based on the stream data.
-* **Parameters**:
-
-  * `documentsStream`: The stream that provides the list of documents to display.
-  * `expandedStream`: The stream that manages the expanded/collapsed state of document categories.
-  * `themeStream`: A stream that provides theme settings for styling.
-  * `keys`: An array of document properties to display in the grid (e.g., `['title', 'status', 'meta', 'filename']`).
-* **Returns**: A `div` containing a searchable, groupable grid layout with expandable document categories.
-
----
-
 ### `gridView(dataStream, options = {}, themeStream = currentTheme)`
 
 * **Description**: Creates a table grid that displays data rows and supports row selection. The grid layout is responsive to the stream's data and theme.
