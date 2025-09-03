@@ -248,22 +248,23 @@ Object.assign(document.body.style, {
   let blockchainPersistPromise = Promise.resolve();
   window.blockchain = blockchain;
 
-  const origStart = simulation.start;
-  simulation.start = (...args) => {
+  function initBlockchain() {
     tokenPanel.hide();
     blockchain = new Blockchain();
     window.blockchain = blockchain;
     processedTokens = 0;
+  }
+
+  const origStart = simulation.start;
+  simulation.start = (...args) => {
+    initBlockchain();
     tokenPanel.show();
     return origStart.apply(simulation, args);
   };
 
   const origReset = simulation.reset;
   simulation.reset = (...args) => {
-    tokenPanel.hide();
-    blockchain = new Blockchain();
-    window.blockchain = blockchain;
-    processedTokens = 0;
+    initBlockchain();
     const res = origReset.apply(simulation, args);
     return res;
   };
