@@ -1,5 +1,7 @@
 import { isAny } from 'bpmn-js/lib/features/modeling/util/ModelingUtil';
 import { is } from 'bpmn-js/lib/util/ModelUtil';
+import inherits from 'inherits';
+import RuleProvider from 'diagram-js/lib/features/rules/RuleProvider';
 
 export default {
   __init__: [ 'attachBoundaryBehavior', 'attachBoundaryRules', 'attachBoundaryContextPad' ],
@@ -27,22 +29,28 @@ function isAttachHost(target) {
 
 // --- Rules: allow shape.attach and create.canExecute='attach' ---
 
-function AttachBoundaryRules(eventBus, rules) {
-  rules.add('shape.attach', (context) => {
+function AttachBoundaryRules(eventBus) {
+  RuleProvider.call(this, eventBus);
+}
+
+inherits(AttachBoundaryRules, RuleProvider);
+
+AttachBoundaryRules.prototype.init = function() {
+  this.addRule('shape.attach', (context) => {
     const { shape, target } = context;
     if (!shape || !target) return false;
     if (!isBoundaryLike(shape)) return false;
     return isAttachHost(target) ? 'attach' : false;
   });
 
-  rules.add('create.canExecute', (context) => {
+  this.addRule('create.canExecute', (context) => {
     const { shape, target } = context;
     if (!shape || !target) return null;
     if (!isBoundaryLike(shape)) return null;
     return isAttachHost(target) ? 'attach' : false;
   });
-}
-AttachBoundaryRules.$inject = [ 'eventBus', 'rules' ];
+};
+AttachBoundaryRules.$inject = [ 'eventBus' ];
 
 // --- Behavior: snap hint + finalize attach on drop ---
 
