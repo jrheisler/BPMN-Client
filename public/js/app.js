@@ -4,7 +4,7 @@ import { logUser, currentUser, authMenuOption } from './auth.js';
 import { initAddOnOverlays } from './addOnOverlays.js';
 import { initAddOnFiltering } from './addOnFiltering.js';
 import BpmnSnapping from 'bpmn-js/lib/features/snapping';
-import AttachBoundaryModule from '../../src/features/attach-boundary/index.js';
+import AttachBoundaryModule from '../features/attach-boundary/index.js';
 
 // js/app.js
   const typeIcons = {
