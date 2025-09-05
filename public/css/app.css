@@ -13,6 +13,13 @@
   filter: drop-shadow(0 0 6px #ff9800);
 }
 
+.djs-element.drop-ok .djs-visual > :nth-child(1) {
+  stroke: #52b415;
+  stroke-width: 4px;
+  fill: rgba(82, 180, 21, 0.3);
+  filter: drop-shadow(0 0 6px #52b415);
+}
+
 .djs-connection.bpmn-addOn-highlight .djs-visual > :nth-child(1) {
   stroke: #ff9800;
   stroke-width: 4px;

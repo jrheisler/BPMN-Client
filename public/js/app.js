@@ -3,6 +3,8 @@ import './components/raciMatrix.js';
 import { logUser, currentUser, authMenuOption } from './auth.js';
 import { initAddOnOverlays } from './addOnOverlays.js';
 import { initAddOnFiltering } from './addOnFiltering.js';
+import BpmnSnapping from 'bpmn-js/lib/features/snapping';
+import AttachBoundaryModule from '../../src/features/attach-boundary/index.js';
 
 // js/app.js
   const typeIcons = {
@@ -171,7 +173,11 @@ Object.assign(document.body.style, {
   // ─── instantiate modeler with navigator only ───────────────────────────────
   const navModule = window.navigatorModule || window.bpmnNavigator;
 
-  const additionalModules = [ customReplaceModule ];
+  const additionalModules = [
+    customReplaceModule,
+    BpmnSnapping,
+    AttachBoundaryModule
+  ];
   if (navModule) additionalModules.push(navModule);
 
   // load custom moddle descriptor for variables and mappings
