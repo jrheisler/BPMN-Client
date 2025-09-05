@@ -1,6 +1,6 @@
 import { isAny } from 'bpmn-js/lib/features/modeling/util/ModelingUtil';
 import { is } from 'bpmn-js/lib/util/ModelUtil';
-import inherits from 'inherits';
+import inherits from 'inherits-browser';
 import RuleProvider from 'diagram-js/lib/features/rules/RuleProvider';
 
 export default {
