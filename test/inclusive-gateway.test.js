@@ -29,6 +29,11 @@ function createSimulationInstance(elements, opts = {}) {
     get(id) { return map.get(id); },
     filter(fn) { return Array.from(map.values()).filter(fn); }
   };
+  for (const el of map.values()) {
+    if (!el.type && el.source && el.target) {
+      el.type = 'bpmn:SequenceFlow';
+    }
+  }
   const canvas = { addMarker() {}, removeMarker() {} };
   const createSimulation = loadSimulation();
   return createSimulation({ elementRegistry, canvas }, opts);
